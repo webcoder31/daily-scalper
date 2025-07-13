@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Daily Scalper - Application de test de stratégies de trading crypto
 Script principal pour exécuter les backtests et analyser les performances.
@@ -240,46 +241,250 @@ class DailyScalper:
             print()
 
 
+def get_user_input(prompt: str, input_type: type = str, default: Any = None) -> Any:
+    """
+    Fonction utilitaire pour obtenir une entrée utilisateur avec validation.
+    
+    Args:
+        prompt: Message à afficher
+        input_type: Type attendu (str, int, float)
+        default: Valeur par défaut
+        
+    Returns:
+        Valeur saisie par l'utilisateur
+    """
+    while True:
+        try:
+            user_input = input(prompt).strip()
+            
+            if not user_input and default is not None:
+                return default
+            
+            if input_type == str:
+                return user_input
+            elif input_type == int:
+                return int(user_input)
+            elif input_type == float:
+                return float(user_input)
+            else:
+                return user_input
+                
+        except ValueError:
+            print(f"❌ Erreur: Veuillez entrer une valeur valide ({input_type.__name__})")
+        except KeyboardInterrupt:
+            print("\n⏹️  Opération annulée")
+            return None
+
+
+def show_menu() -> None:
+    """Affiche le menu principal."""
+    print("\n" + "="*60)
+    print("🚀 DAILY SCALPER - MENU PRINCIPAL")
+    print("="*60)
+    print("1. 🧪 Tester une stratégie")
+    print("2. 🔄 Comparer des stratégies")
+    print("3. 📚 Voir les résultats sauvegardés")
+    print("4. ⚙️  Configuration")
+    print("5. 🚪 Quitter")
+    print("="*60)
+
+
+def test_strategy_menu(app: DailyScalper) -> None:
+    """Menu pour tester une stratégie."""
+    print("\n🧪 TEST DE STRATÉGIE")
+    print("-" * 40)
+    
+    # Paramètres par défaut
+    default_symbol = "BTC-USD"
+    default_period = "1y"
+    default_short = 20
+    default_long = 50
+    
+    # Collecte des paramètres
+    symbol = get_user_input(f"Symbole crypto [{default_symbol}]: ", str, default_symbol)
+    if symbol is None:
+        return
+    
+    print("\nPériodes disponibles: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max")
+    period = get_user_input(f"Période [{default_period}]: ", str, default_period)
+    if period is None:
+        return
+    
+    short_window = get_user_input(f"SMA courte [{default_short}]: ", int, default_short)
+    if short_window is None:
+        return
+    
+    long_window = get_user_input(f"SMA longue [{default_long}]: ", int, default_long)
+    if long_window is None:
+        return
+    
+    show_plots_input = get_user_input("Afficher les graphiques? [o/N]: ", str, "n")
+    if show_plots_input is None:
+        return
+    show_plots = show_plots_input.lower() in ['o', 'oui', 'y', 'yes']
+    
+    save_input = get_user_input("Sauvegarder si profitable? [O/n]: ", str, "o")
+    if save_input is None:
+        return
+    save_if_profitable = save_input.lower() not in ['n', 'non', 'no']
+    
+    try:
+        print(f"\n🚀 Lancement du test...")
+        results = app.run_sma_example(
+            symbol=symbol,
+            period=period,
+            short_window=short_window,
+            long_window=long_window,
+            show_plots=show_plots,
+            save_if_profitable=save_if_profitable
+        )
+        
+        print("\n✅ Test terminé avec succès!")
+        
+    except Exception as e:
+        print(f"\n❌ Erreur lors du test: {e}")
+    
+    input("\nAppuyez sur Entrée pour continuer...")
+
+
+def compare_strategies_menu(app: DailyScalper) -> None:
+    """Menu pour comparer des stratégies."""
+    print("\n🔄 COMPARAISON DE STRATÉGIES")
+    print("-" * 40)
+    
+    # Paramètres par défaut
+    default_symbol = "BTC-USD"
+    default_period = "1y"
+    
+    symbol = get_user_input(f"Symbole crypto [{default_symbol}]: ", str, default_symbol)
+    if symbol is None:
+        return
+    
+    print("\nPériodes disponibles: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max")
+    period = get_user_input(f"Période [{default_period}]: ", str, default_period)
+    if period is None:
+        return
+    
+    try:
+        print(f"\n🔬 Lancement de la comparaison...")
+        app.compare_strategies(symbol=symbol, period=period)
+        print("\n✅ Comparaison terminée!")
+        
+    except Exception as e:
+        print(f"\n❌ Erreur lors de la comparaison: {e}")
+    
+    input("\nAppuyez sur Entrée pour continuer...")
+
+
+def view_saved_results_menu(app: DailyScalper) -> None:
+    """Menu pour voir les résultats sauvegardés."""
+    print("\n📚 RÉSULTATS SAUVEGARDÉS")
+    print("-" * 40)
+    
+    try:
+        app.show_saved_strategies()
+        
+    except Exception as e:
+        print(f"\n❌ Erreur lors de l'affichage: {e}")
+    
+    input("\nAppuyez sur Entrée pour continuer...")
+
+
+def configuration_menu() -> None:
+    """Menu de configuration."""
+    print("\n⚙️  CONFIGURATION")
+    print("-" * 40)
+    print("Configuration actuelle dans config.py:")
+    print()
+    
+    try:
+        # Import des paramètres de configuration
+        from config import (
+            DEFAULT_BACKTEST_CONFIG, 
+            DEFAULT_DATA_CONFIG, 
+            PROFITABILITY_CRITERIA, 
+            VISUALIZATION_CONFIG,
+            POPULAR_CRYPTO_SYMBOLS
+        )
+        
+        # Affichage des paramètres de backtest
+        print("📊 Paramètres de backtest:")
+        print(f"   - Capital initial: {DEFAULT_BACKTEST_CONFIG['initial_cash']:,.2f} USD")
+        print(f"   - Commission: {DEFAULT_BACKTEST_CONFIG['commission']:.3f} ({DEFAULT_BACKTEST_CONFIG['commission']*100:.1f}%)")
+        print(f"   - Slippage: {DEFAULT_BACKTEST_CONFIG['slippage']:.4f} ({DEFAULT_BACKTEST_CONFIG['slippage']*100:.2f}%)")
+        
+        # Affichage des paramètres de données
+        print("\n📈 Configuration des données:")
+        print(f"   - Symbole par défaut: {DEFAULT_DATA_CONFIG['default_symbol']}")
+        print(f"   - Période par défaut: {DEFAULT_DATA_CONFIG['default_period']}")
+        print(f"   - Cache activé: {'Oui' if DEFAULT_DATA_CONFIG['cache_enabled'] else 'Non'}")
+        print(f"   - Durée du cache: {DEFAULT_DATA_CONFIG['cache_max_age_hours']} heures")
+        
+        # Affichage des critères de profitabilité
+        print("\n💰 Critères de profitabilité:")
+        print(f"   - Rendement minimum: {PROFITABILITY_CRITERIA['min_return']:.1%}")
+        print(f"   - Ratio de Sharpe minimum: {PROFITABILITY_CRITERIA['min_sharpe']:.1f}")
+        print(f"   - Drawdown maximum: {PROFITABILITY_CRITERIA['max_drawdown']:.1%}")
+        print(f"   - Nombre minimum de trades: {PROFITABILITY_CRITERIA['min_trades']}")
+        
+        # Affichage des paramètres de visualisation
+        print("\n📊 Configuration de visualisation:")
+        print(f"   - Hauteur par défaut: {VISUALIZATION_CONFIG['default_height']} pixels")
+        print(f"   - Afficher le volume: {'Oui' if VISUALIZATION_CONFIG['show_volume'] else 'Non'}")
+        print(f"   - Afficher les signaux: {'Oui' if VISUALIZATION_CONFIG['show_signals'] else 'Non'}")
+        print(f"   - Afficher les indicateurs: {'Oui' if VISUALIZATION_CONFIG['show_indicators'] else 'Non'}")
+        
+        # Affichage des symboles populaires
+        print(f"\n🪙 Symboles crypto populaires ({len(POPULAR_CRYPTO_SYMBOLS)} disponibles):")
+        print("   ", ", ".join(POPULAR_CRYPTO_SYMBOLS[:10]))
+        if len(POPULAR_CRYPTO_SYMBOLS) > 10:
+            print("   ", f"... et {len(POPULAR_CRYPTO_SYMBOLS) - 10} autres")
+        
+        print("\n🔧 Pour modifier la configuration:")
+        print("   1. Éditez le fichier 'config.py'")
+        print("   2. Redémarrez l'application")
+        print("   3. Les nouveaux paramètres seront appliqués")
+        
+    except Exception as e:
+        print(f"❌ Erreur lors de la lecture de la configuration: {e}")
+    
+    input("\nAppuyez sur Entrée pour continuer...")
+
+
 def main():
-    """Fonction principale."""
+    """Fonction principale avec menu interactif."""
     # Initialisation de l'application
     app = DailyScalper()
     
-    try:
-        # Exemple principal avec BTC
-        print("🎯 EXEMPLE PRINCIPAL - BTC-USD")
-        results = app.run_sma_example(
-            symbol="BTC-USD",
-            period="1y",
-            short_window=20,
-            long_window=50,
-            show_plots=True,
-            save_if_profitable=True
-        )
-        
-        print("\n" + "="*60)
-        
-        # Comparaison de stratégies
-        print("\n🔬 ANALYSE COMPARATIVE")
-        app.compare_strategies(symbol="BTC-USD", period="6mo")
-        
-        print("\n" + "="*60)
-        
-        # Affichage des stratégies sauvegardées
-        print("\n📋 HISTORIQUE")
-        app.show_saved_strategies()
-        
-        print("\n✅ Analyse terminée avec succès!")
-        print("\n💡 Conseils:")
-        print("   - Modifiez les paramètres dans main() pour tester d'autres configurations")
-        print("   - Consultez le dossier 'results/' pour les rapports détaillés")
-        print("   - Les graphiques interactifs s'ouvrent dans votre navigateur")
-        
-    except KeyboardInterrupt:
-        print("\n⏹️  Arrêt demandé par l'utilisateur")
-    except Exception as e:
-        print(f"\n❌ Erreur fatale: {e}")
-        return 1
+    while True:
+        try:
+            show_menu()
+            
+            choice = get_user_input("Choisissez une option (1-5): ", str)
+            
+            if choice is None:  # Ctrl+C
+                break
+            elif choice == "1":
+                test_strategy_menu(app)
+            elif choice == "2":
+                compare_strategies_menu(app)
+            elif choice == "3":
+                view_saved_results_menu(app)
+            elif choice == "4":
+                configuration_menu()
+            elif choice == "5":
+                print("\n👋 Au revoir!")
+                break
+            else:
+                print("\n❌ Option invalide. Veuillez choisir entre 1 et 5.")
+                input("Appuyez sur Entrée pour continuer...")
+                
+        except KeyboardInterrupt:
+            print("\n\n⏹️  Arrêt demandé par l'utilisateur")
+            break
+        except Exception as e:
+            print(f"\n❌ Erreur inattendue: {e}")
+            input("Appuyez sur Entrée pour continuer...")
     
     return 0
 
