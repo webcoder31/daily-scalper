@@ -1,0 +1,36 @@
+# Fichiers de cache de données
+data/*.csv
+data/*.json
+
+# Résultats et rapports
+results/strategies/*.pkl
+results/reports/*.txt
+results/charts/*.html
+
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+.pytest_cache/
+
+# Environnements virtuels
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
