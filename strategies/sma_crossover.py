@@ -84,7 +84,7 @@ class SMACrossoverStrategy(BaseStrategy):
         long_window = self.parameters['long_window']
         
         return (f"Stratégie de croisement de moyennes mobiles simples "
-                f"(SMA {short_window} / SMA {long_window}). "
+                f"(SMA {short_window} / SMA {long_window}).\n"
                 f"Achat quand SMA{short_window} > SMA{long_window}, "
                 f"vente quand SMA{short_window} < SMA{long_window}.")
     

@@ -42,7 +42,7 @@ class Visualizer:
             rows=3, cols=1,
             shared_xaxes=True,
             vertical_spacing=0.05,
-            subplot_titles=('Prix et Signaux', 'Valeur du Portfolio', 'Volume'),
+            subplot_titles=('Prix et Signaux', 'Valeur du Portfeuille', 'Volume'),
             row_heights=[0.5, 0.3, 0.2]
         )
         
@@ -55,8 +55,8 @@ class Visualizer:
                 low=data['Low'],
                 close=data['Close'],
                 name='Prix',
-                increasing_line_color='green',
-                decreasing_line_color='red'
+                increasing_line_color='#2ca02c',  # Green
+                decreasing_line_color='#d62728'   # Red
             ),
             row=1, col=1
         )
@@ -80,6 +80,7 @@ class Visualizer:
         
         # Signaux d'achat et de vente
         if show_signals:
+            
             # Signaux d'achat
             buy_points = data[buy_signals]
             if not buy_points.empty:
@@ -91,8 +92,8 @@ class Visualizer:
                         marker=dict(
                             symbol='triangle-up',
                             size=12,
-                            color='green',
-                            line=dict(color='darkgreen', width=2)
+                            color='#2ca02c',  # Green
+                            line=dict(color='#1f5f1f', width=2)  # Dark green
                         ),
                         name='Achat',
                         hovertemplate='Achat: %{y:.2f}<br>Date: %{x}<extra></extra>'
@@ -111,8 +112,8 @@ class Visualizer:
                         marker=dict(
                             symbol='triangle-down',
                             size=12,
-                            color='red',
-                            line=dict(color='darkred', width=2)
+                            color='#d62728',  # Red
+                            line=dict(color='#8b1a1a', width=2)  # Dark red
                         ),
                         name='Vente',
                         hovertemplate='Vente: %{y:.2f}<br>Date: %{x}<extra></extra>'
@@ -127,7 +128,7 @@ class Visualizer:
                 x=portfolio_value.index,
                 y=portfolio_value.values,
                 name='Valeur Portfolio',
-                line=dict(color='blue', width=2),
+                line=dict(color='#1f77b4', width=2),  # Blue
                 hovertemplate='Valeur: $%{y:,.2f}<br>Date: %{x}<extra></extra>'
             ),
             row=2, col=1
@@ -137,7 +138,7 @@ class Visualizer:
         fig.add_hline(
             y=results['parameters']['initial_cash'],
             line_dash="dash",
-            line_color="gray",
+            line_color="#7f7f7f",  # Gray
             annotation_text="Capital initial",
             row=2, col=1
         )
@@ -148,7 +149,7 @@ class Visualizer:
                 x=data.index,
                 y=data['Volume'],
                 name='Volume',
-                marker_color='lightblue',
+                marker_color='#aec7e8',  # Light blue
                 opacity=0.7
             ),
             row=3, col=1
@@ -157,7 +158,7 @@ class Visualizer:
         # Mise en forme
         fig.update_layout(
             title=f"Backtest: {strategy['name']} - Rendement: {results['metrics']['total_return']:.2%}",
-            xaxis_title="Date",
+            # xaxis_title="Date",
             height=800,
             showlegend=True,
             hovermode='x unified'
@@ -216,7 +217,7 @@ class Visualizer:
             theta=categories,
             fill='toself',
             name='Performance',
-            line_color='blue'
+            line_color='#1f77b4'  # Blue
         ))
         
         fig.update_layout(
@@ -253,8 +254,8 @@ class Visualizer:
                 x=drawdown.index,
                 y=drawdown.values * 100,  # Conversion en pourcentage
                 fill='tonexty',
-                fillcolor='rgba(255, 0, 0, 0.3)',
-                line_color='red',
+                fillcolor='rgba(214, 39, 40, 0.3)',  # Light red
+                line_color='#d62728',  # Red
                 name='Drawdown',
                 hovertemplate='Drawdown: %{y:.2f}%<br>Date: %{x}<extra></extra>'
             ))
@@ -267,7 +268,7 @@ class Visualizer:
             )
             
             # Ligne de référence à 0
-            fig.add_hline(y=0, line_dash="dash", line_color="gray")
+            fig.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")  # Gray
             
             return fig
             

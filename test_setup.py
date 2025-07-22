@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Script de test pour vérifier l'installation et le bon fonctionnement
 de l'application Daily Scalper.
