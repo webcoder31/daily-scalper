@@ -51,6 +51,7 @@ class DailyScalper:
             style="bold bright_green"
         ))
     
+
     def _display_results(self, results: Dict[str, Any]) -> None:
         """
         Display backtest results.
@@ -177,6 +178,7 @@ class DailyScalper:
         ))
         console.print()
 
+
     def backtest_strategy(
             self, 
             symbol: str = "BTC-USD",
@@ -262,6 +264,7 @@ class DailyScalper:
             console.print(f"❌ Error during execution: {e}", style="red")
             raise
     
+
     def compare_strategies(
             self, 
             symbol: str = "BTC-USD",
@@ -378,30 +381,37 @@ class DailyScalper:
             console.print(ranking_table)
         else:
             console.print("❌ No valid results obtained for comparison.", style="red")
-            
+
+
     def show_saved_strategies(self) -> None:
         """Display saved strategies with simple formatting."""
-
-        status_text = "No saved strategies" if not self.strategy_saver.has_saved_strategies() else f"{len(strategies)} saved strategy(s)"
+        
+        # Get list of saved strategies
+        strategies = self.strategy_saver.list_saved_strategies()
+        
+        # Create status text
+        status_text = "No saved strategies" if not strategies else f"{len(strategies)} saved strategy(s)"
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
+            Text(status_text, justify="center"),
             title=f"SAVED STRATEGIES",
-            padding=(1, 1), 
+            padding=(1, 1),
             style="bold bright_magenta"
         ))
+        console.print(status_text, style="bold blue")
         console.print()
         
         if not strategies:
-            console.print("\nNo saved strategies.", style="blue")
-            console.print("Run profitable backtests to create some.")
             return
-        
-        console.print(f"List of best strategies:", style="bold")
-        
-        # Table of saved strategies
-        saved_table = Table(box=box.ROUNDED, style="blue", border_style="blue", width=120)
+
+        # Table of saved best strategies
+        saved_table = Table(
+            box=box.ROUNDED, 
+            style="blue", 
+            border_style="blue", 
+            title="[bold bright_magenta]LIST OF BEST STRATEGIES[/bold bright_magenta]",
+            width=120)
         saved_table.add_column("ID", style="bold bright_blue", width=8)
         saved_table.add_column("Stratégie", style="bold bright_blue", width=18)
         saved_table.add_column("Rendement", justify="right", style="bright_blue", width=15)
@@ -431,8 +441,6 @@ class DailyScalper:
         
         if len(strategies) > 10:
             console.print(f"{len(strategies) - 10} additional strategy(s) available...", style="dim")
-        
-        console.print("=" * 120, style="dim")
 
 
 def get_user_input(prompt: str, input_type: type = str, default: Any = None) -> Any:
