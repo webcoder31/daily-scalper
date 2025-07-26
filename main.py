@@ -25,7 +25,7 @@ from rich import box
 
 from strategies import SMACrossoverStrategy
 from backtest import BacktestEngine, PerformanceMetrics
-from utils import DataLoader, Visualizer, StrategySaver
+from utils import DataLoader, Visualizer, StrategySaver, PeriodTranslator
 
 # Initialize rich console
 console = Console(width=120)
@@ -202,7 +202,7 @@ class DailyScalper:
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover {short_window}/{long_window}\nPaire : {symbol}, Période: {period}", justify="center"), 
+            Text(f"SMA Crossover {short_window}/{long_window}\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
             title=f"BACKTEST D'UNE STRATÉGIE",
             padding=(1, 1), 
             style="bold bright_magenta"
@@ -276,7 +276,7 @@ class DailyScalper:
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover\nPaire : {symbol}, Période: {period}", justify="center"), 
+            Text(f"SMA Crossover\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
             title=f"COMPARAISON DE STRATÉGIES",
             padding=(1, 1), 
             style="bold bright_magenta"
@@ -385,7 +385,7 @@ class DailyScalper:
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover\nPaire : {symbol}, Période: {period}", justify="center"), 
+            Text(f"SMA Crossover\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
             title=f"STRATÉGIES SAUVEGARDÉES",
             padding=(1, 1), 
             style="bold bright_magenta"
@@ -501,8 +501,8 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     if symbol is None:
         return
     
-    console.print("Périodes disponibles: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max", style="dim")
-    period = get_user_input(f"Période [{default_period}]: ", str, default_period)
+    console.print(f"Périodes disponibles: {PeriodTranslator.get_available_periods()}", style="dim")
+    period = get_user_input(f"Période [{PeriodTranslator.get_period_description(default_period)}]: ", str, default_period)
     if period is None:
         return
     
@@ -555,8 +555,8 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     if symbol is None:
         return
     
-    console.print("Périodes disponibles: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max", style="dim")
-    period = get_user_input(f"Période [{default_period}]: ", str, default_period)
+    console.print(f"Périodes disponibles: {PeriodTranslator.get_available_periods()}", style="dim")
+    period = get_user_input(f"Période [{PeriodTranslator.get_period_description(default_period)}]: ", str, default_period)
     if period is None:
         return
     
@@ -622,7 +622,7 @@ def view_configuration_menu() -> None:
         data_table.add_column("Valeur", justify="right", style="bright_blue", width=50)
         
         data_table.add_row("Symbole par défaut", DEFAULT_DATA_CONFIG['default_symbol'])
-        data_table.add_row("Période par défaut", DEFAULT_DATA_CONFIG['default_period'])
+        data_table.add_row("Période par défaut", PeriodTranslator.get_period_description(DEFAULT_DATA_CONFIG['default_period']))
         data_table.add_row("Cache activé", 'Oui' if DEFAULT_DATA_CONFIG['cache_enabled'] else 'Non')
         data_table.add_row("Durée du cache", f"{DEFAULT_DATA_CONFIG['cache_max_age_hours']} heures")
         

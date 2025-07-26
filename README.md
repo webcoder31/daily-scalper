@@ -179,7 +179,7 @@ from utils import DataLoader
 
 # 1. Charger les données
 loader = DataLoader()
-data = loader.get_data('BTC-USD', period='1y')
+data = loader.get_data('BTC-USD', period='1y')  # 1y = 1 an
 
 # 2. Créer la stratégie
 strategy = SMACrossoverStrategy(short_window=10, long_window=20)
@@ -204,7 +204,7 @@ from utils import DataLoader, Visualizer
 
 # Charger les données
 loader = DataLoader()
-data = loader.get_data('ETH-USD', period='6mo')
+data = loader.get_data('ETH-USD', period='6mo')  # 6mo = 6 mois
 
 # Créer les stratégies
 sma_strategy = SMACrossoverStrategy(short_window=5, long_window=15)
@@ -233,7 +233,7 @@ from backtest import BacktestEngine
 from utils import DataLoader
 
 loader = DataLoader()
-data = loader.get_data('BTC-USD', period='1y')
+data = loader.get_data('BTC-USD', period='1y')  # 1y = 1 an
 engine = BacktestEngine(initial_cash=10000)
 
 best_return = 0
@@ -311,7 +311,7 @@ python test_setup.py
 ```
 
 #### 4. Performance lente
-- Réduire la période de données (`period='3mo'` au lieu de `period='5y'`)
+- Réduire la période de données (`period='3mo'` (3 mois) au lieu de `period='5y'` (5 ans))
 - Activer le cache dans la configuration
 - Utiliser des paramètres de stratégie moins complexes
 

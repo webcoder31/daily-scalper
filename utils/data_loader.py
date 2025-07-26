@@ -35,7 +35,7 @@ class DataLoader:
         
         Args:
             symbol: Symbole de la crypto (ex: "BTC-USD", "ETH-USD")
-            period: Période des données ("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max")
+            period: Période des données ("1d" (1 jour), "5d" (5 jours), "1mo" (1 mois), "3mo" (3 mois), "6mo" (6 mois), "1y" (1 an), "2y" (2 ans), "5y" (5 ans), "10y" (10 ans), "ytd" (depuis début d'année), "max" (maximum))
             start_date: Date de début (format 'YYYY-MM-DD')
             end_date: Date de fin (format 'YYYY-MM-DD')
             use_cache: Utiliser le cache local

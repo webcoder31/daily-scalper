@@ -107,7 +107,7 @@ daily-scalper/
 ### 1. Chargement des Données
 ```python
 # DataLoader récupère les données via yfinance
-data = loader.load_crypto_data("BTC-USD", period="1y")
+data = loader.load_crypto_data("BTC-USD", period="1y")  # 1y = 1 an
 # Validation automatique et cache local
 ```
 

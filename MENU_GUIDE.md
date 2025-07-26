@@ -16,7 +16,7 @@ Le menu principal propose 5 options :
 - Permet de tester une stratégie SMA Crossover avec des paramètres personnalisés
 - Vous pouvez choisir :
   - Le symbole crypto (ex: BTC-USD, ETH-USD)
-  - La période d'analyse (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)
+  - La période d'analyse (1d (1 jour), 5d (5 jours), 1mo (1 mois), 3mo (3 mois), 6mo (6 mois), 1y (1 an), 2y (2 ans), 5y (5 ans), 10y (10 ans), ytd (depuis début d'année), max (maximum))
   - Les paramètres SMA (courte et longue)
   - Affichage des graphiques
   - Sauvegarde automatique si profitable
