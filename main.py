@@ -21,6 +21,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from rich.prompt import Prompt, IntPrompt, FloatPrompt, Confirm
 from rich import box
 
 from strategies import SMACrossoverStrategy
@@ -436,7 +437,7 @@ class DailyScalper:
 
 def get_user_input(prompt: str, input_type: type = str, default: Any = None) -> Any:
     """
-    Fonction utilitaire pour obtenir une entrée utilisateur avec validation.
+    Fonction utilitaire pour obtenir une entrée utilisateur avec validation utilisant Rich.
     
     Args:
         prompt: Message à afficher
@@ -446,27 +447,19 @@ def get_user_input(prompt: str, input_type: type = str, default: Any = None) -> 
     Returns:
         Valeur saisie par l'utilisateur
     """
-    while True:
-        try:
-            user_input = input(prompt).strip()
+    try:
+        if input_type == str:
+            return Prompt.ask(prompt, default=default)
+        elif input_type == int:
+            return IntPrompt.ask(prompt, default=default)
+        elif input_type == float:
+            return FloatPrompt.ask(prompt, default=default)
+        else:
+            return Prompt.ask(prompt, default=default)
             
-            if not user_input and default is not None:
-                return default
-            
-            if input_type == str:
-                return user_input
-            elif input_type == int:
-                return int(user_input)
-            elif input_type == float:
-                return float(user_input)
-            else:
-                return user_input
-                
-        except ValueError:
-            console.print(f"❌ Erreur: Veuillez entrer une valeur valide ({input_type.__name__})", style="red")
-        except KeyboardInterrupt:
-            console.print("\n⏹️ Opération annulée", style="yellow")
-            return None
+    except KeyboardInterrupt:
+        console.print("\n⏹️ Opération annulée", style="yellow")
+        return None
 
 
 def show_main_menu() -> None:
@@ -497,32 +490,30 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     default_long = 50
     
     # Collecte des paramètres
-    symbol = get_user_input(f"Symbole crypto [{default_symbol}]: ", str, default_symbol)
+    symbol = get_user_input("Symbole crypto", str, default_symbol)
     if symbol is None:
         return
     
     console.print(f"Périodes disponibles: {PeriodTranslator.get_available_periods()}", style="dim")
-    period = get_user_input(f"Période [{PeriodTranslator.get_period_description(default_period)}]: ", str, default_period)
+    period = get_user_input("Période", str, default_period)
     if period is None:
         return
     
-    short_window = get_user_input(f"SMA courte [{default_short}]: ", int, default_short)
+    short_window = get_user_input("SMA courte", int, default_short)
     if short_window is None:
         return
     
-    long_window = get_user_input(f"SMA longue [{default_long}]: ", int, default_long)
+    long_window = get_user_input("SMA longue", int, default_long)
     if long_window is None:
         return
     
-    show_plots_input = get_user_input("Afficher les graphiques? [o/N]: ", str, "n")
-    if show_plots_input is None:
+    show_plots = Confirm.ask("Afficher les graphiques?", default=False)
+    if show_plots is None:
         return
-    show_plots = show_plots_input.lower() in ['o', 'oui', 'y', 'yes', 'true']
     
-    save_input = get_user_input("Sauvegarder si profitable? [O/n]: ", str, "o")
-    if save_input is None:
+    save_if_profitable = Confirm.ask("Sauvegarder si profitable?", default=True)
+    if save_if_profitable is None:
         return
-    save_if_profitable = save_input.lower() not in ['n', 'non', 'no', 'false']
     
     try:
         console.print("\nLancement du test...", style="bold blue")
@@ -540,7 +531,7 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     except Exception as e:
         console.print(f"❌ Erreur lors du test: {e}", style="red")
     
-    input("\nAppuyez sur Entrée pour continuer...")
+    Prompt.ask("\nAppuyez sur Entrée pour continuer")
 
 
 def compare_strategies_menu(app: DailyScalper) -> None:
@@ -551,12 +542,12 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     default_symbol = "BTC-USD"
     default_period = "1y"
     
-    symbol = get_user_input(f"Symbole crypto [{default_symbol}]: ", str, default_symbol)
+    symbol = get_user_input("Symbole crypto", str, default_symbol)
     if symbol is None:
         return
     
     console.print(f"Périodes disponibles: {PeriodTranslator.get_available_periods()}", style="dim")
-    period = get_user_input(f"Période [{PeriodTranslator.get_period_description(default_period)}]: ", str, default_period)
+    period = get_user_input("Période", str, default_period)
     if period is None:
         return
     
@@ -568,7 +559,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     except Exception as e:
         console.print(f"❌ Erreur lors de la comparaison: {e}", style="red")
     
-    input("\nAppuyez sur Entrée pour continuer...")
+    Prompt.ask("\nAppuyez sur Entrée pour continuer")
 
 
 def view_saved_results_menu(app: DailyScalper) -> None:
@@ -579,7 +570,7 @@ def view_saved_results_menu(app: DailyScalper) -> None:
     except Exception as e:
         console.print(f"❌ Erreur lors de l'affichage: {e}", style="red")
     
-    input("\nAppuyez sur Entrée pour continuer...")
+    Prompt.ask("\nAppuyez sur Entrée pour continuer")
 
 
 def view_configuration_menu() -> None:
@@ -659,7 +650,7 @@ def view_configuration_menu() -> None:
     except Exception as e:
         console.print(f"❌ Erreur lors de la lecture de la configuration: {e}", style="red")
     
-    input("\nAppuyez sur Entrée pour continuer...")
+    Prompt.ask("\nAppuyez sur Entrée pour continuer")
 
 
 def main():
@@ -672,7 +663,7 @@ def main():
         try:
             show_main_menu()
             
-            choice = get_user_input("Choisissez une option (1-5): ", str)
+            choice = get_user_input("Choisissez une option (1-5)", str)
             
             if choice is None:  # Ctrl+C
                 break
@@ -689,14 +680,14 @@ def main():
                 break
             else:
                 console.print("❌ Option invalide. Veuillez choisir entre 1 et 5.", style="red")
-                input("Appuyez sur Entrée pour continuer...")
+                Prompt.ask("Appuyez sur Entrée pour continuer")
                 
         except KeyboardInterrupt:
             console.print("\n\nArrêt demandé par l'utilisateur", style="yellow")
             break
         except Exception as e:
             console.print(f"❌ Erreur inattendue: {e}", style="red")
-            input("Appuyez sur Entrée pour continuer...")
+            Prompt.ask("Appuyez sur Entrée pour continuer")
     
     return 0
 
