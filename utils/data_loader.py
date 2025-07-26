@@ -1,5 +1,5 @@
 """
-Module pour charger les données de marché via yfinance.
+Module for loading market data via yfinance.
 """
 
 from typing import Optional, List
@@ -11,15 +11,15 @@ import os
 
 class DataLoader:
     """
-    Classe pour charger et gérer les données de marché.
+    Class for loading and managing market data.
     """
     
     def __init__(self, cache_dir: str = "data"):
         """
-        Initialise le chargeur de données.
+        Initializes the data loader.
         
         Args:
-            cache_dir: Répertoire pour le cache des données
+            cache_dir: Directory for data cache
         """
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
@@ -31,36 +31,36 @@ class DataLoader:
                         end_date: Optional[str] = None,
                         use_cache: bool = True) -> pd.DataFrame:
         """
-        Charge les données de cryptomonnaie depuis yfinance.
+        Loads cryptocurrency data from yfinance.
         
         Args:
-            symbol: Symbole de la crypto (ex: "BTC-USD", "ETH-USD")
-            period: Période des données ("1d" (1 jour), "5d" (5 jours), "1mo" (1 mois), "3mo" (3 mois), "6mo" (6 mois), "1y" (1 an), "2y" (2 ans), "5y" (5 ans), "10y" (10 ans), "ytd" (depuis début d'année), "max" (maximum))
-            start_date: Date de début (format 'YYYY-MM-DD')
-            end_date: Date de fin (format 'YYYY-MM-DD')
-            use_cache: Utiliser le cache local
+            symbol: Crypto symbol (e.g., "BTC-USD", "ETH-USD")
+            period: Data period ("1d" (1 day), "5d" (5 days), "1mo" (1 month), "3mo" (3 months), "6mo" (6 months), "1y" (1 year), "2y" (2 years), "5y" (5 years), "10y" (10 years), "ytd" (year to date), "max" (maximum))
+            start_date: Start date (format 'YYYY-MM-DD')
+            end_date: End date (format 'YYYY-MM-DD')
+            use_cache: Use local cache
             
         Returns:
-            DataFrame avec les données OHLCV
+            DataFrame with OHLCV data
         """
-        # Nom du fichier cache
+        # Cache filename
         cache_file = os.path.join(self.cache_dir, f"{symbol}_{period}.csv")
         
-        # Vérifier le cache
+        # Check cache
         if use_cache and os.path.exists(cache_file):
             try:
                 data = pd.read_csv(cache_file, index_col=0, parse_dates=True)
-                print(f"Données chargées depuis le cache: {cache_file}")
+                print(f"Data loaded from cache: {cache_file}")
                 
-                # Vérifier si les données sont récentes (moins de 1 jour)
+                # Check if data is recent (less than 1 day)
                 if self._is_cache_recent(cache_file):
                     return self._validate_and_clean_data(data)
             except Exception as e:
-                print(f"Erreur lors du chargement du cache: {e}")
+                print(f"Error loading from cache: {e}")
         
-        # Télécharger les données depuis yfinance
+        # Download data from yfinance
         try:
-            print(f"Téléchargement des données pour {symbol}...")
+            print(f"Downloading data for {symbol}...")
             ticker = yf.Ticker(symbol)
             
             if start_date and end_date:
@@ -69,28 +69,28 @@ class DataLoader:
                 data = ticker.history(period=period)
             
             if data.empty:
-                raise ValueError(f"Aucune donnée trouvée pour {symbol}")
+                raise ValueError(f"No data found for {symbol}")
             
-            # Sauvegarder dans le cache
+            # Save to cache
             if use_cache:
                 data.to_csv(cache_file)
-                print(f"Données sauvegardées dans le cache: {cache_file}")
+                print(f"Data saved to cache: {cache_file}")
             
             return self._validate_and_clean_data(data)
             
         except Exception as e:
-            raise RuntimeError(f"Erreur lors du téléchargement des données: {e}")
+            raise RuntimeError(f"Error downloading data: {e}")
     
     def _is_cache_recent(self, cache_file: str, max_age_hours: int = 24) -> bool:
         """
-        Vérifie si le fichier cache est récent.
+        Checks if the cache file is recent.
         
         Args:
-            cache_file: Chemin du fichier cache
-            max_age_hours: Âge maximum en heures
+            cache_file: Cache file path
+            max_age_hours: Maximum age in hours
             
         Returns:
-            True si le cache est récent, False sinon
+            True if cache is recent, False otherwise
         """
         try:
             file_time = datetime.fromtimestamp(os.path.getmtime(cache_file))
@@ -101,47 +101,47 @@ class DataLoader:
     
     def _validate_and_clean_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """
-        Valide et nettoie les données.
+        Validates and cleans the data.
         
         Args:
-            data: DataFrame brut
+            data: Raw DataFrame
             
         Returns:
-            DataFrame nettoyé et validé
+            Cleaned and validated DataFrame
         """
-        # Vérifier les colonnes requises
+        # Check required columns
         required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         missing_columns = [col for col in required_columns if col not in data.columns]
         
         if missing_columns:
-            raise ValueError(f"Colonnes manquantes: {missing_columns}")
+            raise ValueError(f"Missing columns: {missing_columns}")
         
-        # Supprimer les lignes avec des valeurs manquantes
+        # Remove rows with missing values
         data = data.dropna()
         
-        # Vérifier qu'il reste des données
+        # Check that data remains
         if data.empty:
-            raise ValueError("Aucune donnée valide après nettoyage")
+            raise ValueError("No valid data after cleaning")
         
-        # Trier par date
+        # Sort by date
         data = data.sort_index()
         
-        # Vérifier la cohérence des prix (High >= Low, etc.)
+        # Check price consistency (High >= Low, etc.)
         invalid_rows = (data['High'] < data['Low']) | (data['High'] < data['Close']) | (data['Low'] > data['Close'])
         if invalid_rows.any():
-            print(f"Attention: {invalid_rows.sum()} lignes avec des prix incohérents supprimées")
+            print(f"Warning: {invalid_rows.sum()} rows with inconsistent prices removed")
             data = data[~invalid_rows]
         
-        print(f"Données chargées: {len(data)} points de {data.index[0].strftime('%Y-%m-%d')} à {data.index[-1].strftime('%Y-%m-%d')}")
+        print(f"Data loaded: {len(data)} points from {data.index[0].strftime('%Y-%m-%d')} to {data.index[-1].strftime('%Y-%m-%d')}")
         
         return data
     
     def get_available_symbols(self) -> List[str]:
         """
-        Retourne une liste des symboles crypto populaires.
+        Returns a list of popular crypto symbols.
         
         Returns:
-            Liste des symboles disponibles
+            List of available symbols
         """
         return [
             "BTC-USD", "ETH-USD", "BNB-USD", "XRP-USD", "ADA-USD",
@@ -151,12 +151,12 @@ class DataLoader:
     
     def clear_cache(self) -> None:
         """
-        Supprime tous les fichiers de cache.
+        Deletes all cache files.
         """
         try:
             for file in os.listdir(self.cache_dir):
                 if file.endswith('.csv'):
                     os.remove(os.path.join(self.cache_dir, file))
-            print("Cache supprimé avec succès")
+            print("Cache successfully deleted")
         except Exception as e:
-            print(f"Erreur lors de la suppression du cache: {e}")
+            print(f"Error deleting cache: {e}")

@@ -1,35 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script de test pour vérifier l'installation et le bon fonctionnement
-de l'application Daily Scalper.
+Test script to verify the installation and proper functioning
+of the Daily Scalper application.
 """
 
 import sys
 import os
 import traceback
 
-# Ajout du répertoire racine au path
+# Add root directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 def test_imports():
-    """Teste l'importation de tous les modules."""
-    print("🧪 Test des imports...")
+    """Tests the import of all modules."""
+    print("🧪 Testing imports...")
     
     try:
-        # Test des imports principaux
+        # Test main imports
         from strategies import BaseStrategy, SMACrossoverStrategy
         from backtest import BacktestEngine, PerformanceMetrics
         from utils import DataLoader, Visualizer, StrategySaver
-        print("✅ Tous les modules importés avec succès")
+        print("✅ All modules imported successfully")
         return True
     except ImportError as e:
-        print(f"❌ Erreur d'import: {e}")
+        print(f"❌ Import error: {e}")
         return False
 
 def test_dependencies():
-    """Teste la disponibilité des dépendances."""
-    print("\n📦 Test des dépendances...")
+    """Tests the availability of dependencies."""
+    print("\n📦 Testing dependencies...")
     
     dependencies = [
         'pandas', 'numpy', 'yfinance', 'plotly', 'vectorbt'
@@ -41,67 +41,67 @@ def test_dependencies():
             __import__(dep)
             print(f"✅ {dep}")
         except ImportError:
-            print(f"❌ {dep} - MANQUANT")
+            print(f"❌ {dep} - MISSING")
             missing.append(dep)
     
     if missing:
-        print(f"\n⚠️  Dépendances manquantes: {', '.join(missing)}")
-        print("Installez-les avec: pip install -r requirements.txt")
+        print(f"\n⚠️  Missing dependencies: {', '.join(missing)}")
+        print("Install them with: pip install -r requirements.txt")
         return False
     
     return True
 
 def test_strategy_creation():
-    """Teste la création d'une stratégie."""
-    print("\n🎯 Test de création de stratégie...")
+    """Tests the creation of a strategy."""
+    print("\n🎯 Testing strategy creation...")
     
     try:
         from strategies import SMACrossoverStrategy
         
         strategy = SMACrossoverStrategy(short_window=10, long_window=20)
-        print(f"✅ Stratégie créée: {strategy.name}")
+        print(f"✅ Strategy created: {strategy.name}")
         print(f"   Description: {strategy.get_description()}")
-        print(f"   Paramètres: {strategy.get_parameters()}")
+        print(f"   Parameters: {strategy.get_parameters()}")
         return True
     except Exception as e:
-        print(f"❌ Erreur lors de la création de stratégie: {e}")
+        print(f"❌ Error creating strategy: {e}")
         return False
 
 def test_data_loading():
-    """Teste le chargement de données (sans téléchargement réel)."""
-    print("\n📥 Test de chargement de données...")
+    """Tests data loading (without actual downloading)."""
+    print("\n📥 Testing data loading...")
     
     try:
         from utils import DataLoader
         
         loader = DataLoader()
         symbols = loader.get_available_symbols()
-        print(f"✅ DataLoader initialisé")
-        print(f"   Symboles disponibles: {len(symbols)} (ex: {symbols[:3]})")
+        print(f"✅ DataLoader initialized")
+        print(f"   Available symbols: {len(symbols)} (e.g.: {symbols[:3]})")
         return True
     except Exception as e:
-        print(f"❌ Erreur lors de l'initialisation du DataLoader: {e}")
+        print(f"❌ Error initializing DataLoader: {e}")
         return False
 
 def test_backtest_engine():
-    """Teste l'initialisation du moteur de backtest."""
-    print("\n⚡ Test du moteur de backtest...")
+    """Tests the initialization of the backtest engine."""
+    print("\n⚡ Testing backtest engine...")
     
     try:
         from backtest import BacktestEngine
         
         engine = BacktestEngine(initial_cash=10000, commission=0.001)
-        print(f"✅ BacktestEngine initialisé")
-        print(f"   Capital initial: ${engine.initial_cash:,.2f}")
+        print(f"✅ BacktestEngine initialized")
+        print(f"   Initial capital: ${engine.initial_cash:,.2f}")
         print(f"   Commission: {engine.commission:.3%}")
         return True
     except Exception as e:
-        print(f"❌ Erreur lors de l'initialisation du BacktestEngine: {e}")
+        print(f"❌ Error initializing BacktestEngine: {e}")
         return False
 
 def test_file_structure():
-    """Vérifie la structure des fichiers."""
-    print("\n📁 Test de la structure des fichiers...")
+    """Checks the file structure."""
+    print("\n📁 Testing file structure...")
     
     required_dirs = ['data', 'results', 'strategies', 'backtest', 'utils']
     required_files = ['main.py', 'requirements.txt', 'README.md']
@@ -110,23 +110,23 @@ def test_file_structure():
     
     for directory in required_dirs:
         if os.path.exists(directory):
-            print(f"✅ Dossier {directory}/")
+            print(f"✅ Directory {directory}/")
         else:
-            print(f"❌ Dossier {directory}/ - MANQUANT")
+            print(f"❌ Directory {directory}/ - MISSING")
             all_good = False
     
     for file in required_files:
         if os.path.exists(file):
-            print(f"✅ Fichier {file}")
+            print(f"✅ File {file}")
         else:
-            print(f"❌ Fichier {file} - MANQUANT")
+            print(f"❌ File {file} - MISSING")
             all_good = False
     
     return all_good
 
 def run_mini_backtest():
-    """Exécute un mini backtest avec des données simulées."""
-    print("\n🚀 Test d'un mini backtest...")
+    """Runs a mini backtest with simulated data."""
+    print("\n🚀 Testing mini backtest...")
     
     try:
         import pandas as pd
@@ -135,11 +135,11 @@ def run_mini_backtest():
         from strategies import SMACrossoverStrategy
         from backtest import BacktestEngine
         
-        # Création de données simulées
+        # Creating simulated data
         dates = pd.date_range(start='2023-01-01', end='2023-12-31', freq='D')
         np.random.seed(42)
         
-        # Simulation d'un prix avec tendance
+        # Price simulation with trend
         price_base = 30000
         returns = np.random.normal(0.001, 0.02, len(dates))
         prices = [price_base]
@@ -147,7 +147,7 @@ def run_mini_backtest():
         for ret in returns[1:]:
             prices.append(prices[-1] * (1 + ret))
         
-        # Création du DataFrame
+        # Creating DataFrame
         data = pd.DataFrame({
             'Open': prices,
             'High': [p * (1 + abs(np.random.normal(0, 0.01))) for p in prices],
@@ -156,41 +156,41 @@ def run_mini_backtest():
             'Volume': np.random.randint(1000, 10000, len(dates))
         }, index=dates)
         
-        # Ajustement High/Low
+        # Adjusting High/Low
         data['High'] = np.maximum(data['High'], data[['Open', 'Close']].max(axis=1))
         data['Low'] = np.minimum(data['Low'], data[['Open', 'Close']].min(axis=1))
         
-        # Test de la stratégie
+        # Testing strategy
         strategy = SMACrossoverStrategy(short_window=10, long_window=20)
         engine = BacktestEngine(initial_cash=10000)
         
         results = engine.run_backtest(strategy, data)
         
-        print(f"✅ Mini backtest réussi!")
-        print(f"   Rendement: {results['metrics']['total_return']:.2%}")
+        print(f"✅ Mini backtest successful!")
+        print(f"   Return: {results['metrics']['total_return']:.2%}")
         print(f"   Trades: {results['metrics']['total_trades']}")
-        print(f"   Période: {len(data)} jours")
+        print(f"   Period: {len(data)} days")
         
         return True
         
     except Exception as e:
-        print(f"❌ Erreur lors du mini backtest: {e}")
+        print(f"❌ Error during mini backtest: {e}")
         traceback.print_exc()
         return False
 
 def main():
-    """Fonction principale de test."""
+    """Main test function."""
     print("=" * 60)
-    print("🧪 DAILY SCALPER - TESTS DE VALIDATION")
+    print("🧪 DAILY SCALPER - VALIDATION TESTS")
     print("=" * 60)
     
     tests = [
         ("Imports", test_imports),
-        ("Dépendances", test_dependencies),
-        ("Structure fichiers", test_file_structure),
-        ("Création stratégie", test_strategy_creation),
-        ("Chargement données", test_data_loading),
-        ("Moteur backtest", test_backtest_engine),
+        ("Dependencies", test_dependencies),
+        ("File structure", test_file_structure),
+        ("Strategy creation", test_strategy_creation),
+        ("Data loading", test_data_loading),
+        ("Backtest engine", test_backtest_engine),
         ("Mini backtest", run_mini_backtest),
     ]
     
@@ -202,21 +202,21 @@ def main():
             if test_func():
                 passed += 1
         except Exception as e:
-            print(f"❌ {test_name} - ERREUR CRITIQUE: {e}")
+            print(f"❌ {test_name} - CRITICAL ERROR: {e}")
     
     print("\n" + "=" * 60)
-    print(f"📊 RÉSULTATS: {passed}/{total} tests réussis")
+    print(f"📊 RESULTS: {passed}/{total} tests passed")
     
     if passed == total:
-        print("🎉 Tous les tests sont passés! L'application est prête.")
-        print("\n💡 Pour démarrer l'application:")
+        print("🎉 All tests passed! The application is ready.")
+        print("\n💡 To start the application:")
         print("   python main.py")
     else:
-        print("⚠️  Certains tests ont échoué. Vérifiez les erreurs ci-dessus.")
-        print("\n🔧 Actions recommandées:")
-        print("   1. Installez les dépendances: pip install -r requirements.txt")
-        print("   2. Vérifiez la structure des fichiers")
-        print("   3. Relancez les tests: python test_setup.py")
+        print("⚠️  Some tests failed. Check the errors above.")
+        print("\n🔧 Recommended actions:")
+        print("   1. Install dependencies: pip install -r requirements.txt")
+        print("   2. Check file structure")
+        print("   3. Run tests again: python test_setup.py")
     
     print("=" * 60)
     return 0 if passed == total else 1

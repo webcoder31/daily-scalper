@@ -1,5 +1,5 @@
 """
-Stratégie RSI (Relative Strength Index) - Exemple d'extension.
+RSI Strategy (Relative Strength Index) - Extension example.
 """
 
 from typing import Dict, Any, Tuple
@@ -10,10 +10,10 @@ from .base_strategy import BaseStrategy
 
 class RSIStrategy(BaseStrategy):
     """
-    Stratégie basée sur l'indicateur RSI (Relative Strength Index).
+    Strategy based on the RSI (Relative Strength Index) indicator.
     
-    Signal d'achat: RSI < seuil_bas (survente)
-    Signal de vente: RSI > seuil_haut (surachat)
+    Buy signal: RSI < lower threshold (oversold)
+    Sell signal: RSI > upper threshold (overbought)
     """
     
     def __init__(self, 
@@ -22,13 +22,13 @@ class RSIStrategy(BaseStrategy):
                  overbought_threshold: float = 70,
                  **kwargs):
         """
-        Initialise la stratégie RSI.
+        Initialize the RSI strategy.
         
         Args:
-            period: Période pour le calcul du RSI
-            oversold_threshold: Seuil de survente (signal d'achat)
-            overbought_threshold: Seuil de surachat (signal de vente)
-            **kwargs: Paramètres supplémentaires
+            period: Period for RSI calculation
+            oversold_threshold: Oversold threshold (buy signal)
+            overbought_threshold: Overbought threshold (sell signal)
+            **kwargs: Additional parameters
         """
         parameters = {
             'period': period,
@@ -38,40 +38,40 @@ class RSIStrategy(BaseStrategy):
         }
         super().__init__('RSI Strategy', parameters)
         
-        # Validation des paramètres
+        # Parameter validation
         if not (0 < oversold_threshold < overbought_threshold < 100):
-            raise ValueError("Les seuils doivent respecter: 0 < oversold < overbought < 100")
+            raise ValueError("Thresholds must respect: 0 < oversold < overbought < 100")
         if period < 2:
-            raise ValueError("La période doit être supérieure à 1")
+            raise ValueError("Period must be greater than 1")
     
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
         """
-        Génère les signaux d'achat et de vente basés sur le RSI.
+        Generate buy and sell signals based on RSI.
         
         Args:
-            data: DataFrame avec les données OHLCV
+            data: DataFrame with OHLCV data
             
         Returns:
-            Tuple contenant les signaux d'entrée et de sortie
+            Tuple containing entry and exit signals
         """
         if not self.validate_data(data):
-            raise ValueError("Données invalides: colonnes OHLCV requises")
+            raise ValueError("Invalid data: OHLCV columns required")
         
         period = self.parameters['period']
         oversold = self.parameters['oversold_threshold']
         overbought = self.parameters['overbought_threshold']
         
-        # Calcul du RSI
+        # Calculate RSI
         rsi = self._calculate_rsi(data['Close'], period)
         
-        # Signaux basés sur les seuils
-        # Signal d'achat: RSI passe en-dessous du seuil de survente
+        # Signals based on thresholds
+        # Buy signal: RSI goes below the oversold threshold
         buy_signals = (rsi < oversold) & (rsi.shift(1) >= oversold)
         
-        # Signal de vente: RSI passe au-dessus du seuil de surachat
+        # Sell signal: RSI goes above the overbought threshold
         sell_signals = (rsi > overbought) & (rsi.shift(1) <= overbought)
         
-        # Stockage des indicateurs pour visualisation
+        # Store indicators for visualization
         self.indicators = {
             'rsi': rsi,
             'oversold_line': pd.Series(oversold, index=data.index),
@@ -82,27 +82,27 @@ class RSIStrategy(BaseStrategy):
     
     def _calculate_rsi(self, prices: pd.Series, period: int) -> pd.Series:
         """
-        Calcule l'indicateur RSI.
+        Calculate the RSI indicator.
         
         Args:
-            prices: Série des prix de clôture
-            period: Période pour le calcul
+            prices: Series of closing prices
+            period: Period for calculation
             
         Returns:
-            Série du RSI
+            RSI series
         """
-        # Calcul des variations de prix
+        # Calculate price changes
         delta = prices.diff()
         
-        # Séparation des gains et pertes
+        # Separate gains and losses
         gains = delta.where(delta > 0, 0)
         losses = -delta.where(delta < 0, 0)
         
-        # Moyennes mobiles exponentielles des gains et pertes
+        # Exponential moving averages of gains and losses
         avg_gains = gains.ewm(span=period, adjust=False).mean()
         avg_losses = losses.ewm(span=period, adjust=False).mean()
         
-        # Calcul du RSI
+        # Calculate RSI
         rs = avg_gains / avg_losses
         rsi = 100 - (100 / (1 + rs))
         
@@ -110,24 +110,24 @@ class RSIStrategy(BaseStrategy):
     
     def get_description(self) -> str:
         """
-        Retourne une description de la stratégie.
+        Return a description of the strategy.
         
         Returns:
-            Description de la stratégie RSI
+            Description of the RSI strategy
         """
         period = self.parameters['period']
         oversold = self.parameters['oversold_threshold']
         overbought = self.parameters['overbought_threshold']
         
-        return (f"Stratégie RSI avec période {period}. "
-                f"Achat quand RSI < {oversold} (survente), "
-                f"vente quand RSI > {overbought} (surachat).")
+        return (f"RSI Strategy with period {period}. "
+                f"Buy when RSI < {oversold} (oversold), "
+                f"sell when RSI > {overbought} (overbought).")
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Retourne les indicateurs calculés pour la visualisation.
+        Return the calculated indicators for visualization.
         
         Returns:
-            Dictionnaire des indicateurs techniques
+            Dictionary of technical indicators
         """
         return getattr(self, 'indicators', {})

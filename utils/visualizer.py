@@ -1,5 +1,5 @@
 """
-Module de visualisation des résultats de backtest.
+Module for visualizing backtest results.
 """
 
 from typing import Dict, Any, Optional
@@ -11,7 +11,7 @@ import plotly.express as px
 
 class Visualizer:
     """
-    Classe pour créer des visualisations interactives des résultats de backtest.
+    Class for creating interactive visualizations of backtest results.
     """
     
     @staticmethod
@@ -20,16 +20,16 @@ class Visualizer:
                             show_indicators: bool = True,
                             save_path: Optional[str] = None) -> go.Figure:
         """
-        Crée un graphique interactif des résultats de backtest.
+        Creates an interactive chart of backtest results.
         
         Args:
-            results: Résultats du backtest
-            show_signals: Afficher les signaux d'achat/vente
-            show_indicators: Afficher les indicateurs techniques
-            save_path: Chemin pour sauvegarder le graphique (optionnel)
+            results: Backtest results
+            show_signals: Show buy/sell signals
+            show_indicators: Show technical indicators
+            save_path: Path to save the chart (optional)
             
         Returns:
-            Figure plotly
+            Plotly figure
         """
         data = results['data']
         portfolio = results['portfolio']
@@ -37,16 +37,16 @@ class Visualizer:
         sell_signals = results['sell_signals']
         strategy = results['strategy']
         
-        # Création des sous-graphiques
+        # Create subplots
         fig = make_subplots(
             rows=3, cols=1,
             shared_xaxes=True,
             vertical_spacing=0.05,
-            subplot_titles=('Prix et Signaux', 'Valeur du Portfeuille', 'Volume'),
+            subplot_titles=('Price and Signals', 'Portfolio Value', 'Volume'),
             row_heights=[0.5, 0.3, 0.2]
         )
         
-        # 1. Graphique des prix avec chandelier
+        # 1. Price chart with candlestick
         fig.add_trace(
             go.Candlestick(
                 x=data.index,
@@ -54,14 +54,14 @@ class Visualizer:
                 high=data['High'],
                 low=data['Low'],
                 close=data['Close'],
-                name='Prix',
+                name='Price',
                 increasing_line_color='#2ca02c',  # Green
                 decreasing_line_color='#d62728'   # Red
             ),
             row=1, col=1
         )
         
-        # Indicateurs techniques (si disponibles)
+        # Technical indicators (if available)
         if show_indicators and hasattr(results.get('strategy_instance'), 'get_indicators'):
             try:
                 indicators = results['strategy_instance'].get_indicators()
@@ -78,10 +78,10 @@ class Visualizer:
             except:
                 pass
         
-        # Signaux d'achat et de vente
+        # Buy and sell signals
         if show_signals:
             
-            # Signaux d'achat
+            # Buy signals
             buy_points = data[buy_signals]
             if not buy_points.empty:
                 fig.add_trace(
@@ -95,13 +95,13 @@ class Visualizer:
                             color='#2ca02c',  # Green
                             line=dict(color='#1f5f1f', width=2)  # Dark green
                         ),
-                        name='Achat',
-                        hovertemplate='Achat: %{y:.2f}<br>Date: %{x}<extra></extra>'
+                        name='Buy',
+                        hovertemplate='Buy: %{y:.2f}<br>Date: %{x}<extra></extra>'
                     ),
                     row=1, col=1
                 )
             
-            # Signaux de vente
+            # Sell signals
             sell_points = data[sell_signals]
             if not sell_points.empty:
                 fig.add_trace(
@@ -115,31 +115,31 @@ class Visualizer:
                             color='#d62728',  # Red
                             line=dict(color='#8b1a1a', width=2)  # Dark red
                         ),
-                        name='Vente',
-                        hovertemplate='Vente: %{y:.2f}<br>Date: %{x}<extra></extra>'
+                        name='Sell',
+                        hovertemplate='Sell: %{y:.2f}<br>Date: %{x}<extra></extra>'
                     ),
                     row=1, col=1
                 )
         
-        # 2. Valeur du portfolio
+        # 2. Portfolio value
         portfolio_value = portfolio.value()
         fig.add_trace(
             go.Scatter(
                 x=portfolio_value.index,
                 y=portfolio_value.values,
-                name='Valeur Portfolio',
+                name='Portfolio Value',
                 line=dict(color='#1f77b4', width=2),  # Blue
-                hovertemplate='Valeur: $%{y:,.2f}<br>Date: %{x}<extra></extra>'
+                hovertemplate='Value: $%{y:,.2f}<br>Date: %{x}<extra></extra>'
             ),
             row=2, col=1
         )
         
-        # Ligne de référence (capital initial)
+        # Reference line (initial capital)
         fig.add_hline(
             y=results['parameters']['initial_cash'],
             line_dash="dash",
             line_color="#7f7f7f",  # Gray
-            annotation_text="Capital initial",
+            annotation_text="Initial capital",
             row=2, col=1
         )
         
@@ -155,61 +155,61 @@ class Visualizer:
             row=3, col=1
         )
         
-        # Mise en forme
+        # Formatting
         fig.update_layout(
-            title=f"Backtest: {strategy['name']} - Rendement: {results['metrics']['total_return']:.2%}",
+            title=f"Backtest: {strategy['name']} - Return: {results['metrics']['total_return']:.2%}",
             # xaxis_title="Date",
             height=800,
             showlegend=True,
             hovermode='x unified'
         )
         
-        # Axes Y
-        fig.update_yaxes(title_text="Prix ($)", row=1, col=1)
-        fig.update_yaxes(title_text="Valeur ($)", row=2, col=1)
+        # Y axes
+        fig.update_yaxes(title_text="Price ($)", row=1, col=1)
+        fig.update_yaxes(title_text="Value ($)", row=2, col=1)
         fig.update_yaxes(title_text="Volume", row=3, col=1)
         
-        # Suppression du sélecteur de plage pour le chandelier
+        # Remove range selector for candlestick
         fig.update_layout(xaxis_rangeslider_visible=False)
         
-        # Sauvegarde si demandée
+        # Save if requested
         if save_path:
             fig.write_html(save_path)
-            print(f"Graphique sauvegardé: {save_path}")
+            print(f"Chart saved: {save_path}")
         
         return fig
     
     @staticmethod
     def plot_performance_metrics(results: Dict[str, Any]) -> go.Figure:
         """
-        Crée un graphique des métriques de performance.
+        Creates a chart of performance metrics.
         
         Args:
-            results: Résultats du backtest
+            results: Backtest results
             
         Returns:
-            Figure plotly avec les métriques
+            Plotly figure with metrics
         """
         metrics = results['metrics']
         
-        # Préparation des données pour le graphique radar
+        # Prepare data for radar chart
         categories = [
-            'Rendement Total',
-            'Ratio Sharpe',
-            'Taux de Réussite',
-            'Facteur de Profit',
+            'Total Return',
+            'Sharpe Ratio',
+            'Win Rate',
+            'Profit Factor',
             'Alpha vs B&H'
         ]
         
         values = [
-            min(metrics['total_return'] * 100, 100),  # Normalisation
-            min(metrics['sharpe_ratio'] * 20, 100),   # Normalisation
+            min(metrics['total_return'] * 100, 100),  # Normalization
+            min(metrics['sharpe_ratio'] * 20, 100),   # Normalization
             metrics['win_rate'] * 100,
-            min(metrics['profit_factor'] * 20, 100),  # Normalisation
-            min((metrics['alpha'] + 0.5) * 100, 100) # Normalisation
+            min(metrics['profit_factor'] * 20, 100),  # Normalization
+            min((metrics['alpha'] + 0.5) * 100, 100) # Normalization
         ]
         
-        # Graphique radar
+        # Radar chart
         fig = go.Figure()
         
         fig.add_trace(go.Scatterpolar(
@@ -227,7 +227,7 @@ class Visualizer:
                     range=[0, 100]
                 )),
             showlegend=False,
-            title="Métriques de Performance (Normalisées)"
+            title="Performance Metrics (Normalized)"
         )
         
         return fig
@@ -235,13 +235,13 @@ class Visualizer:
     @staticmethod
     def plot_drawdown(results: Dict[str, Any]) -> go.Figure:
         """
-        Crée un graphique du drawdown.
+        Creates a drawdown chart.
         
         Args:
-            results: Résultats du backtest
+            results: Backtest results
             
         Returns:
-            Figure plotly du drawdown
+            Plotly figure of drawdown
         """
         portfolio = results['portfolio']
         
@@ -252,7 +252,7 @@ class Visualizer:
             
             fig.add_trace(go.Scatter(
                 x=drawdown.index,
-                y=drawdown.values * 100,  # Conversion en pourcentage
+                y=drawdown.values * 100,  # Convert to percentage
                 fill='tonexty',
                 fillcolor='rgba(214, 39, 40, 0.3)',  # Light red
                 line_color='#d62728',  # Red
@@ -261,34 +261,34 @@ class Visualizer:
             ))
             
             fig.update_layout(
-                title="Évolution du Drawdown",
+                title="Drawdown Evolution",
                 xaxis_title="Date",
                 yaxis_title="Drawdown (%)",
                 hovermode='x'
             )
             
-            # Ligne de référence à 0
+            # Reference line at 0
             fig.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")  # Gray
             
             return fig
             
         except Exception as e:
-            print(f"Erreur lors de la création du graphique drawdown: {e}")
-            return go.Figure().add_annotation(text="Erreur: impossible de calculer le drawdown")
+            print(f"Error creating drawdown chart: {e}")
+            return go.Figure().add_annotation(text="Error: unable to calculate drawdown")
     
     @staticmethod
     def show_all_plots(results: Dict[str, Any]) -> None:
         """
-        Affiche tous les graphiques de performance.
+        Displays all performance charts.
         
         Args:
-            results: Résultats du backtest
+            results: Backtest results
         """
-        # Graphique principal
+        # Main chart
         main_fig = Visualizer.plot_backtest_results(results)
         main_fig.show()
         
-        # Métriques de performance
+        # Performance metrics
         metrics_fig = Visualizer.plot_performance_metrics(results)
         metrics_fig.show()
         

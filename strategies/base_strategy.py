@@ -1,5 +1,5 @@
 """
-Classe de base pour toutes les stratégies de trading.
+Base class for all trading strategies.
 """
 
 from abc import ABC, abstractmethod
@@ -10,19 +10,19 @@ import numpy as np
 
 class BaseStrategy(ABC):
     """
-    Classe abstraite de base pour toutes les stratégies de trading.
+    Abstract base class for all trading strategies.
     
-    Toutes les stratégies doivent hériter de cette classe et implémenter
-    les méthodes abstraites requises.
+    All strategies must inherit from this class and implement
+    the required abstract methods.
     """
     
     def __init__(self, name: str, parameters: Dict[str, Any] = None):
         """
-        Initialise la stratégie de base.
+        Initialize the base strategy.
         
         Args:
-            name: Nom de la stratégie
-            parameters: Paramètres de configuration de la stratégie
+            name: Name of the strategy
+            parameters: Configuration parameters for the strategy
         """
         self.name = name
         self.parameters = parameters or {}
@@ -31,63 +31,63 @@ class BaseStrategy(ABC):
     @abstractmethod
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
         """
-        Génère les signaux d'achat et de vente basés sur les données.
+        Generate buy and sell signals based on data.
         
         Args:
-            data: DataFrame avec les données OHLCV
+            data: DataFrame with OHLCV data
             
         Returns:
-            Tuple contenant les signaux d'entrée et de sortie (buy_signals, sell_signals)
+            Tuple containing entry and exit signals (buy_signals, sell_signals)
         """
         pass
     
     @abstractmethod
     def get_description(self) -> str:
         """
-        Retourne une description de la stratégie.
+        Return a description of the strategy.
         
         Returns:
-            Description textuelle de la stratégie
+            Textual description of the strategy
         """
         pass
     
     def validate_data(self, data: pd.DataFrame) -> bool:
         """
-        Valide que les données contiennent les colonnes requises.
+        Validate that the data contains the required columns.
         
         Args:
-            data: DataFrame à valider
+            data: DataFrame to validate
             
         Returns:
-            True si les données sont valides, False sinon
+            True if the data is valid, False otherwise
         """
         required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         return all(col in data.columns for col in required_columns)
     
     def get_parameters(self) -> Dict[str, Any]:
         """
-        Retourne les paramètres de la stratégie.
+        Return the strategy parameters.
         
         Returns:
-            Dictionnaire des paramètres
+            Dictionary of parameters
         """
         return self.parameters.copy()
     
     def set_parameters(self, parameters: Dict[str, Any]) -> None:
         """
-        Met à jour les paramètres de la stratégie.
+        Update the strategy parameters.
         
         Args:
-            parameters: Nouveaux paramètres
+            parameters: New parameters
         """
         self.parameters.update(parameters)
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        Convertit la stratégie en dictionnaire pour la sauvegarde.
+        Convert the strategy to a dictionary for saving.
         
         Returns:
-            Dictionnaire représentant la stratégie
+            Dictionary representing the strategy
         """
         return {
             'name': self.name,

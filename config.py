@@ -1,15 +1,15 @@
 """
-Configuration globale pour l'application Daily Scalper.
+Global configuration for the Daily Scalper application.
 """
 
-# Configuration par défaut pour les backtests
+# Default configuration for backtests
 DEFAULT_BACKTEST_CONFIG = {
     'initial_cash': 10000.0,
     'commission': 0.001,  # 0.1%
     'slippage': 0.0001,   # 0.01%
 }
 
-# Configuration pour la récupération des données
+# Configuration for data retrieval
 DEFAULT_DATA_CONFIG = {
     'default_symbol': 'BTC-USD',
     'default_period': '1y',
@@ -17,15 +17,15 @@ DEFAULT_DATA_CONFIG = {
     'cache_max_age_hours': 24,
 }
 
-# Critères pour considérer une stratégie comme profitable
+# Criteria for considering a strategy as profitable
 PROFITABILITY_CRITERIA = {
     'min_return': 0.1,      # 10% minimum
     'min_sharpe': 1.0,      # Sharpe ratio minimum
     'max_drawdown': 0.2,    # 20% maximum
-    'min_trades': 5,        # Minimum de trades
+    'min_trades': 5,        # Minimum number of trades
 }
 
-# Configuration de visualisation
+# Visualization configuration
 VISUALIZATION_CONFIG = {
     'default_height': 800,
     'show_volume': True,
@@ -33,7 +33,7 @@ VISUALIZATION_CONFIG = {
     'show_indicators': True,
 }
 
-# Symboles crypto populaires
+# Popular crypto symbols
 POPULAR_CRYPTO_SYMBOLS = [
     "BTC-USD", "ETH-USD", "BNB-USD", "XRP-USD", "ADA-USD",
     "SOL-USD", "DOGE-USD", "DOT-USD", "AVAX-USD", "SHIB-USD",

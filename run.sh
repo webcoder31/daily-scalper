@@ -1,22 +1,22 @@
 #!/bin/bash
-# Daily Scalper - Script de démarrage rapide
-# Ce script configure l'environnement virtuel et lance l'application
+# Daily Scalper - Quick start script
+# This script sets up the virtual environment and launches the application
 
-echo "🚀 Configuration de Daily Scalper..."
+echo "🚀 Setting up Daily Scalper..."
 
-# Créer l'environnement virtuel s'il n'existe pas
+# Create virtual environment if it doesn't exist
 if [ ! -d "venv" ]; then
-    echo "Création de l'environnement virtuel..."
+    echo "Creating virtual environment..."
     python3 -m venv venv
 fi
 
-# Activer l'environnement virtuel et installer les dépendances
-echo "Activation de l'environnement virtuel et installation des dépendances..."
+# Activate virtual environment and install dependencies
+echo "Activating virtual environment and installing dependencies..."
 source venv/bin/activate
 pip install -r requirements.txt
 
-echo "✅ Configuration terminée! Démarrage de Daily Scalper..."
+echo "✅ Setup complete! Starting Daily Scalper..."
 echo ""
 
-# Lancer l'application
+# Launch application
 python main.py

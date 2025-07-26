@@ -1,5 +1,5 @@
 """
-Module pour sauvegarder et charger les stratégies performantes.
+Module for saving and loading high-performing strategies.
 """
 
 import json
@@ -12,20 +12,20 @@ import pandas as pd
 
 class StrategySaver:
     """
-    Classe pour sauvegarder et gérer les stratégies performantes.
+    Class for saving and managing high-performing strategies.
     """
     
     def __init__(self, results_dir: str = "results"):
         """
-        Initialise le gestionnaire de sauvegarde.
+        Initializes the save manager.
         
         Args:
-            results_dir: Répertoire pour sauvegarder les résultats
+            results_dir: Directory for saving results
         """
         self.results_dir = results_dir
         os.makedirs(results_dir, exist_ok=True)
         
-        # Sous-dossiers
+        # Subdirectories
         self.strategies_dir = os.path.join(results_dir, "strategies")
         self.reports_dir = os.path.join(results_dir, "reports")
         self.charts_dir = os.path.join(results_dir, "charts")
@@ -37,21 +37,21 @@ class StrategySaver:
                             results: Dict[str, Any], 
                             save_charts: bool = True) -> str:
         """
-        Sauvegarde les résultats d'une stratégie.
+        Saves the results of a strategy.
         
         Args:
-            results: Résultats du backtest
-            save_charts: Sauvegarder les graphiques
+            results: Backtest results
+            save_charts: Save charts
             
         Returns:
-            ID unique de la sauvegarde
+            Unique save ID
         """
-        # Génération d'un ID unique
+        # Generate a unique ID
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         strategy_name = results['strategy']['name'].replace(' ', '_').lower()
         save_id = f"{strategy_name}_{timestamp}"
         
-        # Préparation des données à sauvegarder
+        # Prepare data to save
         save_data = {
             'save_id': save_id,
             'timestamp': timestamp,
@@ -61,33 +61,33 @@ class StrategySaver:
             'parameters': results['parameters']
         }
         
-        # Sauvegarde JSON (métadonnées)
+        # Save JSON (metadata)
         json_file = os.path.join(self.strategies_dir, f"{save_id}.json")
         with open(json_file, 'w', encoding='utf-8') as f:
             json.dump(save_data, f, indent=2, ensure_ascii=False, default=str)
         
-        # Sauvegarde Pickle (données complètes)
+        # Save Pickle (full data)
         pickle_file = os.path.join(self.strategies_dir, f"{save_id}.pkl")
         with open(pickle_file, 'wb') as f:
             pickle.dump(results, f)
         
-        # Sauvegarde du rapport textuel
+        # Save text report
         self._save_text_report(results, save_id)
         
-        # Sauvegarde des graphiques
+        # Save charts
         if save_charts:
             self._save_charts(results, save_id)
         
-        print(f"Stratégie sauvegardée avec l'ID: {save_id}")
+        print(f"Strategy saved with ID: {save_id}")
         return save_id
     
     def _save_text_report(self, results: Dict[str, Any], save_id: str) -> None:
         """
-        Sauvegarde un rapport textuel.
+        Saves a text report.
         
         Args:
-            results: Résultats du backtest
-            save_id: ID de sauvegarde
+            results: Backtest results
+            save_id: Save ID
         """
         from backtest.performance_metrics import PerformanceMetrics
         
@@ -99,63 +99,63 @@ class StrategySaver:
     
     def _save_charts(self, results: Dict[str, Any], save_id: str) -> None:
         """
-        Sauvegarde les graphiques.
+        Saves the charts.
         
         Args:
-            results: Résultats du backtest
-            save_id: ID de sauvegarde
+            results: Backtest results
+            save_id: Save ID
         """
         try:
             from utils.visualizer import Visualizer
             
-            # Graphique principal
+            # Main chart
             main_chart = os.path.join(self.charts_dir, f"{save_id}_main.html")
             fig = Visualizer.plot_backtest_results(results, save_path=main_chart)
             
-            # Graphique des métriques
+            # Metrics chart
             metrics_chart = os.path.join(self.charts_dir, f"{save_id}_metrics.html")
             metrics_fig = Visualizer.plot_performance_metrics(results)
             metrics_fig.write_html(metrics_chart)
             
-            # Graphique du drawdown
+            # Drawdown chart
             drawdown_chart = os.path.join(self.charts_dir, f"{save_id}_drawdown.html")
             drawdown_fig = Visualizer.plot_drawdown(results)
             drawdown_fig.write_html(drawdown_chart)
             
         except Exception as e:
-            print(f"Erreur lors de la sauvegarde des graphiques: {e}")
+            print(f"Error while saving charts: {e}")
     
     def load_strategy_results(self, save_id: str) -> Optional[Dict[str, Any]]:
         """
-        Charge les résultats d'une stratégie sauvegardée.
+        Loads the results of a saved strategy.
         
         Args:
-            save_id: ID de la sauvegarde
+            save_id: Save ID
             
         Returns:
-            Résultats chargés ou None si non trouvé
+            Loaded results or None if not found
         """
         pickle_file = os.path.join(self.strategies_dir, f"{save_id}.pkl")
         
         if not os.path.exists(pickle_file):
-            print(f"Stratégie non trouvée: {save_id}")
+            print(f"Strategy not found: {save_id}")
             return None
         
         try:
             with open(pickle_file, 'rb') as f:
                 results = pickle.load(f)
-            print(f"Stratégie chargée: {save_id}")
+            print(f"Strategy loaded: {save_id}")
             return results
         except Exception as e:
-            print(f"Erreur lors du chargement: {e}")
+            print(f"Error while loading: {e}")
             return None
     
     def list_saved_strategies(self) -> List[Dict[str, Any]]:
         """
-        Liste toutes les stratégies sauvegardées.
+        Lists all saved strategies.
         
         Returns:
-            Liste des métadonnées des stratégies
+            List of strategy metadata
         """
         strategies = []
         
@@ -166,9 +166,9 @@ class StrategySaver:
                         strategy_data = json.load(f)
                     strategies.append(strategy_data)
                 except Exception as e:
-                    print(f"Erreur lors du chargement de {file}: {e}")
+                    print(f"Error while loading {file}: {e}")
         
-        # Tri par timestamp (plus récent en premier)
+        # Sort by timestamp (most recent first)
         strategies.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         return strategies
     
@@ -176,18 +176,18 @@ class StrategySaver:
                           top_n: int = 5, 
                           metric: str = 'total_return') -> List[Dict[str, Any]]:
         """
-        Retourne les meilleures stratégies selon une métrique.
+        Returns the best strategies according to a metric.
         
         Args:
-            top_n: Nombre de stratégies à retourner
-            metric: Métrique pour le classement
+            top_n: Number of strategies to return
+            metric: Metric for ranking
             
         Returns:
-            Liste des meilleures stratégies
+            List of best strategies
         """
         strategies = self.list_saved_strategies()
         
-        # Tri par métrique
+        # Sort by metric
         strategies.sort(
             key=lambda x: x.get('metrics', {}).get(metric, 0), 
             reverse=True
@@ -197,16 +197,16 @@ class StrategySaver:
     
     def delete_strategy(self, save_id: str) -> bool:
         """
-        Supprime une stratégie sauvegardée.
+        Deletes a saved strategy.
         
         Args:
-            save_id: ID de la stratégie à supprimer
+            save_id: ID of the strategy to delete
             
         Returns:
-            True si supprimé avec succès, False sinon
+            True if deleted successfully, False otherwise
         """
         try:
-            # Fichiers à supprimer
+            # Files to delete
             files_to_delete = [
                 os.path.join(self.strategies_dir, f"{save_id}.json"),
                 os.path.join(self.strategies_dir, f"{save_id}.pkl"),
@@ -222,29 +222,29 @@ class StrategySaver:
                     os.remove(file_path)
                     deleted_count += 1
             
-            print(f"Stratégie {save_id} supprimée ({deleted_count} fichiers)")
+            print(f"Strategy {save_id} deleted ({deleted_count} files)")
             return True
             
         except Exception as e:
-            print(f"Erreur lors de la suppression: {e}")
+            print(f"Error while deleting: {e}")
             return False
     
     def export_strategy_summary(self, output_file: str = None) -> str:
         """
-        Exporte un résumé de toutes les stratégies.
+        Exports a summary of all strategies.
         
         Args:
-            output_file: Fichier de sortie (optionnel)
+            output_file: Output file (optional)
             
         Returns:
-            Chemin du fichier créé
+            Path of created file
         """
         if output_file is None:
             output_file = os.path.join(self.results_dir, "strategies_summary.csv")
         
         strategies = self.list_saved_strategies()
         
-        # Préparation des données pour le CSV
+        # Prepare data for CSV
         summary_data = []
         for strategy in strategies:
             row = {
@@ -260,9 +260,9 @@ class StrategySaver:
             }
             summary_data.append(row)
         
-        # Sauvegarde en CSV
+        # Save as CSV
         df = pd.DataFrame(summary_data)
         df.to_csv(output_file, index=False)
         
-        print(f"Résumé exporté: {output_file}")
+        print(f"Summary exported: {output_file}")
         return output_file

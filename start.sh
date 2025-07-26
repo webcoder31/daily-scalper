@@ -1,26 +1,26 @@
 #!/bin/bash
-# Script de démarrage pour Daily Scalper
+# Startup script for Daily Scalper
 
-echo "🚀 Daily Scalper - Démarrage..."
+echo "🚀 Daily Scalper - Starting..."
 
-# Vérifier si l'environnement virtuel existe
+# Check if virtual environment exists
 if [ ! -d "venv" ]; then
-    echo "📦 Création de l'environnement virtuel..."
+    echo "📦 Creating virtual environment..."
     python3 -m venv venv
 fi
 
-# Activer l'environnement virtuel
-echo "🔧 Activation de l'environnement virtuel..."
+# Activate virtual environment
+echo "🔧 Activating virtual environment..."
 source venv/bin/activate
 
-# Vérifier si les dépendances sont installées
+# Check if dependencies are installed
 if [ ! -f "venv/pyvenv.cfg" ] || ! python -c "import vectorbt" 2>/dev/null; then
-    echo "📥 Installation des dépendances..."
+    echo "📥 Installing dependencies..."
     pip install -r requirements.txt
 fi
 
-# Lancer l'application
-echo "▶️  Lancement de l'application..."
+# Launch the application
+echo "▶️  Launching application..."
 python main.py
 
-echo "✅ Terminé!"
+echo "✅ Finished!"

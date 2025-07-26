@@ -1,302 +1,302 @@
-# Daily Scalper - Documentation Technique
+# Daily Scalper - Technical Documentation
 
-## Architecture du Projet
+## Project Architecture
 
-### Vue d'ensemble
-Daily Scalper est une application Python modulaire conçue pour tester et évaluer des stratégies de trading de cryptomonnaies. L'architecture suit les principes SOLID et utilise une approche orientée objet pour maximiser la réutilisabilité et la maintenabilité.
+### Overview
+Daily Scalper is a modular Python application designed to test and evaluate cryptocurrency trading strategies. The architecture follows SOLID principles and uses an object-oriented approach to maximize reusability and maintainability.
 
-### Structure des Modules
+### Module Structure
 
 ```
 daily-scalper/
-├── strategies/          # 🎯 Stratégies de trading
+├── strategies/                # Trading strategies
 │   ├── __init__.py
-│   ├── base_strategy.py     # Classe abstraite de base
-│   └── sma_crossover.py     # Exemple: SMA Crossover
-├── backtest/           # ⚡ Moteur de backtest
+│   ├── base_strategy.py       # Base abstract class
+│   └── sma_crossover.py       # Example: SMA Crossover
+├── backtest/                  # Backtest engine
 │   ├── __init__.py
-│   ├── backtest_engine.py   # Moteur principal avec vectorbt
-│   └── performance_metrics.py # Calcul des métriques
-├── utils/              # 🛠️ Utilitaires
+│   ├── backtest_engine.py     # Main engine with vectorbt
+│   └── performance_metrics.py # Metrics calculation
+├── utils/                     # Utilities
 │   ├── __init__.py
-│   ├── data_loader.py       # Chargement des données (yfinance)
-│   ├── visualizer.py        # Graphiques interactifs (plotly)
-│   └── strategy_saver.py    # Sauvegarde des stratégies
-├── data/               # 📊 Cache des données
-├── results/            # 💾 Résultats sauvegardés
-│   ├── strategies/          # Stratégies au format JSON/PKL
-│   ├── reports/            # Rapports textuels
-│   └── charts/             # Graphiques HTML
-├── main.py             # 🚀 Application principale
-├── test_setup.py       # 🧪 Tests de validation
-├── start.sh            # 📜 Script de démarrage
-└── config.py           # ⚙️ Configuration globale
+│   ├── data_loader.py         # Data loading (yfinance)
+│   ├── visualizer.py          # Interactive charts (plotly)
+│   └── strategy_saver.py      # Strategy saving
+├── data/                      # Data cache
+├── results/                   # Saved results
+│   ├── strategies/            # Strategies in JSON/PKL format
+│   ├── reports/               # Text reports
+│   └── charts/                # HTML charts
+├── main.py                    # Main application
+├── test_setup.py              # Validation tests
+├── start.sh                   # Startup script
+└── config.py                  # Global configuration
 ```
 
-## Composants Principaux
+## Main Components
 
-### 1. Stratégies (`strategies/`)
+### 1. Strategies (`strategies/`)
 
-#### BaseStrategy (Classe Abstraite)
-- **Rôle**: Définit l'interface commune pour toutes les stratégies
-- **Méthodes clés**:
-  - `generate_signals()`: Génère les signaux d'achat/vente
-  - `validate_data()`: Valide les données d'entrée
-  - `get_description()`: Description de la stratégie
-  - `to_dict()`: Sérialisation pour sauvegarde
+#### BaseStrategy (Abstract Class)
+- **Role**: Defines the common interface for all strategies
+- **Key methods**:
+  - `generate_signals()`: Generates buy/sell signals
+  - `validate_data()`: Validates input data
+  - `get_description()`: Strategy description
+  - `to_dict()`: Serialization for saving
 
 #### SMACrossoverStrategy
-- **Rôle**: Exemple d'implémentation de stratégie
-- **Logique**: Croisement de moyennes mobiles simples
-- **Paramètres**: `short_window`, `long_window`
-- **Signaux**:
-  - Achat: SMA courte > SMA longue
-  - Vente: SMA courte < SMA longue
+- **Role**: Example strategy implementation
+- **Logic**: Simple moving average crossover
+- **Parameters**: `short_window`, `long_window`
+- **Signals**:
+  - Buy: Short SMA > Long SMA
+  - Sell: Short SMA < Long SMA
 
-### 2. Moteur de Backtest (`backtest/`)
+### 2. Backtest Engine (`backtest/`)
 
 #### BacktestEngine
-- **Rôle**: Exécute les backtests avec vectorbt
-- **Fonctionnalités**:
-  - Simulation de trading avec commissions/slippage
-  - Calcul automatique des métriques de base
-  - Gestion des erreurs et validation des données
+- **Role**: Executes backtests with vectorbt
+- **Features**:
+  - Trading simulation with commissions/slippage
+  - Automatic calculation of basic metrics
+  - Error handling and data validation
 - **Configuration**:
-  - Capital initial: $10,000 (par défaut)
-  - Commission: 0.1% par transaction
-  - Slippage: 0.01% par transaction
+  - Initial capital: $10,000 (default)
+  - Commission: 0.1% per transaction
+  - Slippage: 0.01% per transaction
 
 #### PerformanceMetrics
-- **Rôle**: Calcul et analyse des métriques avancées
-- **Métriques calculées**:
-  - **Rendement**: Total return, Alpha vs Buy & Hold
-  - **Risque**: Sharpe ratio, Volatilité, Max Drawdown, VaR 95%
-  - **Trading**: Win rate, Profit factor, Nombre de trades
-  - **Avancées**: Calmar ratio, Sortino ratio
+- **Role**: Calculation and analysis of advanced metrics
+- **Calculated metrics**:
+  - **Return**: Total return, Alpha vs Buy & Hold
+  - **Risk**: Sharpe ratio, Volatility, Max Drawdown, VaR 95%
+  - **Trading**: Win rate, Profit factor, Number of trades
+  - **Advanced**: Calmar ratio, Sortino ratio
 
-### 3. Utilitaires (`utils/`)
+### 3. Utilities (`utils/`)
 
 #### DataLoader
-- **Rôle**: Récupération et gestion des données de marché
+- **Role**: Retrieval and management of market data
 - **Sources**: yfinance (Yahoo Finance)
-- **Fonctionnalités**:
-  - Cache automatique des données
-  - Validation et nettoyage des données
-  - Support de multiples cryptomonnaies
-  - Gestion des erreurs de réseau
+- **Features**:
+  - Automatic data caching
+  - Data validation and cleaning
+  - Support for multiple cryptocurrencies
+  - Network error handling
 
 #### Visualizer
-- **Rôle**: Création de graphiques interactifs
-- **Technologies**: Plotly pour l'interactivité
-- **Types de graphiques**:
-  - Chandelier avec signaux d'achat/vente
-  - Évolution du portfolio
-  - Métriques de performance (radar chart)
-  - Analyse du drawdown
+- **Role**: Creation of interactive charts
+- **Technologies**: Plotly for interactivity
+- **Chart types**:
+  - Candlestick with buy/sell signals
+  - Portfolio evolution
+  - Performance metrics (radar chart)
+  - Drawdown analysis
 
 #### StrategySaver
-- **Rôle**: Persistance des stratégies et résultats
-- **Formats de sauvegarde**:
-  - JSON: Métadonnées et paramètres
-  - Pickle: Données complètes (portfolio, signaux)
-  - HTML: Graphiques interactifs
-  - TXT: Rapports formatés
+- **Role**: Persistence of strategies and results
+- **Save formats**:
+  - JSON: Metadata and parameters
+  - Pickle: Complete data (portfolio, signals)
+  - HTML: Interactive charts
+  - TXT: Formatted reports
 
-## Flux d'Exécution
+## Execution Flow
 
-### 1. Chargement des Données
+### 1. Data Loading
 ```python
-# DataLoader récupère les données via yfinance
-data = loader.load_crypto_data("BTC-USD", period="1y")  # 1y = 1 an
-# Validation automatique et cache local
+# DataLoader retrieves data via yfinance
+data = loader.load_crypto_data("BTC-USD", period="1y")  # 1y = 1 year
+# Automatic validation and local cache
 ```
 
-### 2. Initialisation de la Stratégie
+### 2. Strategy Initialization
 ```python
-# Création d'une stratégie avec paramètres
+# Create a strategy with parameters
 strategy = SMACrossoverStrategy(short_window=20, long_window=50)
-# Validation des paramètres
+# Parameter validation
 ```
 
-### 3. Génération des Signaux
+### 3. Signal Generation
 ```python
-# La stratégie analyse les données et génère les signaux
+# The strategy analyzes data and generates signals
 buy_signals, sell_signals = strategy.generate_signals(data)
-# Signaux booléens indexés par date
+# Boolean signals indexed by date
 ```
 
-### 4. Exécution du Backtest
+### 4. Backtest Execution
 ```python
-# BacktestEngine utilise vectorbt pour la simulation
+# BacktestEngine uses vectorbt for simulation
 results = engine.run_backtest(strategy, data)
-# Calcul automatique des métriques
+# Automatic metric calculation
 ```
 
-### 5. Analyse et Visualisation
+### 5. Analysis and Visualization
 ```python
-# Calcul des métriques avancées
+# Calculate advanced metrics
 metrics = PerformanceMetrics.calculate_advanced_metrics(results)
-# Génération des graphiques interactifs
+# Generate interactive charts
 Visualizer.show_all_plots(results)
 ```
 
-### 6. Sauvegarde (Optionnelle)
+### 6. Saving (Optional)
 ```python
-# Sauvegarde si la stratégie est profitable
+# Save if the strategy is profitable
 if PerformanceMetrics.is_strategy_profitable(metrics):
     saver.save_strategy_results(results)
 ```
 
-## Critères de Profitabilité
+## Profitability Criteria
 
-Une stratégie est considérée comme profitable si elle respecte **tous** les critères suivants :
+A strategy is considered profitable if it meets **all** of the following criteria:
 
-- **Rendement minimum**: 10% (`min_return = 0.1`)
-- **Ratio de Sharpe minimum**: 1.0 (`min_sharpe = 1.0`)
-- **Drawdown maximum**: 20% (`max_drawdown = 0.2`)
-- **Nombre minimum de trades**: 5 (`min_trades = 5`)
+- **Minimum return**: 10% (`min_return = 0.1`)
+- **Minimum Sharpe ratio**: 1.0 (`min_sharpe = 1.0`)
+- **Maximum drawdown**: 20% (`max_drawdown = 0.2`)
+- **Minimum number of trades**: 5 (`min_trades = 5`)
 
-Ces critères peuvent être ajustés dans `config.py`.
+These criteria can be adjusted in `config.py`.
 
-## Extension du Système
+## System Extension
 
-### Créer une Nouvelle Stratégie
+### Creating a New Strategy
 
-1. **Hériter de BaseStrategy**:
+1. **Inherit from BaseStrategy**:
 ```python
 from strategies.base_strategy import BaseStrategy
 
-class MaStrategie(BaseStrategy):
+class MyStrategy(BaseStrategy):
     def __init__(self, param1, param2):
-        super().__init__("Ma Stratégie", {
+        super().__init__("My Strategy", {
             'param1': param1,
             'param2': param2
         })
 ```
 
-2. **Implémenter les méthodes requises**:
+2. **Implement required methods**:
 ```python
 def generate_signals(self, data):
-    # Votre logique ici
+    # Your logic here
     buy_signals = ...
     sell_signals = ...
     return buy_signals, sell_signals
 
 def get_description(self):
-    return "Description de ma stratégie"
+    return "Description of my strategy"
 ```
 
-3. **Ajouter à l'initialisation**:
+3. **Add to initialization**:
 ```python
-# Dans strategies/__init__.py
-from .ma_strategie import MaStrategie
-__all__ = ['BaseStrategy', 'SMACrossoverStrategy', 'MaStrategie']
+# In strategies/__init__.py
+from .my_strategy import MyStrategy
+__all__ = ['BaseStrategy', 'SMACrossoverStrategy', 'MyStrategy']
 ```
 
-### Ajouter de Nouvelles Métriques
+### Adding New Metrics
 
-1. **Étendre PerformanceMetrics**:
+1. **Extend PerformanceMetrics**:
 ```python
 @staticmethod
 def calculate_custom_metric(results):
-    # Votre calcul personnalisé
+    # Your custom calculation
     return custom_value
 ```
 
-2. **Intégrer dans le calcul principal**:
+2. **Integrate into main calculation**:
 ```python
-# Dans calculate_advanced_metrics()
+# In calculate_advanced_metrics()
 metrics['custom_metric'] = calculate_custom_metric(results)
 ```
 
-## Configuration Avancée
+## Advanced Configuration
 
-### Paramètres de Backtest
+### Backtest Parameters
 ```python
-# Dans config.py
+# In config.py
 DEFAULT_BACKTEST_CONFIG = {
-    'initial_cash': 10000.0,    # Capital initial
-    'commission': 0.001,        # 0.1% de commission
-    'slippage': 0.0001,        # 0.01% de slippage
+    'initial_cash': 10000.0,    # Initial capital
+    'commission': 0.001,        # 0.1% commission
+    'slippage': 0.0001,         # 0.01% slippage
 }
 ```
 
-### Critères de Profitabilité
+### Profitability Criteria
 ```python
 PROFITABILITY_CRITERIA = {
     'min_return': 0.1,      # 10% minimum
-    'min_sharpe': 1.0,      # Sharpe ratio minimum
+    'min_sharpe': 1.0,      # Minimum Sharpe ratio
     'max_drawdown': 0.2,    # 20% maximum
-    'min_trades': 5,        # Minimum de trades
+    'min_trades': 5,        # Minimum number of trades
 }
 ```
 
-### Symboles Supportés
+### Supported Symbols
 ```python
 POPULAR_CRYPTO_SYMBOLS = [
     "BTC-USD", "ETH-USD", "BNB-USD", "XRP-USD", "ADA-USD",
-    # ... autres cryptomonnaies
+    # ... other cryptocurrencies
 ]
 ```
 
-## Dépannage
+## Troubleshooting
 
-### Problèmes Courants
+### Common Issues
 
-1. **Erreur d'import de modules**:
-   - Vérifier que l'environnement virtuel est activé
-   - Réinstaller les dépendances: `pip install -r requirements.txt`
+1. **Module import error**:
+   - Check that the virtual environment is activated
+   - Reinstall dependencies: `pip install -r requirements.txt`
 
-2. **Données manquantes**:
-   - Vérifier la connexion internet
-   - Supprimer le cache: `rm -rf data/*.csv`
+2. **Missing data**:
+   - Check internet connection
+   - Delete cache: `rm -rf data/*.csv`
 
-3. **Erreurs de calcul vectorbt**:
-   - Vérifier que les données ont suffisamment de points (>100)
-   - S'assurer que les signaux ne sont pas tous vides
+3. **Vectorbt calculation errors**:
+   - Check that data has enough points (>100)
+   - Ensure signals are not all empty
 
-4. **Graphiques ne s'affichent pas**:
-   - Vérifier que plotly est installé
-   - Ouvrir manuellement les fichiers HTML dans `results/charts/`
+4. **Charts not displaying**:
+   - Check that plotly is installed
+   - Manually open HTML files in `results/charts/`
 
-### Logs et Debug
+### Logs and Debug
 
-Pour activer le mode debug, modifier le niveau de logging dans `main.py`:
+To enable debug mode, modify the logging level in `main.py`:
 ```python
 import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
-## Performance et Optimisation
+## Performance and Optimization
 
-### Cache des Données
-- Les données sont automatiquement mises en cache dans `data/`
-- Cache valide pendant 24h par défaut
-- Supprimer le cache pour forcer le rechargement
+### Data Cache
+- Data is automatically cached in `data/`
+- Cache valid for 24h by default
+- Delete cache to force reload
 
-### Optimisation des Backtests
-- Utiliser des périodes plus courtes pour les tests rapides
-- Vectorbt optimise automatiquement les calculs
-- Éviter les stratégies avec trop de signaux (>1000 trades)
+### Backtest Optimization
+- Use shorter periods for quick tests
+- Vectorbt automatically optimizes calculations
+- Avoid strategies with too many signals (>1000 trades)
 
-### Mémoire
-- Les résultats complets sont stockés en mémoire
-- Pour de gros datasets, considérer la sauvegarde incrémentale
-- Limiter le nombre de stratégies comparées simultanément
+### Memory
+- Complete results are stored in memory
+- For large datasets, consider incremental saving
+- Limit the number of strategies compared simultaneously
 
-## Sécurité et Bonnes Pratiques
+## Security and Best Practices
 
-### Gestion des Données
-- Ne jamais committer les fichiers de cache (`data/`)
-- Les clés API (si ajoutées) doivent être dans des variables d'environnement
-- Sauvegarder régulièrement les résultats importants
+### Data Management
+- Never commit cache files (`data/`)
+- API keys (if added) should be in environment variables
+- Regularly save important results
 
 ### Code Quality
-- Suivre les conventions PEP 8
-- Ajouter des docstrings pour les nouvelles fonctions
-- Tester les nouvelles stratégies avec `test_setup.py`
+- Follow PEP 8 conventions
+- Add docstrings for new functions
+- Test new strategies with `test_setup.py`
 
 ### Limitations
-- **Pas de trading en temps réel**: Uniquement du backtesting
-- **Données limitées**: Dépendant de yfinance
-- **Pas d'optimisation automatique**: Paramètres à ajuster manuellement
+- **No real-time trading**: Backtesting only
+- **Limited data**: Dependent on yfinance
+- **No automatic optimization**: Parameters must be adjusted manually

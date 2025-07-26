@@ -1,5 +1,5 @@
 """
-Stratégie de croisement de moyennes mobiles simples (SMA Crossover).
+Simple Moving Average Crossover strategy (SMA Crossover).
 """
 
 from typing import Dict, Any, Tuple
@@ -10,20 +10,20 @@ from .base_strategy import BaseStrategy
 
 class SMACrossoverStrategy(BaseStrategy):
     """
-    Stratégie basée sur le croisement de deux moyennes mobiles simples.
+    Strategy based on the crossing of two simple moving averages.
     
-    Signal d'achat: quand la SMA courte croise au-dessus de la SMA longue
-    Signal de vente: quand la SMA courte croise en-dessous de la SMA longue
+    Buy signal: when the short SMA crosses above the long SMA
+    Sell signal: when the short SMA crosses below the long SMA
     """
     
     def __init__(self, short_window: int = 20, long_window: int = 50, **kwargs):
         """
-        Initialise la stratégie SMA Crossover.
+        Initialize the SMA Crossover strategy.
         
         Args:
-            short_window: Période pour la moyenne mobile courte
-            long_window: Période pour la moyenne mobile longue
-            **kwargs: Paramètres supplémentaires
+            short_window: Period for the short moving average
+            long_window: Period for the long moving average
+            **kwargs: Additional parameters
         """
         parameters = {
             'short_window': short_window,
@@ -32,40 +32,40 @@ class SMACrossoverStrategy(BaseStrategy):
         }
         super().__init__('SMA Crossover', parameters)
         
-        # Validation des paramètres
+        # Parameter validation
         if short_window >= long_window:
-            raise ValueError("La période courte doit être inférieure à la période longue")
+            raise ValueError("The short period must be less than the long period")
         if short_window < 1 or long_window < 1:
-            raise ValueError("Les périodes doivent être positives")
+            raise ValueError("Periods must be positive")
     
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
         """
-        Génère les signaux d'achat et de vente basés sur le croisement des SMA.
+        Generate buy and sell signals based on SMA crossovers.
         
         Args:
-            data: DataFrame avec les données OHLCV
+            data: DataFrame with OHLCV data
             
         Returns:
-            Tuple contenant les signaux d'entrée et de sortie
+            Tuple containing entry and exit signals
         """
         if not self.validate_data(data):
-            raise ValueError("Données invalides: colonnes OHLCV requises")
+            raise ValueError("Invalid data: OHLCV columns required")
         
         short_window = self.parameters['short_window']
         long_window = self.parameters['long_window']
         
-        # Calcul des moyennes mobiles
+        # Calculate moving averages
         sma_short = data['Close'].rolling(window=short_window).mean()
         sma_long = data['Close'].rolling(window=long_window).mean()
         
-        # Signaux de croisement
-        # Signal d'achat: SMA courte croise au-dessus de SMA longue
+        # Crossover signals
+        # Buy signal: Short SMA crosses above long SMA
         buy_signals = (sma_short > sma_long) & (sma_short.shift(1) <= sma_long.shift(1))
         
-        # Signal de vente: SMA courte croise en-dessous de SMA longue
+        # Sell signal: Short SMA crosses below long SMA
         sell_signals = (sma_short < sma_long) & (sma_short.shift(1) >= sma_long.shift(1))
         
-        # Stockage des indicateurs pour visualisation
+        # Store indicators for visualization
         self.indicators = {
             'sma_short': sma_short,
             'sma_long': sma_long
@@ -75,24 +75,24 @@ class SMACrossoverStrategy(BaseStrategy):
     
     def get_description(self) -> str:
         """
-        Retourne une description de la stratégie.
+        Return a description of the strategy.
         
         Returns:
-            Description de la stratégie SMA Crossover
+            Description of the SMA Crossover strategy
         """
         short_window = self.parameters['short_window']
         long_window = self.parameters['long_window']
         
-        return (f"Stratégie de croisement de moyennes mobiles simples "
+        return (f"Simple Moving Average Crossover Strategy "
                 f"(SMA {short_window} / SMA {long_window}).\n"
-                f"Achat quand SMA{short_window} > SMA{long_window}, "
-                f"vente quand SMA{short_window} < SMA{long_window}.")
+                f"Buy when SMA{short_window} > SMA{long_window}, "
+                f"sell when SMA{short_window} < SMA{long_window}.")
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Retourne les indicateurs calculés pour la visualisation.
+        Return the calculated indicators for visualization.
         
         Returns:
-            Dictionnaire des indicateurs techniques
+            Dictionary of technical indicators
         """
         return getattr(self, 'indicators', {})
