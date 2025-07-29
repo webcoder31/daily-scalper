@@ -1,13 +1,10 @@
-# Fichiers de cache de données
-data/*.csv
-data/*.json
+# Cached datasets of cryptocurrencies
+data/
 
-# Résultats et rapports
-results/strategies/*.pkl
-results/reports/*.txt
-results/charts/*.html
+# Backtest results and reports
+results/
 
-# Fichiers Python
+# Python files
 __pycache__/
 *.pyc
 *.pyo
@@ -17,7 +14,7 @@ __pycache__/
 .coverage
 .pytest_cache/
 
-# Environnements virtuels
+# Virtual environnements
 venv/
 env/
 ENV/

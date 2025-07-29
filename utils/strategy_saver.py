@@ -3,7 +3,6 @@ Module for saving and loading high-performing strategies.
 """
 
 import json
-import pickle
 import os
 from typing import Dict, Any, List, Optional
 from datetime import datetime
@@ -33,9 +32,11 @@ class StrategySaver:
         for directory in [self.strategies_dir, self.reports_dir, self.charts_dir]:
             os.makedirs(directory, exist_ok=True)
     
-    def save_strategy_results(self, 
-                            results: Dict[str, Any], 
-                            save_charts: bool = True) -> str:
+    def save_strategy_results(
+            self, 
+            results: Dict[str, Any], 
+            save_charts: bool = True
+        ) -> str:
         """
         Saves the results of a strategy.
         
@@ -47,29 +48,51 @@ class StrategySaver:
             Unique save ID
         """
         # Generate a unique ID
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        strategy_name = results['strategy']['name'].replace(' ', '_').lower()
-        save_id = f"{strategy_name}_{timestamp}"
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d-%H%M%S")
+        strategy_name = results['strategy']['name'].replace(' ', '-')
+        symbol = results['symbol']
+        save_id = f"{timestamp}--{strategy_name}--{symbol}".lower()
         
-        # Prepare data to save
+        # Convert DataFrame to dict with datetime index converted to strings
+        data_dict = None
+        if 'data' in results:
+            data_df = results['data']
+            data_dict = {
+                col: {k.strftime('%Y-%m-%d'): v for k, v in data_df[col].items()}
+                for col in data_df.columns
+            }
+        
+        # Convert Series to dict with datetime index converted to strings
+        buy_signals_dict = None
+        sell_signals_dict = None
+        if 'buy_signals' in results:
+            buy_signals_dict = {k.strftime('%Y-%m-%d'): v 
+                            for k, v in results['buy_signals'].items()}
+        if 'sell_signals' in results:
+            sell_signals_dict = {k.strftime('%Y-%m-%d'): v 
+                            for k, v in results['sell_signals'].items()}
+        
+        # Prepare data to save - exclude non-serializable objects
         save_data = {
             'save_id': save_id,
             'timestamp': timestamp,
+            'test_date': now.isoformat(),
             'strategy': results['strategy'],
+            'strategy_label': results['strategy_label'],
             'metrics': results['metrics'],
             'backtest_period': results['backtest_period'],
-            'parameters': results['parameters']
+            'parameters': results['parameters'],
+            'symbol': results['symbol'], 
+            'data': data_dict,
+            'buy_signals': buy_signals_dict,
+            'sell_signals': sell_signals_dict,
         }
         
-        # Save JSON (metadata)
+        # Save JSON (metadata and full data)
         json_file = os.path.join(self.strategies_dir, f"{save_id}.json")
         with open(json_file, 'w', encoding='utf-8') as f:
             json.dump(save_data, f, indent=2, ensure_ascii=False, default=str)
-        
-        # Save Pickle (full data)
-        pickle_file = os.path.join(self.strategies_dir, f"{save_id}.pkl")
-        with open(pickle_file, 'wb') as f:
-            pickle.dump(results, f)
         
         # Save text report
         self._save_text_report(results, save_id)
@@ -78,7 +101,6 @@ class StrategySaver:
         if save_charts:
             self._save_charts(results, save_id)
         
-        print(f"Strategy saved with ID: {save_id}")
         return save_id
     
     def _save_text_report(self, results: Dict[str, Any], save_id: str) -> None:
@@ -109,18 +131,19 @@ class StrategySaver:
             from utils.visualizer import Visualizer
             
             # Main chart
-            main_chart = os.path.join(self.charts_dir, f"{save_id}_main.html")
-            fig = Visualizer.plot_backtest_results(results, save_path=main_chart)
+            main_chart_path = os.path.join(self.charts_dir, f"{save_id}_main.html")
+            main_fig = Visualizer.plot_backtest_results(results)
+            main_fig.write_html(main_chart_path)
             
             # Metrics chart
-            metrics_chart = os.path.join(self.charts_dir, f"{save_id}_metrics.html")
+            metrics_chart_path = os.path.join(self.charts_dir, f"{save_id}_metrics.html")
             metrics_fig = Visualizer.plot_performance_metrics(results)
-            metrics_fig.write_html(metrics_chart)
+            metrics_fig.write_html(metrics_chart_path)
             
             # Drawdown chart
-            drawdown_chart = os.path.join(self.charts_dir, f"{save_id}_drawdown.html")
+            drawdown_chart_path = os.path.join(self.charts_dir, f"{save_id}_drawdown.html")
             drawdown_fig = Visualizer.plot_drawdown(results)
-            drawdown_fig.write_html(drawdown_chart)
+            drawdown_fig.write_html(drawdown_chart_path)
             
         except Exception as e:
             print(f"Error while saving charts: {e}")
@@ -135,19 +158,40 @@ class StrategySaver:
         Returns:
             Loaded results or None if not found
         """
-        pickle_file = os.path.join(self.strategies_dir, f"{save_id}.pkl")
-        
-        if not os.path.exists(pickle_file):
-            print(f"Strategy not found: {save_id}")
+        json_file = os.path.join(self.strategies_dir, f"{save_id}.json")
+        if not os.path.exists(json_file):
+            print(f"❌ Strategy not found: {save_id}")
             return None
-        
+            
         try:
-            with open(pickle_file, 'rb') as f:
-                results = pickle.load(f)
-            print(f"Strategy loaded: {save_id}")
+            with open(json_file, 'r', encoding='utf-8') as f:
+                results = json.load(f)
+                
+            # Convert string dates back to datetime index
+            if results.get('data'):
+                data_dict = results['data']
+                df = pd.DataFrame()
+                for col in data_dict:
+                    df[col] = pd.Series({
+                        pd.Timestamp(k): v for k, v in data_dict[col].items()
+                    })
+                results['data'] = df
+                
+            if results.get('buy_signals'):
+                results['buy_signals'] = pd.Series({
+                    pd.Timestamp(k): v for k, v in results['buy_signals'].items()
+                })
+                
+            if results.get('sell_signals'):
+                results['sell_signals'] = pd.Series({
+                    pd.Timestamp(k): v for k, v in results['sell_signals'].items()
+                })
+            
+            print(f"✅ Strategy loaded: {save_id}")
             return results
+            
         except Exception as e:
-            print(f"Error while loading: {e}")
+            print(f"❌ Error while loading: {e}")
             return None
     
     def list_saved_strategies(self) -> List[Dict[str, Any]]:
@@ -172,9 +216,11 @@ class StrategySaver:
         strategies.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         return strategies
     
-    def get_best_strategies(self, 
-                          top_n: int = 5, 
-                          metric: str = 'total_return') -> List[Dict[str, Any]]:
+    def get_best_strategies(
+            self, 
+            top_n: int = 5, 
+            metric: str = 'total_return'
+        ) -> List[Dict[str, Any]]:
         """
         Returns the best strategies according to a metric.
         
@@ -209,7 +255,6 @@ class StrategySaver:
             # Files to delete
             files_to_delete = [
                 os.path.join(self.strategies_dir, f"{save_id}.json"),
-                os.path.join(self.strategies_dir, f"{save_id}.pkl"),
                 os.path.join(self.reports_dir, f"{save_id}_report.txt"),
                 os.path.join(self.charts_dir, f"{save_id}_main.html"),
                 os.path.join(self.charts_dir, f"{save_id}_metrics.html"),
@@ -250,7 +295,9 @@ class StrategySaver:
             row = {
                 'save_id': strategy.get('save_id', ''),
                 'timestamp': strategy.get('timestamp', ''),
+                'test_date': strategy.get('test_date', ''),
                 'strategy_name': strategy.get('strategy', {}).get('name', ''),
+                'symbol': strategy.get('symbol', ''),
                 'total_return': strategy.get('metrics', {}).get('total_return', 0),
                 'sharpe_ratio': strategy.get('metrics', {}).get('sharpe_ratio', 0),
                 'max_drawdown': strategy.get('metrics', {}).get('max_drawdown', 0),

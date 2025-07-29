@@ -87,7 +87,7 @@ This file records architectural and implementation decisions using a list format
 * Current implementation shows default values twice:
   1. In the prompt text string with square brackets: `[BTC-USD]`
   2. Automatically by Rich's Prompt.ask() function with parentheses: `(BTC-USD)`
-* This creates redundant UI like: `"Symbole crypto [BTC-USD]: (BTC-USD):"`
+* This creates redundant UI like: `"Crypto pair [BTC-USD]: (BTC-USD):"`
 * Cleaner UI would improve user experience
 
 ## Implementation Details

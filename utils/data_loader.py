@@ -24,12 +24,14 @@ class DataLoader:
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
     
-    def load_crypto_data(self, 
-                        symbol: str = "BTC-USD",
-                        period: str = "1y",
-                        start_date: Optional[str] = None,
-                        end_date: Optional[str] = None,
-                        use_cache: bool = True) -> pd.DataFrame:
+    def load_crypto_data(
+            self, 
+            symbol: str = "BTC-USD",
+            period: str = "1y",
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            use_cache: bool = True
+        ) -> pd.DataFrame:
         """
         Loads cryptocurrency data from yfinance.
         

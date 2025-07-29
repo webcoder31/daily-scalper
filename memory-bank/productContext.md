@@ -23,7 +23,7 @@ This file provides a high-level overview of the project and the expected product
 
 ## Overall Architecture
 
-* **strategies/**: Contains trading strategies (SMA Crossover, RSI Strategy)
+* **strategies/**: Contains trading strategies (SMA Crossover, RSI Threshold)
 * **backtest/**: Contains the backtesting engine and performance metrics
 * **utils/**: Contains utilities like data loading, visualization, and strategy saving
 * **data/**: Contains cached market data

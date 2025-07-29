@@ -18,7 +18,7 @@ def test_imports():
     
     try:
         # Test main imports
-        from strategies import BaseStrategy, SMACrossoverStrategy
+        from strategies import BaseStrategy, SMAStrategy
         from backtest import BacktestEngine, PerformanceMetrics
         from utils import DataLoader, Visualizer, StrategySaver
         print("✅ All modules imported successfully")
@@ -56,11 +56,11 @@ def test_strategy_creation():
     print("\n🎯 Testing strategy creation...")
     
     try:
-        from strategies import SMACrossoverStrategy
+        from strategies import SMAStrategy
         
-        strategy = SMACrossoverStrategy(short_window=10, long_window=20)
+        strategy = SMAStrategy(short_window=10, long_window=20)
         print(f"✅ Strategy created: {strategy.name}")
-        print(f"   Description: {strategy.get_description()}")
+        print(f"   Description: {strategy.get_explanation()}")
         print(f"   Parameters: {strategy.get_parameters()}")
         return True
     except Exception as e:
@@ -132,7 +132,7 @@ def run_mini_backtest():
         import pandas as pd
         import numpy as np
         from datetime import datetime, timedelta
-        from strategies import SMACrossoverStrategy
+        from strategies import SMAStrategy
         from backtest import BacktestEngine
         
         # Creating simulated data
@@ -161,7 +161,7 @@ def run_mini_backtest():
         data['Low'] = np.minimum(data['Low'], data[['Open', 'Close']].min(axis=1))
         
         # Testing strategy
-        strategy = SMACrossoverStrategy(short_window=10, long_window=20)
+        strategy = SMAStrategy(short_window=10, long_window=20)
         engine = BacktestEngine(initial_cash=10000)
         
         results = engine.run_backtest(strategy, data)

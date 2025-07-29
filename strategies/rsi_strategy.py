@@ -1,13 +1,15 @@
 """
-RSI Strategy (Relative Strength Index) - Extension example.
+RSI Threshold (Relative Strength Index) - Extension example.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List
 import pandas as pd
 import numpy as np
 from .base_strategy import BaseStrategy
+from .strategy_registry import register_strategy
 
 
+@register_strategy
 class RSIStrategy(BaseStrategy):
     """
     Strategy based on the RSI (Relative Strength Index) indicator.
@@ -15,6 +17,35 @@ class RSIStrategy(BaseStrategy):
     Buy signal: RSI < lower threshold (oversold)
     Sell signal: RSI > upper threshold (overbought)
     """
+    
+    @classmethod
+    def get_parameter_definitions(cls) -> Dict[str, Dict[str, Any]]:
+        """
+        Define parameters for this strategy with constraints.
+        
+        Returns:
+            Dictionary of parameter definitions
+        """
+        return {
+            'period': {
+                'type': int,
+                'default': 14,
+                'range': (2, 50),
+                'description': 'Period for RSI calculation'
+            },
+            'oversold_threshold': {
+                'type': float,
+                'default': 30.0,
+                'range': (10.0, 40.0),
+                'description': 'Oversold threshold (buy signal)'
+            },
+            'overbought_threshold': {
+                'type': float,
+                'default': 70.0,
+                'range': (60.0, 90.0),
+                'description': 'Overbought threshold (sell signal)'
+            }
+        }
     
     def __init__(self, 
                  period: int = 14, 
@@ -36,7 +67,7 @@ class RSIStrategy(BaseStrategy):
             'overbought_threshold': overbought_threshold,
             **kwargs
         }
-        super().__init__('RSI Strategy', parameters)
+        super().__init__(self.get_label(), parameters)
         
         # Parameter validation
         if not (0 < oversold_threshold < overbought_threshold < 100):
@@ -108,20 +139,75 @@ class RSIStrategy(BaseStrategy):
         
         return rsi
     
-    def get_description(self) -> str:
+    def get_explanation(self) -> str:
         """
-        Return a description of the strategy.
+        Return an explanation of the strategy.
         
         Returns:
-            Description of the RSI strategy
+            Textual explanation of the strategy
         """
         period = self.parameters['period']
         oversold = self.parameters['oversold_threshold']
         overbought = self.parameters['overbought_threshold']
         
-        return (f"RSI Strategy with period {period}. "
-                f"Buy when RSI < {oversold} (oversold), "
-                f"sell when RSI > {overbought} (overbought).")
+        return (
+            f"{self.get_label()} with period {period}.\n"
+            f"Buy when {self.get_short_label()} < {oversold:.2f} (oversold), " 
+            f"sell when {self.get_short_label()} > {overbought:.2f} (overbought)."
+        )
+    
+    @classmethod
+    def get_short_description(cls, config: Dict[str, Any] = None) -> str:
+        """
+        Get a short description of the strategy with optional configuration details.
+        
+        Args:
+            config: Strategy parameters configuration
+            
+        Returns:
+            Short description string
+        """
+        if config and 'period' in config:
+            oversold = config.get('oversold_threshold', 30)
+            overbought = config.get('overbought_threshold', 70)
+            return f"{cls.get_short_label()} {config['period']} ({oversold:.2f}/{overbought:.2f})"
+        return cls.get_short_label()
+        
+    @classmethod
+    def get_label(cls) -> str:
+        """
+        Get the label of the strategy.
+            
+        Returns:
+            Label string
+        """
+        return "Relative Strengh Index"
+    
+    @classmethod
+    def get_short_label(cls) -> str:
+        """
+        Get the short label of the strategy.
+            
+        Returns:
+            Label string
+        """
+        return "RSI"
+    
+    @classmethod
+    def get_predefined_configurations(cls) -> List[Dict[str, Any]]:
+        """
+        Get predefined configurations for strategy comparison.
+        
+        Returns:
+            List of parameter dictionaries for comparison
+        """
+        return [
+            {'period': 7, 'oversold_threshold': 30, 'overbought_threshold': 70},
+            {'period': 14, 'oversold_threshold': 30, 'overbought_threshold': 70},
+            {'period': 21, 'oversold_threshold': 30, 'overbought_threshold': 70},
+            {'period': 14, 'oversold_threshold': 20, 'overbought_threshold': 80},
+            {'period': 14, 'oversold_threshold': 40, 'overbought_threshold': 60}
+        ]
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """

@@ -15,10 +15,11 @@ class Visualizer:
     """
     
     @staticmethod
-    def plot_backtest_results(results: Dict[str, Any], 
-                            show_signals: bool = True,
-                            show_indicators: bool = True,
-                            save_path: Optional[str] = None) -> go.Figure:
+    def plot_backtest_results(
+            results: Dict[str, Any], 
+            show_signals: bool = True,
+            show_indicators: bool = True,
+        ) -> go.Figure:
         """
         Creates an interactive chart of backtest results.
         
@@ -171,11 +172,6 @@ class Visualizer:
         
         # Remove range selector for candlestick
         fig.update_layout(xaxis_rangeslider_visible=False)
-        
-        # Save if requested
-        if save_path:
-            fig.write_html(save_path)
-            print(f"Chart saved: {save_path}")
         
         return fig
     

@@ -1,9 +1,29 @@
 """
-Module des stratégies de trading.
+Trading strategies module.
 """
 
 from .base_strategy import BaseStrategy
-from .sma_crossover import SMACrossoverStrategy
-from .rsi_strategy import RSIStrategy
+"""
+Strategies package - Contains all trading strategies for the Daily Scalper app.
+"""
 
-__all__ = ['BaseStrategy', 'SMACrossoverStrategy', 'RSIStrategy']
+# Import base classes
+from .base_strategy import BaseStrategy
+from .strategy_registry import register_strategy, get_strategy_names, create_strategy, get_strategy_parameter_info
+
+# Import strategy implementations (these will register with the decorator)
+from .sma_strategy import SMAStrategy
+from .rsi_strategy import RSIStrategy
+from .bb_strategy import BBStrategy
+
+# Export the classes
+__all__ = [
+    'BaseStrategy',
+    'register_strategy',
+    'get_strategy_names',
+    'create_strategy',
+    'get_strategy_parameter_info',
+    'SMAStrategy',
+    'RSIStrategy'
+    'BBStrategy'
+]

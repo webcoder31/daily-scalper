@@ -8,7 +8,7 @@ It is optional, but recommended to be updated as the project evolves.
 
 ## Coding Patterns
 
-* **Strategy Pattern**: Used extensively with BaseStrategy as the abstract interface and concrete implementations like SMACrossoverStrategy and RSIStrategy
+* **Strategy Pattern**: Used extensively with BaseStrategy as the abstract interface and concrete implementations like SMACrossoverStrategy and RSIThresholdStrategy
 * **Dependency Injection**: Components receive their dependencies (e.g., DataLoader passed to BacktestEngine) rather than creating them
 * **Factory Methods**: Class methods that create and return objects (e.g., get_period_description in PeriodTranslator)
 * **Rich Docstrings**: Comprehensive documentation in Python docstrings using Google-style format

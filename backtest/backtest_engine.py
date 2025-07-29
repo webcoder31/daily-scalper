@@ -1,5 +1,5 @@
 """
-Moteur de backtest utilisant vectorbt pour l'évaluation des stratégies.
+Backtest engine using vectorbt for strategy evaluation.
 """
 
 from typing import Dict, Any, Optional, Tuple
@@ -14,67 +14,71 @@ from strategies.base_strategy import BaseStrategy
 
 class BacktestEngine:
     """
-    Moteur de backtest pour évaluer les performances des stratégies de trading.
+    Backtest engine to evaluate trading strategy performances.
     """
     
-    def __init__(self, 
-                 initial_cash: float = 10000.0,
-                 commission: float = 0.001,
-                 slippage: float = 0.0001):
+    def __init__(
+            self, 
+            initial_cash: float = 10000.0,
+            commission: float = 0.001,
+            slippage: float = 0.0001
+        ):
         """
-        Initialise le moteur de backtest.
+        Initializes the backtest engine.
         
         Args:
-            initial_cash: Capital initial en USD
-            commission: Commission par transaction (0.001 = 0.1%)
-            slippage: Slippage par transaction (0.0001 = 0.01%)
+            initial_cash: Initial capital in USD
+            commission: Commission per transaction (0.001 = 0.1%)
+            slippage: Slippage per transaction (0.0001 = 0.01%)
         """
         self.initial_cash = initial_cash
         self.commission = commission
         self.slippage = slippage
         self.results = None
         
-    def run_backtest(self, 
-                    strategy: BaseStrategy, 
-                    data: pd.DataFrame,
-                    start_date: Optional[str] = None,
-                    end_date: Optional[str] = None) -> Dict[str, Any]:
+    def run_backtest(
+            self, 
+            strategy: BaseStrategy, 
+            data: pd.DataFrame,
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None
+        ) -> Dict[str, Any]:
         """
-        Exécute un backtest pour une stratégie donnée.
+        Runs a backtest for a given strategy.
         
         Args:
-            strategy: Instance de la stratégie à tester
-            data: DataFrame avec les données OHLCV
-            start_date: Date de début (format 'YYYY-MM-DD')
-            end_date: Date de fin (format 'YYYY-MM-DD')
+            strategy: Instance of the strategy to test
+            data: DataFrame with OHLCV data
+            start_date: Start date (format 'YYYY-MM-DD')
+            end_date: End date (format 'YYYY-MM-DD')
             
         Returns:
-            Dictionnaire contenant les résultats du backtest
+            Dictionary containing backtest results
         """
-        # Filtrage des données par date si spécifié
+        # Filter data by date if specified
         if start_date or end_date:
             data = self._filter_data_by_date(data, start_date, end_date)
         
         if len(data) < 100:
-            warnings.warn("Données insuffisantes pour un backtest fiable (< 100 points)")
+            warnings.warn("Insufficient data for reliable backtest (< 100 points)")
         
-        # Génération des signaux
+        # Generate signals
         try:
             buy_signals, sell_signals = strategy.generate_signals(data)
         except Exception as e:
-            raise RuntimeError(f"Erreur lors de la génération des signaux: {e}")
+            raise RuntimeError(f"Error while generating signals: {e}")
         
-        # Nettoyage des signaux (suppression des NaN)
+        # Clean signals (remove NaN)
         buy_signals = buy_signals.fillna(False)
         sell_signals = sell_signals.fillna(False)
         
-        # Création du portfolio avec vectorbt
+        # Create portfolio with vectorbt
         portfolio = self._create_portfolio(data, buy_signals, sell_signals)
         
-        # Calcul des métriques de performance
+        # Calculate performance metrics
         metrics = self._calculate_metrics(portfolio, data)
         
-        # Stockage des résultats
+        # Store results
         self.results = {
             'strategy': strategy.to_dict(),
             'portfolio': portfolio,
@@ -96,20 +100,22 @@ class BacktestEngine:
         
         return self.results
     
-    def _filter_data_by_date(self, 
-                           data: pd.DataFrame, 
-                           start_date: Optional[str], 
-                           end_date: Optional[str]) -> pd.DataFrame:
+    def _filter_data_by_date(
+            self, 
+            data: pd.DataFrame, 
+            start_date: Optional[str], 
+            end_date: Optional[str]
+        ) -> pd.DataFrame:
         """
-        Filtre les données par plage de dates.
+        Filters data by date range.
         
         Args:
-            data: DataFrame à filtrer
-            start_date: Date de début
-            end_date: Date de fin
+            data: DataFrame to filter
+            start_date: Start date
+            end_date: End date
             
         Returns:
-            DataFrame filtré
+            Filtered DataFrame
         """
         if start_date:
             data = data[data.index >= start_date]
@@ -117,26 +123,28 @@ class BacktestEngine:
             data = data[data.index <= end_date]
         return data
     
-    def _create_portfolio(self, 
-                         data: pd.DataFrame, 
-                         buy_signals: pd.Series, 
-                         sell_signals: pd.Series) -> vbt.Portfolio:
+    def _create_portfolio(
+            self, 
+            data: pd.DataFrame, 
+            buy_signals: pd.Series, 
+            sell_signals: pd.Series
+        ) -> vbt.Portfolio:
         """
-        Crée un portfolio vectorbt à partir des signaux.
+        Creates a vectorbt portfolio from signals.
         
         Args:
-            data: Données de prix
-            buy_signals: Signaux d'achat
-            sell_signals: Signaux de vente
+            data: Price data
+            buy_signals: Buy signals
+            sell_signals: Sell signals
             
         Returns:
-            Portfolio vectorbt
+            Vectorbt portfolio
         """
-        # Conversion des signaux booléens en entrées/sorties
+        # Convert boolean signals to entries/exits
         entries = buy_signals
         exits = sell_signals
         
-        # Création du portfolio avec vectorbt
+        # Create portfolio with vectorbt
         portfolio = vbt.Portfolio.from_signals(
             close=data['Close'],
             entries=entries,
@@ -144,32 +152,34 @@ class BacktestEngine:
             init_cash=self.initial_cash,
             fees=self.commission,
             slippage=self.slippage,
-            freq='1D'  # Fréquence journalière par défaut
+            freq='1D'  # Default daily frequency
         )
         
         return portfolio
     
-    def _calculate_metrics(self, 
-                          portfolio: vbt.Portfolio, 
-                          data: pd.DataFrame) -> Dict[str, float]:
+    def _calculate_metrics(
+            self, 
+            portfolio: vbt.Portfolio, 
+            data: pd.DataFrame
+        ) -> Dict[str, float]:
         """
-        Calcule les métriques de performance du portfolio.
+        Calculates portfolio performance metrics.
         
         Args:
-            portfolio: Portfolio vectorbt
-            data: Données originales
+            portfolio: Vectorbt portfolio
+            data: Original data
             
         Returns:
-            Dictionnaire des métriques
+            Dictionary of metrics
         """
         try:
-            # Métriques de base
+            # Basic metrics
             total_return = portfolio.total_return()
             sharpe_ratio = portfolio.sharpe_ratio()
             max_drawdown = portfolio.max_drawdown()
             win_rate = portfolio.trades.win_rate()
             
-            # Métriques supplémentaires
+            # Additional metrics
             total_trades = portfolio.trades.count()
             avg_trade_duration = portfolio.trades.duration.mean() if total_trades > 0 else 0
             profit_factor = portfolio.trades.profit_factor() if total_trades > 0 else 0
@@ -190,7 +200,7 @@ class BacktestEngine:
                 'alpha': float(total_return - buy_hold_return) if not pd.isna(total_return) else 0.0
             }
         except Exception as e:
-            print(f"Erreur lors du calcul des métriques: {e}")
+            print(f"Error while calculating metrics: {e}")
             return {
                 'total_return': 0.0,
                 'sharpe_ratio': 0.0,
@@ -206,9 +216,9 @@ class BacktestEngine:
     
     def get_last_results(self) -> Optional[Dict[str, Any]]:
         """
-        Retourne les résultats du dernier backtest.
+        Returns the results of the last backtest.
         
         Returns:
-            Dictionnaire des résultats ou None
+            Dictionary of results or None
         """
         return self.results

@@ -7,7 +7,7 @@ Main script for running backtests and analyzing performance.
 
 import sys
 import os
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 import warnings
 
 # Suppress non-critical warnings
@@ -24,9 +24,12 @@ from rich.text import Text
 from rich.prompt import Prompt, IntPrompt, FloatPrompt, Confirm
 from rich import box
 
-from strategies import SMACrossoverStrategy
 from backtest import BacktestEngine, PerformanceMetrics
 from utils import DataLoader, Visualizer, StrategySaver, PeriodTranslator
+from strategies.strategy_registry import get_strategy_names, \
+                                         create_strategy, \
+                                         get_strategy_parameter_info, \
+                                         get_strategy_class
 
 # Initialize rich console
 console = Console(width=120)
@@ -68,17 +71,17 @@ class DailyScalper:
             box=box.DOUBLE_EDGE, 
             style="bright_magenta", 
             border_style="blue", 
-            title="[bold bright_magenta]BACKTEST CONFIGURATION[/bold bright_magenta]",
+            title="[bold bright_magenta]TESTED CONFIGURATION[/bold bright_magenta]",
             width=120
         )
-        header_table.add_column("PARAMETER", style="bold bright_magenta", width=41)
-        header_table.add_column("VALUE", style="bold bright_white", width=79)
+        header_table.add_column("PARAMETER", style="bold bright_blue", width=60)
+        header_table.add_column("VALUE", style="bold bright_white", width=60)
         
         # Add coin pair
-        coin_pair = results.get('symbol', strategy.get('symbol', 'N/A'))
+        symbol = results['symbol']
         header_table.add_row(
-            "SYMBOL",
-            f"[bold bright_green]{coin_pair.upper()}[/bold bright_green]"
+            "CRYPTO PAIR",
+            f"[bold bright_green]{symbol}[/bold bright_green]"
         )
 
         # Add initial capital
@@ -91,7 +94,7 @@ class DailyScalper:
         # Add period
         period_str = f"{period['start']} → {period['end']} ({period['duration_days']} DAYS)"
         header_table.add_row(
-            "PERIOD",
+            "BACKTEST PERIOD",
             f"[bold bright_green]{period_str}[/bold bright_green]"
         )
         
@@ -119,7 +122,7 @@ class DailyScalper:
             box=box.ROUNDED, 
             style="blue", 
             border_style="blue", 
-            title="[bold bright_magenta]BACKTEST RESULTS[/bold bright_magenta]",
+            title="[bold bright_magenta]RESULTS[/bold bright_magenta]",
             width=120
         )
         perf_metric_table.add_column("Performance Metric", style="bold bright_blue", width=40)
@@ -166,13 +169,15 @@ class DailyScalper:
         
         # Final evaluation
         is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
-        status_text =  "✅ PROFITABLE STRATEGY" if is_profitable else "❌ UNPROFITABLE STRATEGY"
+        tested_strategy = f"{results['strategy_label']} for {results['symbol']}"
+        status_text = f"✅ {tested_strategy} is PROFITABLE" if is_profitable \
+                      else f"❌ {tested_strategy} is UNPROFITABLE"
         status_style = "bold green" if is_profitable else "bold red"
 
         console.print()
         console.print(Panel(
             Text(status_text, justify="center"), 
-            title=f"FINAL EVALUATION",
+            title=f"STRATEGY EVALUATION",
             padding=(1, 1), 
             style=status_style
         ))
@@ -180,34 +185,48 @@ class DailyScalper:
 
 
     def backtest_strategy(
-            self, 
+            self,
+            strategy_name: str = "SMACrossoverStrategy",
             symbol: str = "BTC-USD",
             period: str = "1y",
-            short_window: int = 20,
-            long_window: int = 50,
+            strategy_params: Dict[str, Any] = None,
             show_plots: bool = True,
             save_if_profitable: bool = True
         ) -> Dict[str, Any]:
         """
-        Execute a backtest of an SMA Crossover strategy.
+        Execute a backtest of a trading strategy.
         
         Args:
+            strategy_name: Name of the strategy class to use
             symbol: Crypto symbol to analyze
             period: Data period
-            short_window: Short SMA period
-            long_window: Long SMA period
+            strategy_params: Parameters for the strategy
             show_plots: Show charts
             save_if_profitable: Save if profitable
             
         Returns:
             Backtest results
         """
+        # Use default parameters if none provided
+        if strategy_params is None:
+            strategy_params = {}
+            
+        # Get parameter info for the strategy
+        param_info = get_strategy_parameter_info(strategy_name)
+            
+        # Build parameter description for display
+        param_desc = []
+        for name, value in strategy_params.items():
+            if name in param_info:
+                param_desc.append(f"{name}: {value}")
+        
+        param_str = ", ".join(param_desc) if param_desc else "Default parameters"
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover {short_window}/{long_window}\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
+            Text(f"{strategy_name.upper()}\n\nCrypto pair: {symbol}, Backtest period: {PeriodTranslator.get_period_description(period)}\n{param_str}", justify="center"),
             title=f"STRATEGY BACKTEST",
-            padding=(1, 1), 
+            padding=(1, 1),
             style="bold bright_magenta"
         ))
         console.print()
@@ -220,11 +239,8 @@ class DailyScalper:
             
             # 2. Creating strategy
             console.print("Initializing strategy...", style="blue")
-            strategy = SMACrossoverStrategy(
-                short_window=short_window,
-                long_window=long_window
-            )
-            console.print(f"✅ {strategy.get_description()}\n", style="green")
+            strategy = create_strategy(strategy_name, **strategy_params)
+            console.print(f"✅ {strategy.get_explanation()}\n", style="green")
             
             # 3. Executing backtest
             console.print("Executing backtest...", style="blue")
@@ -232,8 +248,9 @@ class DailyScalper:
             
             # Add strategy instance for visualization
             results['strategy_instance'] = strategy
+            results['strategy_label'] = strategy.get_short_description(strategy_params)
             
-            # Add symbol for display
+            # Add symbol to results
             results['symbol'] = symbol
             
             # 4. Calculate advanced metrics
@@ -266,55 +283,76 @@ class DailyScalper:
     
 
     def compare_strategies(
-            self, 
+            self,
+            strategy_name: str = "SMACrossoverStrategy",
             symbol: str = "BTC-USD",
-            period: str = "1y"
+            period: str = "1y",
+            configurations: List[Dict[str, Any]] = None
         ) -> None:
         """
-        Compare different configurations of the SMA strategy.
+        Compare different configurations of a strategy.
         
         Args:
+            strategy_name: Name of the strategy class to use
             symbol: Symbol to analyze
             period: Data period
+            configurations: List of parameter configurations to test
         """
+        # If no configurations provided, get predefined ones from the strategy class
+        if configurations is None:
+            # Get the strategy class from registry
+            strategy_class = get_strategy_class(strategy_name)
+            if strategy_class:
+                # Use the strategy's predefined configurations
+                configurations = strategy_class.get_predefined_configurations()
+            else:
+                # Fallback to empty configuration if strategy not found
+                configurations = [{}]
 
         console.print()
         console.print(Panel(
-            Text(f"SMA Crossover\nPaire : {symbol}, Période: {PeriodTranslator.get_period_description(period)}", justify="center"), 
+            Text(f"{strategy_name}\nCrypto pair: {symbol}, Period: {PeriodTranslator.get_period_description(period)}", justify="center"),
             title=f"STRATEGY COMPARISON",
-            padding=(1, 1), 
+            padding=(1, 1),
             style="bold bright_magenta"
         ))
         console.print()
         
-        # Different configurations to test
-        configurations = [
-            (10, 30),
-            (20, 50),
-            (30, 70),
-            (50, 100),
-            (20, 100)
-        ]
-        
         results_list = []
         
         # Table for results
-        progress_table = Table(box=box.ROUNDED, style="blue", border_style="blue", width=120)
+        progress_table = Table(
+            box=box.ROUNDED, 
+            show_lines=True,
+            style="blue", 
+            border_style="blue", 
+            title="[bold bright_magenta]COMPARISON RESULTS[/bold bright_magenta]",
+            width=120
+        )
         progress_table.add_column("Test", style="bold bright_blue", width=8)
-        progress_table.add_column("Configuration", style="bold bright_blue", width=20)
-        progress_table.add_column("Rendement", justify="right", style="bright_blue", width=15)
-        progress_table.add_column("Sharpe", justify="right", style="bright_blue", width=12)
-        progress_table.add_column("Trades", justify="right", style="bright_blue", width=12)
+        progress_table.add_column("Configuration", style="bold bright_blue", width=30)
+        progress_table.add_column("Return", justify="right", style="bright_blue", width=11)
+        progress_table.add_column("Sharpe", justify="right", style="bright_blue", width=9)
+        progress_table.add_column("Trades", justify="right", style="bright_blue", width=9)
         progress_table.add_column("Profit Factor", justify="right", style="bright_blue", width=15)
-        progress_table.add_column("Statut", justify="center", style="bright_blue", width=12)
+        progress_table.add_column("Status", justify="center", style="bright_blue", width=12)
         
-        for i, (short, long) in enumerate(configurations, 1):
+        for i, strategy_params in enumerate(configurations, 1):
             try:
+                # Get the strategy class for short description
+                strategy_class = get_strategy_class(strategy_name)
+                if strategy_class:
+                    # Use the strategy's short description method
+                    strategy_short_desc = strategy_class.get_short_description(strategy_params)
+                else:
+                    # Fallback to generic formatting
+                    strategy_short_desc = ", ".join([f"{k}={v}" for k, v in strategy_params.items()])
+                
                 results = self.backtest_strategy(
+                    strategy_name=strategy_name,
                     symbol=symbol,
                     period=period,
-                    short_window=short,
-                    long_window=long,
+                    strategy_params=strategy_params,
                     show_plots=False,
                     save_if_profitable=False
                 )
@@ -324,8 +362,8 @@ class DailyScalper:
                 status = "✅" if metrics['total_return'] > 0 else "❌"
                 
                 progress_table.add_row(
-                    f"{i}/5",
-                    f"SMA {short}/{long}",
+                    f"{i}/{len(configurations)}",
+                    strategy_short_desc,
                     f"{metrics['total_return']:.2%}",
                     f"{metrics['sharpe_ratio']:.2f}",
                     f"{metrics['total_trades']}",
@@ -335,16 +373,15 @@ class DailyScalper:
                 
             except Exception as e:
                 progress_table.add_row(
-                    f"{i}/5",
-                    f"SMA {short}/{long}",
+                    f"{i}/{len(configurations)}",
+                    strategy_short_desc,
                     "❌ Erreur",
                     "-",
                     "-",
                     "-",
                     "❌"
                 )
-        
-        console.print("\nTEST RESULTS", style="bold bright_blue")
+
         console.print(progress_table)
         
         # Strategy ranking
@@ -352,13 +389,19 @@ class DailyScalper:
             
             ranked_strategies = PerformanceMetrics.rank_strategies(results_list)
             
-            ranking_table = Table(box=box.ROUNDED, style="blue", border_style="blue", width=120)
+            ranking_table = Table(
+                box=box.ROUNDED, 
+                style="blue", 
+                border_style="blue", 
+                title="[bold bright_magenta]STRATEGY RANKING[/bold bright_magenta]",
+                width=120
+            )
             ranking_table.add_column("Rang", style="bold bright_blue", width=10)
             ranking_table.add_column("Configuration", style="bold bright_blue", width=20)
-            ranking_table.add_column("Rendement", justify="right", style="bright_blue", width=15)
+            ranking_table.add_column("Return", justify="right", style="bright_blue", width=15)
             ranking_table.add_column("Sharpe", justify="right", style="bright_blue", width=12)
             ranking_table.add_column("Score", justify="right", style="bright_blue", width=12)
-            ranking_table.add_column("Statut", style="bright_blue", width=20)
+            ranking_table.add_column("Status", style="bright_blue", width=20)
                         
             for i, result in enumerate(ranked_strategies, 1):
                 strategy = result['strategy']
@@ -368,23 +411,31 @@ class DailyScalper:
                 is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
                 status = "✅ Profitable" if is_profitable else "❌ Not profitable"
                 
+                # Get the strategy class
+                strategy_class = get_strategy_class(strategy_name)
+                if strategy_class:
+                    # Use the strategy's short description
+                    config_display = strategy_class.get_short_description(params)
+                else:
+                    # Fallback to generic display
+                    config_display = ", ".join([f"{k}={v}" for k, v in params.items()])
+                
                 ranking_table.add_row(
                     f"#{i}",
-                    f"SMA {params['short_window']}/{params['long_window']}",
+                    config_display,
                     f"{metrics['total_return']:.2%}",
                     f"{metrics['sharpe_ratio']:.2f}",
                     f"{result['score']:.3f}",
                     status
                 )
             
-            console.print("\nSTRATEGY RANKING", style="bold bright_blue")
             console.print(ranking_table)
         else:
             console.print("❌ No valid results obtained for comparison.", style="red")
 
 
     def show_saved_strategies(self) -> None:
-        """Display saved strategies with simple formatting."""
+        """Display saved profitable strategies."""
         
         # Get list of saved strategies
         strategies = self.strategy_saver.list_saved_strategies()
@@ -395,11 +446,10 @@ class DailyScalper:
         console.print()
         console.print(Panel(
             Text(status_text, justify="center"),
-            title=f"SAVED STRATEGIES",
+            title=f"SAVED PROFITABLE STRATEGIES",
             padding=(1, 1),
             style="bold bright_magenta"
         ))
-        console.print(status_text, style="bold blue")
         console.print()
         
         if not strategies:
@@ -408,33 +458,32 @@ class DailyScalper:
         # Table of saved best strategies
         saved_table = Table(
             box=box.ROUNDED, 
-            style="blue", 
+            show_lines=True,
+            style="bold bright_blue", 
             border_style="blue", 
-            title="[bold bright_magenta]LIST OF BEST STRATEGIES[/bold bright_magenta]",
-            width=120)
-        saved_table.add_column("ID", style="bold bright_blue", width=8)
-        saved_table.add_column("Stratégie", style="bold bright_blue", width=18)
-        saved_table.add_column("Rendement", justify="right", style="bright_blue", width=15)
-        saved_table.add_column("Sharpe", justify="right", style="bright_blue", width=12)
-        saved_table.add_column("Trades", justify="right", style="bright_blue", width=12)
-        saved_table.add_column("Date", style="bright_blue", width=15)
-        saved_table.add_column("Statut", style="bright_blue", width=15)
+            title="[bold bright_magenta]LAST 10 PROFITABLE STRATEGIES[/bold bright_magenta]",
+            width=120
+        )
+        saved_table.add_column("ID", justify="center", style="bold bright_blue", width=5)
+        saved_table.add_column("Strategy", justify="left", style="bold bright_blue", width=40)
+        saved_table.add_column("Crypto", justify="left", style="bold bright_blue", width=15)
+        saved_table.add_column("Return", justify="right", style="bright_blue", width=15)
+        saved_table.add_column("Sharpe", justify="right", style="bright_blue", width=15)
+        saved_table.add_column("Trades", justify="right", style="bright_blue", width=15)
+        saved_table.add_column("Date", justify="center", style="bright_blue", width=15)
         
         for i, strategy in enumerate(strategies[:10], 1):
             metrics = strategy.get('metrics', {})
             strategy_info = strategy.get('strategy', {})
             
-            is_profitable = metrics.get('total_return', 0) > 0
-            status = "✅ Profitable" if is_profitable else "❌ Not profitable"
-            
             saved_table.add_row(
                 f"#{i}",
-                strategy_info.get('name', 'N/A'),
+                f"{strategy_info.get('name', 'N/A')}\n{strategy.get('strategy_label', '')}",
+                strategy.get('symbol', ''),
                 f"{metrics.get('total_return', 0):.2%}",
                 f"{metrics.get('sharpe_ratio', 0):.2f}",
                 f"{metrics.get('total_trades', 0)}",
-                strategy.get('timestamp', 'N/A')[:10],  # Date only
-                status
+                strategy.get('test_date', 'N/A')[:10],  # Date only
             )
         
         console.print(saved_table)
@@ -472,33 +521,67 @@ def get_user_input(prompt: str, input_type: type = str, default: Any = None) -> 
 
 def show_main_menu() -> None:
     """Display the main menu."""
-    console.print("\nMENU PRINCIPAL", style="bold bright_green")
+    console.print("\nMAIN MENU", style="bold bright_green")
 
-    menu_table = Table(show_header=False, box=box.ROUNDED, style="bright_green", border_style="bright_green", width=120)
+    menu_table = Table(
+        show_header=False, 
+        box=box.ROUNDED, 
+        style="bright_green", 
+        border_style="bright_green", 
+        width=120
+    )
     menu_table.add_column("Option", style="bold bright_green", width=5)
     menu_table.add_column("Description", style="bright_green", width=115)
     
-    menu_table.add_row("1", "Test a strategy")
-    menu_table.add_row("2", "Compare strategies")
-    menu_table.add_row("3", "View saved results")
-    menu_table.add_row("4", "Configuration")
-    menu_table.add_row("5", "Exit")
+    menu_table.add_row("1", "Test a single strategy configuration")
+    menu_table.add_row("2", "Compare different strategy configurations")
+    menu_table.add_row("3", "View saved profitable strategies")
+    menu_table.add_row("4", "View application settings")
+    menu_table.add_row("5", "Exit application")
     
     console.print(menu_table)
 
 
 def backtest_strategy_menu(app: DailyScalper) -> None:
     """Menu for testing a strategy."""
-    console.print("\nSTRATEGY BACKTEST PARAMETERS\n", style="bright_green bold  underline")
+    console.print("\nSTRATEGY BACKTEST PARAMETERS\n", style="bright_green bold underline")
+    
+    # Get available strategies
+    strategy_names = get_strategy_names()
     
     # Default parameters
     default_symbol = "BTC-USD"
     default_period = "1y"
-    default_short = 20
-    default_long = 50
     
-    # Parameter collection
-    symbol = get_user_input("Symbole crypto", str, default_symbol)
+    # Create strategy selection options
+    strategy_table = Table(
+        show_header=False, 
+        box=box.ROUNDED, 
+        style="bright_green", 
+        border_style="bright_green", 
+        width=120
+    )
+    strategy_table.add_column("ID", style="bold bright_green", width=5)
+    strategy_table.add_column("Strategy", style="bright_green", width=115)
+    
+    for i, strategy_name in enumerate(strategy_names, 1):
+        strategy_table.add_row(f"{i}", strategy_name)
+    
+    console.print("Available strategies:")
+    console.print(strategy_table)
+    
+    # Strategy selection
+    strategy_choice = get_user_input("Select strategy (number)", int, 1)
+    if strategy_choice is None or strategy_choice < 1 or strategy_choice > len(strategy_names):
+        console.print("Invalid strategy selection.", style="red")
+        return
+    
+    # Get selected strategy name (short description)
+    selected_strategy_name = strategy_names[strategy_choice - 1]
+    console.print(f"Selected strategy: {selected_strategy_name}", style="bold bright_blue")
+    
+    # Parameter collection - Symbol and Period
+    symbol = get_user_input("Crypto pair", str, default_symbol)
     if symbol is None:
         return
     
@@ -507,14 +590,32 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     if period is None:
         return
     
-    short_window = get_user_input("Short SMA", int, default_short)
-    if short_window is None:
-        return
+    # Get strategy-specific parameters
+    strategy_params = {}
+    param_info = get_strategy_parameter_info(selected_strategy_name)
     
-    long_window = get_user_input("Long SMA", int, default_long)
-    if long_window is None:
-        return
+    console.print("\nStrategy parameters:", style="bold bright_blue")
+    for param_name, param_config in param_info.items():
+        param_type = param_config.get('type', str)
+        default_value = param_config.get('default')
+        description = param_config.get('description', param_name)
+        
+        # Format the prompt with description and range if available
+        range_info = ""
+        if 'range' in param_config:
+            min_val, max_val = param_config['range']
+            range_info = f" (range: {min_val}-{max_val})"
+        
+        prompt = f"{description}{range_info}"
+        
+        # Get user input with appropriate type
+        value = get_user_input(prompt, param_type, default_value)
+        if value is None:  # User cancelled
+            return
+        
+        strategy_params[param_name] = value
     
+    # Chart and save options
     show_plots = Confirm.ask("Show charts?", default=False)
     if show_plots is None:
         return
@@ -526,10 +627,10 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     try:
         console.print("\nStarting test...", style="bold blue")
         results = app.backtest_strategy(
+            strategy_name=selected_strategy_name,
             symbol=symbol,
             period=period,
-            short_window=short_window,
-            long_window=long_window,
+            strategy_params=strategy_params,
             show_plots=show_plots,
             save_if_profitable=save_if_profitable
         )
@@ -546,11 +647,41 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     """Menu for comparing strategies."""
     console.print("\nSTRATEGY COMPARISON PARAMETERS\n", style="bright_green bold underline")
     
+    # Get available strategies
+    strategy_names = get_strategy_names()
+    
+    # Create strategy selection options
+    strategy_table = Table(
+        show_header=False, 
+        box=box.ROUNDED, 
+        style="bright_green", 
+        border_style="bright_green", 
+        width=120
+    )
+    strategy_table.add_column("ID", style="bold bright_green", width=5)
+    strategy_table.add_column("Strategy", style="bright_green", width=115)
+    
+    for i, strategy_name in enumerate(strategy_names, 1):
+        strategy_table.add_row(f"{i}", strategy_name)
+    
+    console.print("Available strategies:")
+    console.print(strategy_table)
+    
+    # Strategy selection
+    strategy_choice = get_user_input("Select strategy to compare (number)", int, 1)
+    if strategy_choice is None or strategy_choice < 1 or strategy_choice > len(strategy_names):
+        console.print("Invalid strategy selection.", style="red")
+        return
+    
+    # Get selected strategy name (short description)
+    selected_strategy_name = strategy_names[strategy_choice - 1]
+    console.print(f"Selected strategy: {selected_strategy_name}", style="bold bright_blue")
+    
     # Default parameters
     default_symbol = "BTC-USD"
     default_period = "1y"
     
-    symbol = get_user_input("Symbole crypto", str, default_symbol)
+    symbol = get_user_input("Crypto pair", str, default_symbol)
     if symbol is None:
         return
     
@@ -559,9 +690,44 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     if period is None:
         return
     
+    # Check if user wants to customize configurations
+    custom_configs = Confirm.ask("Do you want to customize test configurations?", default=False)
+    configurations = None
+    
+    if custom_configs:
+        configurations = []
+        console.print("\nEnter up to 5 configurations (leave blank to finish):", style="bold bright_blue")
+        
+        param_info = get_strategy_parameter_info(selected_strategy_name)
+        for i in range(1, 6):
+            console.print(f"\nConfiguration #{i}:", style="bold")
+            config = {}
+            
+            for param_name, param_config in param_info.items():
+                param_type = param_config.get('type', str)
+                default_value = param_config.get('default')
+                description = param_config.get('description', param_name)
+                
+                value = get_user_input(f"{description}", param_type, default_value)
+                if value is None:
+                    break
+                config[param_name] = value
+            
+            if not config:
+                break
+                
+            configurations.append(config)
+            if i < 5 and not Confirm.ask("Add another configuration?", default=True):
+                break
+    
     try:
         console.print("Starting comparison...", style="bold blue")
-        app.compare_strategies(symbol=symbol, period=period)
+        app.compare_strategies(
+            strategy_name=selected_strategy_name,
+            symbol=symbol,
+            period=period,
+            configurations=configurations
+        )
         console.print("✅ Comparison completed!", style="bold green")
         
     except Exception as e:
@@ -604,7 +770,12 @@ def view_configuration_menu() -> None:
         )
         
         # Backtest configuration table
-        backtest_table = Table(box=box.ROUNDED, style="blue", border_style="blue", width=120)
+        backtest_table = Table(
+            box=box.ROUNDED, 
+            style="blue", 
+            border_style="blue", 
+            width=120
+        )
         backtest_table.add_column("Backtest Parameter", style="bold bright_blue", width=50)
         backtest_table.add_column("Value", justify="right", style="bright_blue", width=50)
         
