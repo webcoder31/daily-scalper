@@ -18,7 +18,9 @@ Daily Scalper is a modular, object-oriented Python application for backtesting a
 - **backtest/**: Backtest engine and performance metrics.
 - **utils/**: Data loading, visualization, strategy saving, and period utilities.
 - **results/**: Output directory for saved strategies, reports, and charts (created at runtime).
-- **main.py**: Entry point and interactive CLI.
+- **main.py**: Entry point. Launches the interactive CLI.
+- **cli.py**: All CLI/menu and user interaction logic.
+- **app.py**: Core application logic (DailyScalper class, backtest/compare logic).
 - **config.py**: All configuration (capital, commission, cache, profitability criteria, etc.).
 
 ---
@@ -48,6 +50,8 @@ daily-scalper/
 │   ├── strategies/
 │   ├── reports/
 │   └── charts/
+├── app.py
+├── cli.py
 ├── main.py
 ├── test_setup.py
 ├── run.sh

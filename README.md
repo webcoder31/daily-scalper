@@ -65,6 +65,10 @@ source venv/bin/activate
 python main.py
 ```
 
+- The entrypoint is [`main.py`](main.py), which launches the interactive CLI.
+- The CLI/menu logic is in [`cli.py`](cli.py).
+- The core application logic is in [`app.py`](app.py).
+
 ### Menu Options
 
 1. Test a single strategy configuration
