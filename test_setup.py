@@ -12,6 +12,7 @@ import traceback
 # Add root directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+
 def test_imports():
     """Tests the import of all modules."""
     print("🧪 Testing imports...")
@@ -26,6 +27,7 @@ def test_imports():
     except ImportError as e:
         print(f"❌ Import error: {e}")
         return False
+
 
 def test_dependencies():
     """Tests the availability of dependencies."""
@@ -51,6 +53,7 @@ def test_dependencies():
     
     return True
 
+
 def test_strategy_creation():
     """Tests the creation of a strategy."""
     print("\n🎯 Testing strategy creation...")
@@ -66,6 +69,7 @@ def test_strategy_creation():
     except Exception as e:
         print(f"❌ Error creating strategy: {e}")
         return False
+
 
 def test_data_loading():
     """Tests data loading (without actual downloading)."""
@@ -83,6 +87,7 @@ def test_data_loading():
         print(f"❌ Error initializing DataLoader: {e}")
         return False
 
+
 def test_backtest_engine():
     """Tests the initialization of the backtest engine."""
     print("\n⚡ Testing backtest engine...")
@@ -98,6 +103,7 @@ def test_backtest_engine():
     except Exception as e:
         print(f"❌ Error initializing BacktestEngine: {e}")
         return False
+
 
 def test_file_structure():
     """Checks the file structure."""
@@ -123,6 +129,7 @@ def test_file_structure():
             all_good = False
     
     return all_good
+
 
 def run_mini_backtest():
     """Runs a mini backtest with simulated data."""
@@ -178,6 +185,7 @@ def run_mini_backtest():
         traceback.print_exc()
         return False
 
+
 def main():
     """Main test function."""
     print("=" * 60)
@@ -220,6 +228,7 @@ def main():
     
     print("=" * 60)
     return 0 if passed == total else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
