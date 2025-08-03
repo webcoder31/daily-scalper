@@ -27,7 +27,8 @@ import pandas as pd
 import logging
 
 # Configure logging
-logger = logging.getLogger(__name__)
+from utils.logging_config import get_logger
+logger = get_logger(__name__)
 
 
 class StrategySaveError(Exception):

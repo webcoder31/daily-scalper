@@ -152,3 +152,43 @@ This file records architectural and implementation decisions using a list format
 * Standardized all text to English and removed French comments for consistency
 * Added helper functions and improved code organization for better maintainability
 * Implemented comprehensive logging throughout all utility modules for better debugging
+
+
+[2025-08-03 17:14:00] - Optional Logging Implementation
+
+## Decision
+
+* Implemented optional logging output controlled by command line arguments
+
+## Rationale 
+
+* Users requested the ability to control logging output, making it optional and configurable
+* Previous implementation had hardcoded logging levels in individual modules
+* Centralized logging configuration improves maintainability and user experience
+* Command line control provides flexibility for different use cases (debugging, production, quiet operation)
+
+## Implementation Details
+
+* Created new `utils/logging_config.py` module with centralized logging configuration
+* Added `LoggingConfig` class with methods to configure logging application-wide
+* Implemented `setup_application_logging()` function for easy command line integration
+* Added command line argument parsing in `cli.py` with options:
+  - `--verbose` / `-v`: Enable INFO level logging
+  - `--log-level`: Set specific log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  - `--log-file`: Save logs to file in addition to console
+  - `--quiet` / `-q`: Disable all logging output
+* Updated all modules to use centralized logging configuration:
+  - `backtest/backtest_engine.py`
+  - `backtest/performance_metrics.py`
+  - `utils/data_loader.py`
+  - `utils/period_translator.py`
+  - `utils/strategy_saver.py`
+  - `utils/theme.py`
+  - `utils/ui_components.py`
+  - `utils/visualizer.py`
+  - `strategies/strategy_registry.py`
+* Replaced individual `logging.basicConfig()` calls with centralized `get_logger()` function
+* Default behavior: Only WARNING and ERROR messages are shown (minimal logging)
+* Added `--file-only` option to log exclusively to file without console output
+* Enhanced logging configuration with file_only parameter and proper validation
+* Comprehensive testing confirms all logging levels work correctly including quiet mode and file-only logging

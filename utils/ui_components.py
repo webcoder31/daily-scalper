@@ -43,7 +43,8 @@ import readchar
 from utils.theme import THEME
 
 # Configure logging
-logger = logging.getLogger(__name__)
+from utils.logging_config import get_logger
+logger = get_logger(__name__)
 
 
 class UIComponentError(Exception):

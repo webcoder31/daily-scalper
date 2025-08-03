@@ -20,7 +20,8 @@ def run_application() -> NoReturn:
     Run the Daily Scalper application.
     
     This function serves as the main entry point that starts the CLI interface
-    and handles the application exit code properly.
+    and handles the application exit code properly. Command line arguments are
+    automatically parsed and processed by the CLI module.
     
     Raises:
         SystemExit: Always exits with the return code from the CLI main function.

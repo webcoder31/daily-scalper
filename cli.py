@@ -7,6 +7,7 @@ interface for backtesting cryptocurrency trading strategies.
 """
 
 import sys
+import argparse
 from typing import Any, Dict, List, Optional, Union, Type
 
 from rich.console import Console
@@ -38,6 +39,7 @@ from strategies.strategy_registry import (
     get_strategy_parameter_info
 )
 from utils.theme import THEME
+from utils.logging_config import setup_application_logging, LoggingConfig
 
 # Console configuration
 UI_WIDTH: int = 100
@@ -454,6 +456,58 @@ def view_app_settings_menu() -> None:
         )
 
 
+def parse_arguments() -> argparse.Namespace:
+    """
+    Parse command line arguments for the Daily Scalper application.
+    
+    Returns:
+        Parsed command line arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Daily Scalper - Cryptocurrency Trading Strategy Backtesting Tool",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py                    # Run with default settings (minimal logging)
+  python main.py --verbose          # Run with verbose logging (INFO level)
+  python main.py --log-level DEBUG  # Run with DEBUG level logging
+  python main.py --quiet            # Run with no logging output
+  python main.py --log-file app.log # Save logs to file
+  python main.py --log-file app.log --file-only # Log only to file (no console)
+        """
+    )
+    
+    # Logging options
+    logging_group = parser.add_argument_group('Logging Options')
+    logging_group.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Enable verbose logging (INFO level)'
+    )
+    logging_group.add_argument(
+        '--log-level',
+        choices=LoggingConfig.get_available_levels(),
+        help='Set specific log level (overrides --verbose)'
+    )
+    logging_group.add_argument(
+        '--log-file',
+        type=str,
+        help='Save logs to specified file (in addition to console output)'
+    )
+    logging_group.add_argument(
+        '--file-only',
+        action='store_true',
+        help='Log only to file, no console output (requires --log-file)'
+    )
+    logging_group.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help='Disable all logging output'
+    )
+    
+    return parser.parse_args()
+
+
 def main() -> int:
     """
     Main function with interactive menu loop.
@@ -465,6 +519,18 @@ def main() -> int:
         Exit code (0 for success, non-zero for errors).
     """
     try:
+        # Parse command line arguments
+        args = parse_arguments()
+        
+        # Configure logging based on command line arguments
+        setup_application_logging(
+            verbose=args.verbose,
+            log_level=args.log_level,
+            log_file=args.log_file,
+            quiet=args.quiet,
+            file_only=args.file_only
+        )
+        
         # Initialize the application
         app = DailyScalper()
 

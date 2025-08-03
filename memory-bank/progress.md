@@ -116,3 +116,28 @@ This file tracks the project's progress using a task list format.
 * Functional test showed 25.69% return on Bollinger Bands strategy with real BTC-USD data
 * All refactored components working seamlessly together with professional code quality
 * The Daily Scalper application is now fully validated and production-ready
+
+[2025-08-03 17:14:00] - Optional Logging Implementation Completed
+* Successfully implemented optional logging output controlled by command line arguments
+* Created centralized logging configuration system in `utils/logging_config.py`
+* Added comprehensive command line argument parsing with --verbose, --log-level, --log-file, and --quiet options
+* Updated all modules to use centralized logging configuration instead of individual basicConfig calls
+* Implemented and tested all logging levels: DEBUG, INFO, WARNING, ERROR, CRITICAL, and quiet mode
+* Default behavior now shows only WARNING and ERROR messages (minimal logging)
+* Users can now control logging output based on their needs (debugging, production, silent operation)
+* All functionality tested and working correctly with comprehensive test script
+* The Daily Scalper application now provides flexible logging control for better user experience
+
+[2025-08-03 17:34:00] - Enhanced Optional Logging Implementation Completed
+* Successfully enhanced the optional logging system with file-only capability
+* Added `--file-only` command line option to log exclusively to file without console output
+* Enhanced logging configuration with comprehensive validation and error handling for file-only mode
+* Updated command line argument parsing to support the new file-only logging option
+* Comprehensive testing confirms all logging modes work correctly:
+  - Default: WARNING and ERROR messages to console only
+  - Verbose: INFO, WARNING, and ERROR messages to console
+  - Debug: All messages including DEBUG to console
+  - Quiet: No logging output at all
+  - File logging: Messages to both console and file
+  - File-only: Messages exclusively to file with no console output
+* The Daily Scalper application now provides complete flexible logging control for all user scenarios
