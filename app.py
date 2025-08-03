@@ -27,9 +27,16 @@ from utils import DataLoader, Visualizer, StrategySaver, PeriodTranslator
 from strategies.strategy_registry import create_strategy
 from strategies.strategy_registry import get_strategy_parameter_info
 from strategies.strategy_registry import get_strategy_class
+from utils.theme import THEME
+from utils.ui_components import ui_interactive_menu
+from utils.ui_components import ui_section_header
+from utils.ui_components import ui_error_message
+from utils.ui_components import ui_modern_table
+from utils.ui_components import ui_block_header
 
 # Initialize rich console
-console = Console(width=120)
+UI_WIDTH = 100
+console = Console(width=UI_WIDTH)
 
 
 class DailyScalper:
@@ -37,19 +44,18 @@ class DailyScalper:
     Main class for the Daily Scalper application.
     """
 
+
     def __init__(self):
-        """Initialize the application."""
+        """
+        Initialize the application.
+        """
+
         self.data_loader = DataLoader()
         self.backtest_engine = BacktestEngine()
         self.strategy_saver = StrategySaver()
 
-        console.print()
-        console.print(Panel(
-            Text("Application successfully initialized!", justify="center"),
-            title="DAILY SCALPER - TRADING STRATEGY TESTER",
-            padding=(1, 1),
-            style="bold bright_green"
-        ))
+        console.print(ui_block_header("Daily Scalper", "Application successfully initialized."))
+
 
     def _display_results(self, results: Dict[str, Any]) -> None:
         """
@@ -58,107 +64,95 @@ class DailyScalper:
         Args:
             results: Backtest results
         """
+
         metrics = results['metrics']
         strategy = results['strategy']
         period = results['backtest_period']
 
         # Create a header table with key information
-        header_table = Table(
-            box=box.DOUBLE_EDGE,
-            style="bright_magenta",
-            border_style="blue",
-            title="[bold bright_magenta]TESTED CONFIGURATION[/bold bright_magenta]",
-            width=120
-        )
-        header_table.add_column("PARAMETER", style="bold bright_blue", width=60)
-        header_table.add_column("VALUE", style="bold bright_white", width=60)
+        header_table = ui_modern_table("Tested Configuration")
+        header_table.add_column("Setting", width=48)
+        header_table.add_column("Value", width=48)
 
         # Add coin pair
         symbol = results['symbol']
         header_table.add_row(
-            "CRYPTO PAIR",
-            f"[bold bright_green]{symbol}[/bold bright_green]"
+            "Crytpo Pair",
+            f"[{THEME['success']}]{symbol}[/{THEME['success']}]"
         )
 
         # Add initial capital
         initial_cash = results['parameters']['initial_cash']
         header_table.add_row(
-            "INITIAL CAPITAL",
-            f"[bold bright_green]${initial_cash:,.2f}[/bold bright_green]"
+            "Initial Capital",
+            f"[{THEME['success']}]${initial_cash:,.2f}[/{THEME['success']}]"
         )
 
         # Add period
-        period_str = f"{period['start']} → {period['end']} ({period['duration_days']} DAYS)"
+        period_str = f"{period['start']} → {period['end']} ({period['duration_days']} days)"
         header_table.add_row(
-            "BACKTEST PERIOD",
-            f"[bold bright_green]{period_str}[/bold bright_green]"
+            "Backtest Period",
+            f"[{THEME['success']}]{period_str}[/{THEME['success']}]"
         )
 
         # Add strategy name
         strategy_name = strategy['name'].upper()
         header_table.add_row(
-            "STRATEGY",
-            f"[bold bright_yellow]{strategy_name}[/bold bright_yellow]"
+            "Strategy",
+            f"[{THEME['highlight']}]{strategy_name}[/{THEME['highlight']}]"
         )
 
         # Add strategy parameters if available
         if 'parameters' in strategy:
             params = strategy['parameters']
-            param_str = " | ".join([f"{k.upper()}: {v}" for k, v in params.items()])
+            param_str = "\n".join([f"{k}: {v}" for k, v in params.items()])
             header_table.add_row(
-                "PARAMETERS",
-                f"[bold bright_yellow]{param_str}[/bold bright_yellow]"
+                "Parameters",
+                f"[{THEME['accent']}]{param_str}[/{THEME['accent']}]"
             )
 
         console.print(header_table)
-        console.print()
 
         # Performance metrics table
-        perf_metric_table = Table(
-            box=box.ROUNDED,
-            style="blue",
-            border_style="blue",
-            title="[bold bright_magenta]RESULTS[/bold bright_magenta]",
-            width=120
-        )
-        perf_metric_table.add_column("Performance Metric", style="bold bright_blue", width=40)
-        perf_metric_table.add_column("Value", justify="right", style="bright_blue", width=20)
-        perf_metric_table.add_column("Performance Metric", style="bold bright_blue", width=40)
-        perf_metric_table.add_column("Value", justify="right", style="bright_blue", width=20)
+        perf_metric_table = ui_modern_table("Performance Metrics")
+        perf_metric_table.add_column("Metric", width=24)
+        perf_metric_table.add_column("Value", justify="right", width=24)
+        perf_metric_table.add_column("Metric", width=24)
+        perf_metric_table.add_column("Value", justify="right", width=24)
 
         perf_metric_table.add_row(
-            "Initial Capital", f"${results['parameters']['initial_cash']:,.2f}",
-            "Final Value", f"${metrics['final_value']:,.2f}"
+            "Initial Capital", f"[bold]${results['parameters']['initial_cash']:,.2f}[/bold]",
+            "Final Value", f"[bold]${metrics['final_value']:,.2f}[/bold]"
         )
         perf_metric_table.add_row(
-            "Total Return", f"{metrics['total_return']:.2%}",
-            "Alpha vs Buy & Hold", f"{metrics['alpha']:.2%}"
+            "Total Return", f"[bold]{metrics['total_return']:.2%}[/bold]",
+            "Alpha vs Buy & Hold", f"[bold]{metrics['alpha']:.2%}[/bold]"
         )
         perf_metric_table.add_row(
-            "Sharpe Ratio", f"{metrics['sharpe_ratio']:.2f}",
-            "Maximum Drawdown", f"{metrics['max_drawdown']:.2%}"
+            "Sharpe Ratio", f"[bold]{metrics['sharpe_ratio']:.2f}[/bold]",
+            "Maximum Drawdown", f"[bold]{metrics['max_drawdown']:.2%}[/bold]"
         )
         perf_metric_table.add_row(
-            "Volatility", f"{metrics.get('volatility', 0):.2%}",
-            "VaR 95%", f"{metrics.get('var_95', 0):.2%}"
+            "Volatility", f"[bold]{metrics.get('volatility', 0):.2%}[/bold]",
+            "VaR 95%", f"[bold]{metrics.get('var_95', 0):.2%}[/bold]"
         )
 
         console.print(perf_metric_table)
 
         # Trading statistics table
-        trading_metric_table = Table(box=box.ROUNDED, style="blue", border_style="blue", width=120)
-        trading_metric_table.add_column("Trading Statistics", style="bold bright_blue", width=40)
-        trading_metric_table.add_column("Value", justify="right", style="bright_blue", width=20)
-        trading_metric_table.add_column("Trading Statistics", style="bold bright_blue", width=40)
-        trading_metric_table.add_column("Value", justify="right", style="bright_blue", width=20)
+        trading_metric_table = ui_modern_table("Trading Statistics")
+        trading_metric_table.add_column("Statistic", width=24)
+        trading_metric_table.add_column("Value", justify="right", width=24)
+        trading_metric_table.add_column("Statistic", width=24)
+        trading_metric_table.add_column("Value", justify="right", width=24)
 
         trading_metric_table.add_row(
-            "Number of Trades", f"{metrics['total_trades']}",
-            "Win Rate", f"{metrics['win_rate']:.2%}"
+            "Number of Trades", f"[bold]{metrics['total_trades']}[/bold]",
+            "Win Rate", f"[bold]{metrics['win_rate']:.2%}[/bold]"
         )
         trading_metric_table.add_row(
-            "Profit Factor", f"{metrics['profit_factor']:.2f}",
-            "Average Duration", f"{metrics['avg_trade_duration']:.1f} days"
+            "Profit Factor", f"[bold]{metrics['profit_factor']:.2f}[/bold]",
+            "Average Duration", f"[bold]{metrics['avg_trade_duration']:.1f} days[/bold]"
         )
 
         console.print(trading_metric_table)
@@ -167,26 +161,23 @@ class DailyScalper:
         is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
         tested_strategy = f"{results['strategy_label']} for {results['symbol']}"
         status_text = f"✅ {tested_strategy} is PROFITABLE" if is_profitable \
-                      else f"❌ {tested_strategy} is UNPROFITABLE"
-        status_style = "bold green" if is_profitable else "bold red"
+                      else f"❌ {tested_strategy} is NOT PROFITABLE"
+        status_style = THEME["success"] if is_profitable else THEME["error"]
 
-        console.print()
-        console.print(Panel(
-            Text(status_text, justify="center"),
-            title=f"STRATEGY EVALUATION",
-            padding=(1, 1),
-            style=status_style
-        ))
-        console.print()
+        print()
+        console.print(Text(status_text, style=status_style))
+        print()
+
 
     def backtest_strategy(
             self,
-            strategy_name: str = "SMACrossoverStrategy",
+            strategy_name: str,
             symbol: str = "BTC-USD",
             period: str = "1y",
             strategy_params: Dict[str, Any] = None,
             show_plots: bool = True,
-            save_if_profitable: bool = True
+            save_if_profitable: bool = True,
+            batch_mode: bool = False
         ) -> Dict[str, Any]:
         """
         Execute a backtest of a trading strategy.
@@ -202,6 +193,7 @@ class DailyScalper:
         Returns:
             Backtest results
         """
+
         # Use default parameters if none provided
         if strategy_params is None:
             strategy_params = {}
@@ -217,74 +209,74 @@ class DailyScalper:
 
         param_str = ", ".join(param_desc) if param_desc else "Default parameters"
 
-        console.print()
-        console.print(Panel(
-            Text(
-                f"{strategy_name.upper()}\n\n"
+        if not batch_mode:
+            console.print(ui_block_header("Strategy Backtest",
+                f"{strategy_name}\n"
                 f"Crypto pair: {symbol}, "
-                f"Backtest period: {PeriodTranslator.get_period_description(period)}\n"
-                f"{param_str}",
-                justify="center"
-            ),
-            title=f"STRATEGY BACKTEST",
-            padding=(1, 1),
-            style="bold bright_magenta"
-        ))
-        console.print()
+                f"Period: {PeriodTranslator.get_period_description(period)}\n"
+                f"{param_str}"))
+        else:
+            console.print(ui_section_header(f"Running backtest with {param_str}"))
 
-        try:
-            # 1. Loading data
-            console.print("Loading data...", style="blue")
-            data = self.data_loader.load_crypto_data(symbol=symbol, period=period)
-            console.print(f"✅ {len(data)} data points loaded\n", style="green")
+        # 1. Loading data
+        console.print("Loading data...", style=THEME["table_border"])
+        data = self.data_loader.load_crypto_data(symbol=symbol, period=period)
+        if data.empty:
+            console.print(ui_error_message("No data found for the specified period.", "Data Error"))
+            return {}
+        console.print(
+            f"✅ {len(data)} data points loaded " \
+                f"from {data.index[0].strftime('%Y-%m-%d')} " \
+                f"to {data.index[-1].strftime('%Y-%m-%d')}\n", 
+            style=THEME["success"])
+        
 
-            # 2. Creating strategy
-            console.print("Initializing strategy...", style="blue")
-            strategy = create_strategy(strategy_name, **strategy_params)
-            console.print(f"✅ {strategy.get_explanation()}\n", style="green")
+        # 2. Creating strategy
+        console.print("Initializing strategy...", style=THEME["table_border"])
+        strategy = create_strategy(strategy_name, **strategy_params)
+        console.print(f"✅ Strategy ready\n", style=THEME["success"])
+        console.print(f"{strategy.get_explanation()}\n", style=THEME["success"])
 
-            # 3. Executing backtest
-            console.print("Executing backtest...", style="blue")
-            results = self.backtest_engine.run_backtest(strategy, data)
+        # 3. Executing backtest
+        console.print("Executing backtest...", style=THEME["table_border"])
+        results = self.backtest_engine.run_backtest(strategy, data)
+        console.print("✅ Backtest completed\n", style=THEME["success"])
 
-            # Add strategy instance for visualization
-            results['strategy_instance'] = strategy
-            results['strategy_label'] = strategy.get_short_description(strategy_params)
+        # Add strategy instance to results for visualization
+        results['strategy_instance'] = strategy
+        results['strategy_label'] = strategy.get_short_description(strategy_params)
 
-            # Add symbol to results
-            results['symbol'] = symbol
+        # Add symbol to results
+        results['symbol'] = symbol
 
-            # 4. Calculate advanced metrics
-            console.print("Calculating advanced metrics...", style="blue")
-            results['metrics'] = PerformanceMetrics.calculate_advanced_metrics(results)
-            console.print("✅ Backtest completed!\n", style="green")
+        # 4. Calculate advanced metrics
+        console.print("Calculating advanced metrics...", style=THEME["table_border"])
+        results['metrics'] = PerformanceMetrics.calculate_advanced_metrics(results)
+        console.print("✅ Metrics computed\n", style=THEME["success"])
 
-            # 5. Display results
-            self._display_results(results)
+        # 5. Display results
+        self._display_results(results)
 
-            # 6. Visualization
-            if show_plots:
-                console.print("Generating charts...", style="blue")
-                Visualizer.show_all_plots(results)
+        # 6. Visualization
+        if show_plots:
+            console.print("Generating charts...", style=THEME["accent"])
+            Visualizer.show_all_plots(results)
 
-            # 7. Save if profitable
-            if save_if_profitable and PerformanceMetrics.is_strategy_profitable(results['metrics']):
-                console.print("Profitable strategy detected - Saving...", style="green")
-                save_id = self.strategy_saver.save_strategy_results(results)
-                results['save_id'] = save_id
-                console.print(f"✅ Strategy saved: {save_id}", style="green")
-            elif save_if_profitable:
-                console.print("❌ Unprofitable strategy - Not saved", style="yellow")
+        # 7. Save if profitable
+        if save_if_profitable and PerformanceMetrics.is_strategy_profitable(results['metrics']):
+            console.print("\nProfitable strategy detected - Saving...", style=THEME["dim"])
+            save_id = self.strategy_saver.save_strategy_results(results)
+            results['save_id'] = save_id
+            console.print(f"✅ Strategy saved: {save_id}", style=THEME["success"])
+        elif save_if_profitable:
+            console.print("⚠️  Unprofitable strategy - Not saved", style=THEME["warning"])
 
-            return results
+        return results
 
-        except Exception as e:
-            console.print(f"❌ Error during execution: {e}", style="red")
-            raise
 
     def compare_strategies(
             self,
-            strategy_name: str = "SMACrossoverStrategy",
+            strategy_name: str,
             symbol: str = "BTC-USD",
             period: str = "1y",
             configurations: List[Dict[str, Any]] = None
@@ -298,6 +290,7 @@ class DailyScalper:
             period: Data period
             configurations: List of parameter configurations to test
         """
+
         # If no configurations provided, get predefined ones from the strategy class
         if configurations is None:
             # Get the strategy class from registry
@@ -309,38 +302,22 @@ class DailyScalper:
                 # Fallback to empty configuration if strategy not found
                 configurations = [{}]
 
-        console.print()
-        console.print(Panel(
-            Text(
-                f"{strategy_name}\n"
-                f"Crypto pair: {symbol}, "
-                f"Period: {PeriodTranslator.get_period_description(period)}",
-                justify="center"
-            ),
-            title=f"STRATEGY COMPARISON",
-            padding=(1, 1),
-            style="bold bright_magenta"
-        ))
-        console.print()
+        console.print(ui_block_header("Strategy Comparison",
+            f"{strategy_name}\n"
+            f"Crypto pair: {symbol}, "
+            f"Period: {PeriodTranslator.get_period_description(period)}"))
 
         results_list = []
 
         # Table for results
-        progress_table = Table(
-            box=box.ROUNDED,
-            show_lines=True,
-            style="blue",
-            border_style="blue",
-            title="[bold bright_magenta]COMPARISON RESULTS[/bold bright_magenta]",
-            width=120
-        )
-        progress_table.add_column("Test", style="bold bright_blue", width=8)
-        progress_table.add_column("Configuration", style="bold bright_blue", width=30)
-        progress_table.add_column("Return", justify="right", style="bright_blue", width=11)
-        progress_table.add_column("Sharpe", justify="right", style="bright_blue", width=9)
-        progress_table.add_column("Trades", justify="right", style="bright_blue", width=9)
-        progress_table.add_column("Profit Factor", justify="right", style="bright_blue", width=15)
-        progress_table.add_column("Status", justify="center", style="bright_blue", width=12)
+        progress_table = ui_modern_table("Comparison Results")
+        progress_table.add_column("Test", style=THEME["table_header"], width=8)
+        progress_table.add_column("Configuration", width=32)
+        progress_table.add_column("Return", justify="right", width=12)
+        progress_table.add_column("Sharpe", justify="right", width=10)
+        progress_table.add_column("Trades", justify="right", width=10)
+        progress_table.add_column("Profit Factor", justify="right", width=14)
+        progress_table.add_column("Status", justify="center", width=14)
 
         for i, strategy_params in enumerate(configurations, 1):
             try:
@@ -354,12 +331,13 @@ class DailyScalper:
                     strategy_short_desc = ", ".join([f"{k}={v}" for k, v in strategy_params.items()])
 
                 results = self.backtest_strategy(
-                    strategy_name=strategy_name,
+                    strategy_name,
                     symbol=symbol,
                     period=period,
                     strategy_params=strategy_params,
                     show_plots=False,
-                    save_if_profitable=False
+                    save_if_profitable=False,
+                    batch_mode=True
                 )
                 results_list.append(results)
 
@@ -387,25 +365,22 @@ class DailyScalper:
                     "❌"
                 )
 
+        # Section title
+        console.print(ui_section_header(f"Comparison Results for Strategy {strategy_name}"))
+
         console.print(progress_table)
 
         # Strategy ranking
         if results_list:
             ranked_strategies = PerformanceMetrics.rank_strategies(results_list)
 
-            ranking_table = Table(
-                box=box.ROUNDED,
-                style="blue",
-                border_style="blue",
-                title="[bold bright_magenta]STRATEGY RANKING[/bold bright_magenta]",
-                width=120
-            )
-            ranking_table.add_column("Rang", style="bold bright_blue", width=10)
-            ranking_table.add_column("Configuration", style="bold bright_blue", width=20)
-            ranking_table.add_column("Return", justify="right", style="bright_blue", width=15)
-            ranking_table.add_column("Sharpe", justify="right", style="bright_blue", width=12)
-            ranking_table.add_column("Score", justify="right", style="bright_blue", width=12)
-            ranking_table.add_column("Status", style="bright_blue", width=20)
+            ranking_table = ui_modern_table("Strategy Ranking")
+            ranking_table.add_column("Rank", style=THEME["table_header"], width=5)
+            ranking_table.add_column("Configuration", width=25)
+            ranking_table.add_column("Return", justify="right", width=15)
+            ranking_table.add_column("Sharpe", justify="right", width=15)
+            ranking_table.add_column("Score", justify="right", width=15)
+            ranking_table.add_column("Status", width=20)
 
             for i, result in enumerate(ranked_strategies, 1):
                 strategy = result['strategy']
@@ -435,53 +410,42 @@ class DailyScalper:
 
             console.print(ranking_table)
         else:
-            console.print("❌ No valid results obtained for comparison.", style="red")
+            console.print("❌ No valid results obtained for comparison.", style=THEME["error"])
+
 
     def show_saved_strategies(self) -> None:
-        """Display saved profitable strategies."""
+        """
+        Display saved profitable strategies.
+        """
 
         # Get list of saved strategies
         strategies = self.strategy_saver.list_saved_strategies()
 
         # Create status text
-        status_text = "No saved strategies" if not strategies else f"{len(strategies)} saved strategy(s)"
+        status_text = "No saved strategy for now." if not strategies else f"{len(strategies)} profitable strategies saved."
 
-        console.print()
-        console.print(Panel(
-            Text(status_text, justify="center"),
-            title=f"SAVED PROFITABLE STRATEGIES",
-            padding=(1, 1),
-            style="bold bright_magenta"
-        ))
-        console.print()
-
+        console.print(ui_block_header("Saved Strategies", status_text))
         if not strategies:
             return
 
         # Table of saved best strategies
-        saved_table = Table(
-            box=box.ROUNDED,
-            show_lines=True,
-            style="bold bright_blue",
-            border_style="blue",
-            title="[bold bright_magenta]LAST 10 PROFITABLE STRATEGIES[/bold bright_magenta]",
-            width=120
-        )
-        saved_table.add_column("ID", justify="center", style="bold bright_blue", width=5)
-        saved_table.add_column("Strategy", justify="left", style="bold bright_blue", width=40)
-        saved_table.add_column("Crypto", justify="left", style="bold bright_blue", width=15)
-        saved_table.add_column("Return", justify="right", style="bright_blue", width=15)
-        saved_table.add_column("Sharpe", justify="right", style="bright_blue", width=15)
-        saved_table.add_column("Trades", justify="right", style="bright_blue", width=15)
-        saved_table.add_column("Date", justify="center", style="bright_blue", width=15)
+        saved_table = ui_modern_table("Profitable Strategies", show_line=True)
+        saved_table.add_column("ID", justify="left", style=THEME["table_header"], width=5)
+        saved_table.add_column("Strategy", justify="left", width=35)
+        saved_table.add_column("Crypto", justify="left", width=12)
+        saved_table.add_column("Return", justify="right", width=12)
+        saved_table.add_column("Sharpe", justify="right", width=12)
+        saved_table.add_column("Trades", justify="right", width=12)
+        saved_table.add_column("Date", justify="right", width=12)
 
         for i, strategy in enumerate(strategies[:10], 1):
             metrics = strategy.get('metrics', {})
             strategy_info = strategy.get('strategy', {})
+            strategy_cell = Text(strategy.get('strategy_label', ''), style=THEME["highlight"]) + "\n" + Text(strategy_info.get('name', 'N/A'), style=THEME["dim"])
 
             saved_table.add_row(
                 f"#{i}",
-                f"{strategy_info.get('name', 'N/A')}\n{strategy.get('strategy_label', '')}",
+                strategy_cell,
                 strategy.get('symbol', ''),
                 f"{metrics.get('total_return', 0):.2%}",
                 f"{metrics.get('sharpe_ratio', 0):.2f}",
@@ -492,4 +456,4 @@ class DailyScalper:
         console.print(saved_table)
 
         if len(strategies) > 10:
-            console.print(f"{len(strategies) - 10} additional strategy(s) available...", style="dim")
+            console.print(f"{len(strategies) - 10} additional strategy(s) available...", style=THEME["dim"])

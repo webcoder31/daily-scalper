@@ -134,7 +134,7 @@ class DataLoader:
             print(f"Warning: {invalid_rows.sum()} rows with inconsistent prices removed")
             data = data[~invalid_rows]
         
-        print(f"Data loaded: {len(data)} points from {data.index[0].strftime('%Y-%m-%d')} to {data.index[-1].strftime('%Y-%m-%d')}")
+        # print(f"Data loaded: {len(data)} points from {data.index[0].strftime('%Y-%m-%d')} to {data.index[-1].strftime('%Y-%m-%d')}")
         
         return data
     
