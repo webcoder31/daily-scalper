@@ -15,6 +15,7 @@ from .strategy_registry import register_strategy, get_strategy_names, create_str
 from .sma_strategy import SMAStrategy
 from .rsi_strategy import RSIStrategy
 from .bb_strategy import BBStrategy
+from .emarsi_strategy import EMARSIStrategy
 
 # Export the classes
 __all__ = [
@@ -24,6 +25,7 @@ __all__ = [
     'create_strategy',
     'get_strategy_parameter_info',
     'SMAStrategy',
-    'RSIStrategy'
-    'BBStrategy'
+    'RSIStrategy',
+    'BBStrategy',
+    'EMARSIStrategy'
 ]
