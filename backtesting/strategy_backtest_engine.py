@@ -12,9 +12,6 @@ Key Features:
 - Flexible date range filtering and analysis
 - Professional performance metrics calculation
 - Robust error handling and logging
-
-Author: Daily Scalper Development Team
-Version: 2.0.0
 """
 
 from typing import Dict, Any, Optional, Tuple, Union, List
@@ -26,7 +23,7 @@ import warnings
 import logging
 from pathlib import Path
 
-from strategies.base_strategy import BaseStrategy
+from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
 
 # Configure logging
 from utils.logging_config import get_logger
@@ -58,7 +55,7 @@ class MetricsCalculationError(BacktestError):
     pass
 
 
-class BacktestEngine:
+class StrategyBacktestEngine:
     """
     Advanced backtesting engine for evaluating cryptocurrency trading strategies.
     
@@ -76,11 +73,11 @@ class BacktestEngine:
         Basic usage of the backtesting engine:
         
         ```python
-        from backtest import BacktestEngine
+        from backtest import StrategyBacktestEngine
         from strategies import SMACrossoverStrategy
         
         # Initialize engine with custom parameters
-        engine = BacktestEngine(
+        engine = StrategyBacktestEngine(
             initial_cash=10000.0,
             commission=0.001,
             slippage=0.0001
@@ -90,7 +87,7 @@ class BacktestEngine:
         strategy = SMACrossoverStrategy(short_window=10, long_window=30)
         
         # Run backtest
-        results = engine.run_backtest(strategy, data, start_date='2023-01-01')
+        results = engine.execute_strategy_evaluation(strategy, data, start_date='2023-01-01')
         
         # Access results
         metrics = results['metrics']
@@ -130,9 +127,9 @@ class BacktestEngine:
                    f"commission={commission:.4f}, slippage={slippage:.4f}")
 
 
-    def run_backtest(
+    def execute_strategy_evaluation(
         self, 
-        strategy: BaseStrategy, 
+        strategy: AbstractTradingStrategy, 
         data: pd.DataFrame,
         start_date: Optional[Union[str, datetime, date]] = None,
         end_date: Optional[Union[str, datetime, date]] = None,
@@ -145,7 +142,7 @@ class BacktestEngine:
         signal generation, portfolio construction, and performance analysis.
         
         Args:
-            strategy: Trading strategy instance implementing BaseStrategy interface.
+            strategy: Trading strategy instance implementing AbstractTradingStrategy interface.
             data: DataFrame containing OHLCV price data with DatetimeIndex.
             start_date: Optional start date for backtesting period.
             end_date: Optional end date for backtesting period.
@@ -176,7 +173,7 @@ class BacktestEngine:
             self._validate_input_data(data, strategy)
             
             # Filter data by date range if specified
-            filtered_data = self._filter_data_by_date(data, start_date, end_date)
+            filtered_data = self.slice_data_by_date_range(data, start_date, end_date)
             
             # Validate filtered data sufficiency
             self._validate_data_sufficiency(filtered_data)
@@ -185,10 +182,10 @@ class BacktestEngine:
             buy_signals, sell_signals = self._generate_signals(strategy, filtered_data)
             
             # Create vectorbt portfolio
-            portfolio = self._create_portfolio(filtered_data, buy_signals, sell_signals)
+            portfolio = self.build_vectorbt_portfolio(filtered_data, buy_signals, sell_signals)
             
             # Calculate comprehensive performance metrics
-            metrics = self._calculate_metrics(portfolio, filtered_data)
+            metrics = self.compute_performance_statistics(portfolio, filtered_data)
             
             # Construct comprehensive results dictionary
             self.results = self._construct_results(
@@ -236,7 +233,7 @@ class BacktestEngine:
             raise ValueError(f"Minimum data points must be at least 10, got: {min_data_points}")
 
 
-    def _validate_input_data(self, data: pd.DataFrame, strategy: BaseStrategy) -> None:
+    def _validate_input_data(self, data: pd.DataFrame, strategy: AbstractTradingStrategy) -> None:
         """
         Validate input data format and content for backtesting.
         
@@ -292,7 +289,7 @@ class BacktestEngine:
             )
 
 
-    def _filter_data_by_date(
+    def slice_data_by_date_range(
         self, 
         data: pd.DataFrame, 
         start_date: Optional[Union[str, datetime, date]], 
@@ -336,7 +333,7 @@ class BacktestEngine:
 
     def _generate_signals(
         self, 
-        strategy: BaseStrategy, 
+        strategy: AbstractTradingStrategy, 
         data: pd.DataFrame
     ) -> Tuple[pd.Series, pd.Series]:
         """
@@ -374,7 +371,7 @@ class BacktestEngine:
             raise StrategyExecutionError(f"Signal generation failed: {str(e)}") from e
 
 
-    def _create_portfolio(
+    def build_vectorbt_portfolio(
         self, 
         data: pd.DataFrame, 
         buy_signals: pd.Series, 
@@ -420,7 +417,7 @@ class BacktestEngine:
             raise PortfolioConstructionError(f"Portfolio creation failed: {str(e)}") from e
 
 
-    def _calculate_metrics(
+    def compute_performance_statistics(
         self, 
         portfolio: vbt.Portfolio, 
         data: pd.DataFrame
@@ -513,7 +510,7 @@ class BacktestEngine:
 
     def _construct_results(
         self,
-        strategy: BaseStrategy,
+        strategy: AbstractTradingStrategy,
         portfolio: vbt.Portfolio,
         metrics: Dict[str, float],
         data: pd.DataFrame,
@@ -571,7 +568,7 @@ class BacktestEngine:
         Example:
             ```python
             engine = BacktestEngine()
-            results = engine.run_backtest(strategy, data)
+            results = engine.execute_strategy_evaluation(strategy, data)
             
             # Later retrieve the same results
             last_results = engine.get_last_results()

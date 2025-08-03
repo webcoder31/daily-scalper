@@ -87,7 +87,7 @@ class DataVisualizationError(Exception):
         super().__init__(message)
 
 
-class Visualizer:
+class BacktestChartGenerator:
     """
     Class for creating interactive visualizations of cryptocurrency trading backtest results.
     
@@ -102,7 +102,7 @@ class Visualizer:
         SUBPLOT_SPACING: Default spacing between subplots.
         
     Example:
-        >>> visualizer = Visualizer()
+        >>> visualizer = BacktestChartGenerator()
         >>> main_chart = visualizer.plot_backtest_results(results)
         >>> metrics_chart = visualizer.plot_performance_metrics(results)
         >>> drawdown_chart = visualizer.plot_drawdown(results)

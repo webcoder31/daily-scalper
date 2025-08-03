@@ -13,7 +13,7 @@ Classes:
 
 Example:
     >>> from utils.data_loader import DataLoader
-    >>> loader = DataLoader(cache_dir="data")
+    >>> loader = DataLoader(cache_dir="cache")
     >>> data = loader.load_crypto_data("BTC-USD", "1y")
     >>> print(f"Loaded {len(data)} data points")
 """
@@ -83,7 +83,7 @@ class ValidationError(Exception):
         super().__init__(message)
 
 
-class DataLoader:
+class MarketDataProvider:
     """
     Class for loading and managing cryptocurrency market data with caching.
     
@@ -96,9 +96,9 @@ class DataLoader:
         cache_max_age_hours: Maximum age of cached data in hours before refresh.
         
     Example:
-        >>> loader = DataLoader(cache_dir="data", cache_max_age_hours=24)
-        >>> data = loader.load_crypto_data("BTC-USD", "1y")
-        >>> symbols = loader.get_available_symbols()
+        >>> loader = MarketDataProvider(cache_dir="data", cache_max_age_hours=24)
+        >>> data = loader.fetch_cryptocurrency_data("BTC-USD", "1y")
+        >>> symbols = loader.get_supported_cryptocurrency_symbols()
     """
     
     # Valid period values for yfinance
@@ -110,7 +110,7 @@ class DataLoader:
     REQUIRED_COLUMNS: List[str] = ["Open", "High", "Low", "Close", "Volume"]
     
 
-    def __init__(self, cache_dir: str = "data", cache_max_age_hours: int = 24) -> None:
+    def __init__(self, cache_dir: str = "cache", cache_max_age_hours: int = 24) -> None:
         """
         Initialize the DataLoader with caching configuration.
         
@@ -135,7 +135,7 @@ class DataLoader:
             ) from e
     
 
-    def load_crypto_data(
+    def fetch_cryptocurrency_data(
         self,
         symbol: str = "BTC-USD",
         period: str = "1y",
@@ -603,7 +603,7 @@ class DataLoader:
                     "name": cache_file.name,
                     "size": stat.st_size,
                     "modified": datetime.fromtimestamp(stat.st_mtime),
-                    "is_recent": self._is_cache_recent(cache_file)
+                    "is_recent": self.is_cached_data_fresh(cache_file)
                 })
             
             return {

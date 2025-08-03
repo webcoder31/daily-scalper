@@ -1,5 +1,5 @@
 """
-Utility modules for the Daily Scalper trading application.
+Utility modules for the Trading Strategy Backtester trading application.
 
 This package provides essential utility modules for data loading, visualization,
 strategy persistence, UI components, and other supporting functionality for the
@@ -14,32 +14,30 @@ Modules:
     ui_components: Rich terminal UI components and interactive elements
 
 Classes:
-    DataLoader: Handles cryptocurrency market data loading with caching
-    Visualizer: Creates interactive charts and visualizations
-    StrategySaver: Manages strategy results persistence and retrieval
+    MarketDataProvider: Handles cryptocurrency market data loading with caching
+    BacktestChartGenerator: Creates interactive charts and visualizations
+    StrategyResultsPersistence: Manages strategy results persistence and retrieval
     PeriodTranslator: Translates time period abbreviations for display
 
 Example:
-    >>> from utils import DataLoader, Visualizer, StrategySaver
-    >>> loader = DataLoader()
-    >>> data = loader.load_crypto_data("BTC-USD", "1y")
+    >>> from utils import MarketDataProvider, BacktestChartGenerator, StrategyResultsPersistence
+    >>> loader = MarketDataProvider()
+    >>> data = loader.fetch_cryptocurrency_data("BTC-USD", "1y")
     >>> # Use data for backtesting...
 """
 
 from typing import List
 
-from .data_loader import DataLoader
-from .visualizer import Visualizer
-from .strategy_saver import StrategySaver
-from .period_translator import PeriodTranslator
+from market_data.market_data_provider import MarketDataProvider
+from visualization.backtest_chart_generator import BacktestChartGenerator
+from persistence.strategy_results_persistence import StrategyResultsPersistence
+from market_data.period_translator import PeriodTranslator
 
 __all__: List[str] = [
-    'DataLoader',
-    'Visualizer', 
-    'StrategySaver',
+    'MarketDataProvider',
+    'BacktestChartGenerator',
+    'StrategyResultsPersistence',
     'PeriodTranslator'
 ]
 
 __version__ = "1.0.0"
-__author__ = "Daily Scalper Team"
-__description__ = "Utility modules for cryptocurrency trading strategy backtesting"

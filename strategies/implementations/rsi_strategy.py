@@ -14,12 +14,12 @@ from typing import Dict, Any, Tuple, List, Optional
 import pandas as pd
 import numpy as np
 
-from .base_strategy import BaseStrategy, ParameterValidationError, DataValidationError
-from .strategy_registry import register_strategy
+from ..base.abstract_trading_strategy import AbstractTradingStrategy, ParameterValidationError, DataValidationError
+from ..base.strategy_registry import register_strategy
 
 
 @register_strategy
-class RSIStrategy(BaseStrategy):
+class RSIStrategy(AbstractTradingStrategy):
     """
     Relative Strength Index (RSI) Threshold Trading Strategy.
     

@@ -1,8 +1,8 @@
 """
-CLI and Menu Functions for Daily Scalper.
+CLI and Menu Functions for Trading Strategy Backtester.
 
 This module contains all user interaction, menu navigation, and main loop logic
-for the Daily Scalper application. It provides an interactive command-line
+for the Trading Strategy Backtester application. It provides an interactive command-line
 interface for backtesting cryptocurrency trading strategies.
 """
 
@@ -25,20 +25,20 @@ from config import (
     VISUALIZATION_CONFIG,
     POPULAR_CRYPTO_SYMBOLS
 )
-from app import DailyScalper, DailyScalperError
-from utils import PeriodTranslator
-from utils.ui_components import (
+from core.trading_strategy_backtester import TradingStrategyBacktester, TradingStrategyBacktesterError
+from market_data.period_translator import PeriodTranslator
+from ui.components import (
     ui_interactive_menu,
     ui_section_header,
     ui_error_message,
     ui_modern_table,
     ui_block_header
 )
-from strategies.strategy_registry import (
+from strategies.base.strategy_registry import (
     get_strategy_names,
     get_strategy_parameter_info
 )
-from utils.theme import THEME
+from ui.theme import THEME
 from utils.logging_config import setup_application_logging, LoggingConfig
 
 # Console configuration
@@ -56,7 +56,7 @@ class UserCancelledError(CLIError):
     pass
 
 
-def get_user_input(
+def prompt_user_for_input(
     prompt: str,
     input_type: Type[Union[str, int, float]] = str,
     default: Optional[Union[str, int, float]] = None
@@ -93,7 +93,7 @@ def get_user_input(
         raise UserCancelledError("User cancelled input") from None
 
 
-def backtest_strategy_menu(app: DailyScalper) -> None:
+def handle_single_strategy_test(app: TradingStrategyBacktester) -> None:
     """
     Interactive menu for testing a single trading strategy configuration.
     
@@ -101,7 +101,7 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
     parameters, and executing a backtest with optional visualization and saving.
     
     Args:
-        app: The DailyScalper application instance.
+        app: The TradingStrategyBacktester application instance.
     
     Raises:
         CLIError: If menu operations encounter errors.
@@ -129,7 +129,7 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
         # Parameter collection - Symbol and Period
         console.print("\nBacktest parameters:", style=THEME["table_title"])
         
-        symbol = get_user_input(
+        symbol = prompt_user_for_input(
             "Crypto pair", 
             str, 
             DEFAULT_DATA_CONFIG['default_symbol']
@@ -142,7 +142,7 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
             style=THEME["dim"]
         )
         
-        period = get_user_input(
+        period = prompt_user_for_input(
             "Period", 
             str, 
             DEFAULT_DATA_CONFIG['default_period']
@@ -151,7 +151,7 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
             return
 
         # Get strategy-specific parameters
-        strategy_params = {}
+        strategy_parameters = {}
         param_info = get_strategy_parameter_info(selected_strategy_name)
 
         if param_info:
@@ -171,21 +171,21 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
                 prompt = f"{description}{range_info}"
 
                 # Get user input with appropriate type
-                value = get_user_input(prompt, param_type, default_value)
+                value = prompt_user_for_input(prompt, param_type, default_value)
                 if value is None:  # User cancelled
                     return
 
-                strategy_params[param_name] = value
+                strategy_parameters[param_name] = value
 
         # Chart and save options
         console.print("\nOptional features:", style=THEME["table_title"])
         
-        show_plots = Confirm.ask("Show charts?", default=False)
-        if show_plots is None:
+        display_charts = Confirm.ask("Show charts?", default=False)
+        if display_charts is None:
             return
 
-        save_if_profitable = Confirm.ask("Save if profitable?", default=True)
-        if save_if_profitable is None:
+        auto_save_profitable_results = Confirm.ask("Save if profitable?", default=True)
+        if auto_save_profitable_results is None:
             return
 
         # Execute the backtest
@@ -194,24 +194,24 @@ def backtest_strategy_menu(app: DailyScalper) -> None:
             style=THEME["accent"]
         )
         
-        app.backtest_strategy(
+        app.execute_strategy_backtest(
             selected_strategy_name,
             symbol=symbol,
             period=period,
-            strategy_params=strategy_params,
-            show_plots=show_plots,
-            save_if_profitable=save_if_profitable
+            strategy_parameters=strategy_parameters,
+            display_charts=display_charts,
+            auto_save_profitable_results=auto_save_profitable_results
         )
 
     except UserCancelledError:
         console.print("Operation cancelled by user", style=THEME["warning"])
-    except DailyScalperError as e:
+    except TradingStrategyBacktesterError as e:
         console.print(ui_error_message(str(e), "Backtest Error"))
     except Exception as e:
         console.print(ui_error_message(f"Unexpected error: {str(e)}", "System Error"))
 
 
-def compare_strategies_menu(app: DailyScalper) -> None:
+def handle_strategy_comparison(app: TradingStrategyBacktester) -> None:
     """
     Interactive menu for comparing multiple strategy configurations.
     
@@ -219,7 +219,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
     of the same strategy, either using predefined configurations or custom ones.
     
     Args:
-        app: The DailyScalper application instance.
+        app: The TradingStrategyBacktester application instance.
     
     Raises:
         CLIError: If menu operations encounter errors.
@@ -245,7 +245,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
         selected_strategy_name = strategy_names[strategy_choice - 1]
 
         # Get basic parameters
-        symbol = get_user_input(
+        symbol = prompt_user_for_input(
             "\nCrypto pair", 
             str, 
             DEFAULT_DATA_CONFIG['default_symbol']
@@ -258,7 +258,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
             style=THEME["dim"]
         )
         
-        period = get_user_input(
+        period = prompt_user_for_input(
             "Period", 
             str, 
             DEFAULT_DATA_CONFIG['default_period']
@@ -279,7 +279,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
                 console.print("No configurations provided, using defaults", style=THEME["warning"])
 
         # Execute comparison
-        app.compare_strategies(
+        app.analyze_strategy_variants(
             selected_strategy_name,
             symbol=symbol,
             period=period,
@@ -290,7 +290,7 @@ def compare_strategies_menu(app: DailyScalper) -> None:
 
     except UserCancelledError:
         console.print("Operation cancelled by user", style=THEME["warning"])
-    except DailyScalperError as e:
+    except TradingStrategyBacktesterError as e:
         console.print(ui_error_message(str(e), "Comparison Error"))
     except Exception as e:
         console.print(ui_error_message(f"Unexpected error: {str(e)}", "System Error"))
@@ -326,7 +326,7 @@ def _collect_custom_configurations(strategy_name: str) -> List[Dict[str, Any]]:
             default_value = param_config.get('default')
             description = param_config.get('description', param_name)
 
-            value = get_user_input(f"{description}", param_type, default_value)
+            value = prompt_user_for_input(f"{description}", param_type, default_value)
             if value is None:
                 break
             config[param_name] = value
@@ -342,22 +342,22 @@ def _collect_custom_configurations(strategy_name: str) -> List[Dict[str, Any]]:
     return configurations
 
 
-def view_saved_results_menu(app: DailyScalper) -> None:
+def handle_saved_results_display(app: TradingStrategyBacktester) -> None:
     """
     Display saved profitable strategies.
     
     Args:
-        app: The DailyScalper application instance.
+        app: The TradingStrategyBacktester application instance.
     """
     try:
-        app.show_saved_strategies()
-    except DailyScalperError as e:
+        app.display_saved_results()
+    except TradingStrategyBacktesterError as e:
         console.print(ui_error_message(str(e), "Display Error"))
     except Exception as e:
         console.print(ui_error_message(f"Unexpected error: {str(e)}", "System Error"))
 
 
-def view_app_settings_menu() -> None:
+def handle_configuration_display() -> None:
     """
     Display current application configuration settings.
     
@@ -458,13 +458,13 @@ def view_app_settings_menu() -> None:
 
 def parse_arguments() -> argparse.Namespace:
     """
-    Parse command line arguments for the Daily Scalper application.
+    Parse command line arguments for the Trading Strategy Backtester application.
     
     Returns:
         Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(
-        description="Daily Scalper - Cryptocurrency Trading Strategy Backtesting Tool",
+        description="Trading Strategy Backtester - Cryptocurrency Trading Strategy Backtesting Tool",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -532,7 +532,7 @@ def main() -> int:
         )
         
         # Initialize the application
-        app = DailyScalper()
+        app = TradingStrategyBacktester()
 
         # Main menu loop
         while True:
@@ -554,13 +554,13 @@ def main() -> int:
 
                 # Handle menu choices
                 if choice == 1:
-                    backtest_strategy_menu(app)
+                    handle_single_strategy_test(app)
                 elif choice == 2:
-                    compare_strategies_menu(app)
+                    handle_strategy_comparison(app)
                 elif choice == 3:
-                    view_saved_results_menu(app)
+                    handle_saved_results_display(app)
                 elif choice == 4:
-                    view_app_settings_menu()
+                    handle_configuration_display()
                 elif choice == 5:
                     break
                 else:
@@ -588,7 +588,7 @@ def main() -> int:
         console.print("\nGoodbye.\n", style=THEME["highlight"])
         return 0
 
-    except DailyScalperError as e:
+    except TradingStrategyBacktesterError as e:
         console.print(f"❌ Application error: {e}", style=THEME["error"])
         return 1
     except Exception as e:

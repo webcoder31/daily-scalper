@@ -1,4 +1,4 @@
-# Daily Scalper
+# Trading Strategy Backtester
 
 A user-friendly Python application for testing, evaluating, and saving cryptocurrency trading strategies.
 
@@ -6,17 +6,19 @@ A user-friendly Python application for testing, evaluating, and saving cryptocur
 
 ## Overview
 
-Daily Scalper lets you backtest and compare crypto trading strategies with an interactive menu and clear visualizations. No coding required for basic use.
+Trading Strategy Backtester lets you backtest and compare crypto trading strategies with an interactive menu and clear visualizations. No coding required for basic use.
 
 ---
 
 ## Features
 
 - Test built-in trading strategies on historical crypto data
-- Compare strategy performance
-- Interactive charts and performance metrics
+- Compare strategy performance with multiple configurations
+- Interactive charts and comprehensive performance metrics
 - Automatic saving of profitable strategies
 - Simple, menu-driven interface
+- Flexible logging control with multiple output options
+- Professional modular architecture with clear separation of concerns
 
 ---
 
@@ -65,9 +67,35 @@ source venv/bin/activate
 python main.py
 ```
 
+### Logging Options
+
+Trading Strategy Backtester provides flexible logging control through command-line options:
+
+```bash
+# Default: Minimal logging (WARNING and ERROR only)
+python main.py
+
+# Verbose logging with detailed operation information
+python main.py --verbose
+
+# Debug logging with full debugging information
+python main.py --log-level DEBUG
+
+# Quiet mode with no logging output
+python main.py --quiet
+
+# Save logs to file in addition to console output
+python main.py --log-file
+
+# Log exclusively to file without console output
+python main.py --file-only
+```
+
+### Application Architecture
+
 - The entrypoint is [`main.py`](main.py), which launches the interactive CLI.
-- The CLI/menu logic is in [`cli.py`](cli.py).
-- The core application logic is in [`app.py`](app.py).
+- The CLI/menu logic is in [`core/command_line_interface.py`](core/command_line_interface.py).
+- The core application logic is in [`core/trading_strategy_backtester.py`](core/trading_strategy_backtester.py).
 
 ### Menu Options
 
@@ -82,8 +110,97 @@ python main.py
 - **Simple Moving Average Crossover (SMA)**
 - **Relative Strength Index (RSI) Threshold**
 - **Bollinger Bands**
+- **EMA + RSI Combined Strategy**
 
-Each strategy can be customized via the menu.
+Each strategy can be customized via the menu with various parameter configurations.
+
+---
+
+## Project Structure
+
+The application follows a professional modular architecture:
+
+```
+daily-scalper/
+├── main.py                               # Entry point
+├── config.py                             # Global configuration
+├── core/                                 # Core application logic
+│   ├── trading_strategy_backtester.py    # Main application controller
+│   └── command_line_interface.py         # CLI and menu system
+├── strategies/                           # Trading strategies
+│   ├── base/                             # Strategies
+│   │   ├── abstract_trading_strategy.py  # Base strategy class
+│   │   └── strategy_registry.py          # Strategy registration system
+│   └── implementations/                  # Strategy implementations
+│       ├── sma_strategy.py               # SMA Crossover strategy
+│       ├── rsi_strategy.py               # RSI strategy
+│       ├── bb_strategy.py                # Bollinger Bands strategy
+│       └── ema_rsi_strategy.py           # EMA + RSI strategy
+├── backtesting/                          # Backtesting engine and analysis
+│   ├── strategy_backtest_engine.py       # Backtesting execution
+│   └── performance_analyzer.py           # Performance analysis and metrics
+├── market_data/                          # Market data management
+│   ├── market_data_provider.py           # Data fetching and caching
+│   └── period_translator.py              # Period string conversions
+├── visualization/                        # Chart generation
+│   └── backtest_chart_generator.py       # Interactive visualizations
+├── persistence/                          # Data persistence
+│   └── strategy_results_persistence.py   # Results management
+├── ui/                                   # User interface components
+│   ├── components.py                     # UI components and menus
+│   └── theme.py                          # Theme and styling
+├── utils/                                # General utilities
+│   └── logging_config.py                 # Centralized logging configuration
+├── cache/                                # Cached market data
+├── results/                              # Output directory (created at runtime)
+│   ├── strategies/                       # Saved strategy results
+│   ├── reports/                          # Performance reports
+│   └── charts/                           # Generated charts
+└── tests/                                # Test files
+    ├── test_setup.py                     # Setup validation
+    ├── functional_test.py                # Functional testing
+    └── validation_test.py                # Comprehensive validation
+```
+
+---
+
+## Core Components
+
+### DailyScalper (Main Application Controller)
+The main application controller that orchestrates backtesting operations:
+- `execute_strategy_backtest()` - Execute single strategy backtest
+- `analyze_strategy_variants()` - Compare multiple strategy configurations
+- `display_saved_results()` - Show previously saved profitable strategies
+
+### MarketDataProvider
+Handles cryptocurrency data fetching and caching:
+- `fetch_cryptocurrency_data()` - Load market data from Yahoo Finance
+- `get_supported_cryptocurrency_symbols()` - Get available trading pairs
+- `is_cached_data_fresh()` - Check cache validity
+
+### StrategyBacktestEngine
+Executes vectorized backtests using vectorbt:
+- `execute_strategy_evaluation()` - Run strategy backtest simulation
+- `build_vectorbt_portfolio()` - Construct trading portfolio
+- `compute_performance_statistics()` - Calculate basic metrics
+
+### PerformanceAnalyzer
+Calculates comprehensive performance metrics:
+- `compute_extended_performance_stats()` - Advanced metrics calculation
+- `meets_profitability_criteria()` - Evaluate strategy profitability
+- `sort_strategies_by_performance()` - Rank strategy performance
+- `create_detailed_analysis_report()` - Generate performance reports
+
+### BacktestChartGenerator
+Creates interactive visualizations:
+- `generate_backtest_chart()` - Create strategy performance charts
+- `display_all_charts()` - Show comprehensive visualization suite
+
+### StrategyResultsPersistence
+Manages strategy result storage:
+- `persist_strategy_results()` - Save profitable strategies
+- `retrieve_strategy_results()` - Load saved strategies
+- `list_persisted_strategies()` - Display saved strategy list
 
 ---
 
@@ -92,13 +209,20 @@ Each strategy can be customized via the menu.
 All settings (default capital, commission, cache, etc.) can be changed in [`config.py`](config.py).  
 To modify: edit the file and restart the app.
 
+Key configuration sections:
+- `DEFAULT_BACKTEST_CONFIG`: Initial cash, commission, slippage settings
+- `DEFAULT_DATA_CONFIG`: Default symbol, period, cache settings
+- `PROFITABILITY_CRITERIA`: Minimum return, Sharpe ratio, drawdown thresholds
+- `POPULAR_CRYPTO_SYMBOLS`: List of supported cryptocurrency symbols
+
 ---
 
 ## Results & Visualizations
 
 - Results and charts are saved in the `results/` directory.
 - Interactive charts open in your browser.
-- Profitable strategies are saved automatically.
+- Profitable strategies are saved automatically based on configurable criteria.
+- Charts include buy/sell signals, performance metrics, and technical indicators.
 
 ---
 
@@ -120,11 +244,16 @@ To modify: edit the file and restart the app.
 - **Slow performance:**  
   Use a shorter data period or enable cache.
 
+- **Logging issues:**
+  Use `--quiet` for no logging or `--verbose` for detailed output.
+
 ---
 
 ## More Information
 
-For technical details, developer documentation, and instructions on adding new strategies, see [`TECHNICAL_DOCUMENTATION.md`](TECHNICAL_DOCUMENTATION.md).
+For technical details, developer documentation, and instructions on adding new strategies, see:
+- [`TECHNICAL_DOCUMENTATION.md`](TECHNICAL_DOCUMENTATION.md) - Technical architecture and development guide
+- [`STRATEGY_IMPLEMENTATION_GUIDE.md`](STRATEGY_IMPLEMENTATION_GUIDE.md) - Step-by-step strategy creation guide
 
 ---
 

@@ -16,12 +16,12 @@ from itertools import product
 import pandas as pd
 import numpy as np
 
-from .base_strategy import BaseStrategy, ParameterValidationError, DataValidationError
-from .strategy_registry import register_strategy
+from ..base.abstract_trading_strategy import AbstractTradingStrategy, ParameterValidationError, DataValidationError
+from ..base.strategy_registry import register_strategy
 
 
 @register_strategy
-class EMARSIStrategy(BaseStrategy):
+class EMARSIStrategy(AbstractTradingStrategy):
     """
     EMA + RSI Combined Trading Strategy.
     

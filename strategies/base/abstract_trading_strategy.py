@@ -5,7 +5,7 @@ This module defines the abstract base class that all trading strategies must inh
 It provides a consistent interface and common functionality for strategy implementation,
 parameter management, and signal generation.
 
-The BaseStrategy class enforces the Strategy Pattern design, ensuring all concrete
+The AbstractTradingStrategy class enforces the Strategy Pattern design, ensuring all concrete
 strategy implementations follow the same interface while allowing for flexible
 customization of trading logic.
 """
@@ -31,7 +31,7 @@ class DataValidationError(StrategyError):
     pass
 
 
-class BaseStrategy(ABC):
+class AbstractTradingStrategy(ABC):
     """
     Abstract base class for all trading strategies.
     
@@ -211,7 +211,7 @@ class BaseStrategy(ABC):
 
 
     @classmethod
-    def get_short_description(cls, config: Optional[Dict[str, Any]] = None) -> str:
+    def get_parameter_summary(cls, config: Optional[Dict[str, Any]] = None) -> str:
         """
         Get a concise description of the strategy with optional configuration details.
         
@@ -226,8 +226,8 @@ class BaseStrategy(ABC):
         """
         if config:
             param_str = ", ".join([f"{k}={v}" for k, v in config.items()])
-            return f"{cls.get_short_label()} ({param_str})"
-        return cls.get_short_label()
+            return f"{cls.get_abbreviated_name()} ({param_str})"
+        return cls.get_abbreviated_name()
 
 
     @classmethod
@@ -245,7 +245,7 @@ class BaseStrategy(ABC):
 
 
     @classmethod
-    def get_short_label(cls) -> str:
+    def get_abbreviated_name(cls) -> str:
         """
         Get a short abbreviation or code for the strategy.
         
@@ -259,7 +259,7 @@ class BaseStrategy(ABC):
 
 
     @classmethod
-    def get_predefined_configurations(cls) -> List[Dict[str, Any]]:
+    def get_comparison_parameter_sets(cls) -> List[Dict[str, Any]]:
         """
         Get a list of predefined parameter configurations for strategy comparison.
         

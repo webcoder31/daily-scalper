@@ -192,3 +192,136 @@ This file records architectural and implementation decisions using a list format
 * Added `--file-only` option to log exclusively to file without console output
 * Enhanced logging configuration with file_only parameter and proper validation
 * Comprehensive testing confirms all logging levels work correctly including quiet mode and file-only logging
+
+
+[2025-08-03 17:49:00] - Comprehensive Daily Scalper Refactoring Architecture Plan
+
+## Decision
+
+* Plan comprehensive refactoring of Daily Scalper project to achieve professional-level code quality through systematic reorganization of directory structure, class renaming, and module separation
+
+## Rationale 
+
+* Current codebase has grown organically and needs professional-level organization
+* Directory structure needs better separation of concerns (data/ → cache/, new organized modules)
+* Class names need semantic accuracy and professional naming conventions
+* File structure needs proper module separation for maintainability
+* Need systematic approach to maintain functionality during transition
+* Comprehensive mapping required to ensure all imports and references are properly updated
+
+## Implementation Details
+
+* **Current Architecture Analysis**: 
+  - Well-organized modular structure with strategies/, backtest/, utils/, core files
+  - Recently refactored with professional Python standards, type annotations, custom exceptions
+  - Comprehensive validation confirms 46/46 tests passing with no circular dependencies
+  - 4 registered strategies (Bollinger Bands, EMA+RSI, RSI, SMA) with full functionality
+
+* **Directory Structure Transformation**:
+  - Rename 'data/' → 'cache/' for semantic accuracy
+  - Create new organized structure: core/, strategies/, backtesting/, market_data/, visualization/, persistence/, ui/, utils/
+  - Maintain backward compatibility during transition
+
+* **Core Class Renaming Strategy**:
+  - DailyScalper → TradingStrategyBacktester (main application controller)
+  - DataLoader → MarketDataProvider (data fetching and caching)
+  - Visualizer → BacktestChartGenerator (chart generation)
+  - StrategySaver → StrategyResultsPersistence (results management)
+  - BacktestEngine → StrategyBacktestEngine (backtesting execution)
+  - PerformanceMetrics → PerformanceAnalyzer (metrics calculation)
+
+* **Execution Strategy**:
+  - Phase-based approach with dependency analysis
+  - Maintain functionality at each step
+  - Comprehensive testing between phases
+  - Rollback procedures for each step
+  - Import dependency mapping and systematic updates
+
+[2025-08-03 17:11:00] - **Phase 3 Class and Method Renaming Decisions**
+
+## Strategic Naming Decisions
+
+### Class Renaming Strategy
+- **Decision**: Rename all core classes for professional semantic accuracy
+- **Rationale**: Original names were too generic or didn't clearly indicate functionality
+- **Impact**: Improved code readability and professional appearance
+
+### Method Renaming Approach
+- **Decision**: Use descriptive, action-oriented method names
+- **Examples**: `backtest_strategy` → `execute_strategy_backtest`, `show_saved_strategies` → `display_saved_results`
+- **Rationale**: Method names should clearly indicate what action they perform
+
+### Variable Renaming Scope
+- **Decision**: Rename only specific variables, keep standard financial terms
+- **Kept Unchanged**: `symbol` and `period` (77 and 126 occurrences respectively)
+- **Rationale**: These are standard, widely-accepted terms in financial/trading domain
+- **Renamed**: `strategy_params` → `strategy_parameters`, `show_plots` → `display_charts`, `save_if_profitable` → `auto_save_profitable_results`
+
+### Import Statement Management
+- **Decision**: Update all import statements systematically
+- **Approach**: File-by-file comprehensive update to prevent broken references
+- **Result**: Maintained all external library compatibility
+
+### Testing Strategy
+- **Decision**: Comprehensive functional testing after each major change
+- **Approach**: Fix functional test imports and method calls to match new names
+- **Validation**: Ensure complete backtest execution with all features working
+
+## Technical Implementation Decisions
+
+### Method Reference Updates
+- **Challenge**: Ensuring all internal method calls use new names
+- **Solution**: Systematic search and replace across entire codebase
+- **Verification**: Functional test execution to catch any missed references
+
+### Backward Compatibility
+- **Decision**: Complete migration without backward compatibility
+- **Rationale**: Clean break for professional naming, no legacy method support needed
+- **Impact**: All code now uses consistent, professional naming conventions
+
+### Error Handling
+- **Approach**: Maintain all existing error handling while updating method names
+- **Result**: No loss of functionality or error reporting capabilities
+
+
+[2025-08-03 19:59:00] - **User Post-Refactoring Corrections and Completions**
+
+## Decision
+
+* Complete user-implemented fixes for missed renaming tasks and inconsistencies after Phase 4 completion
+
+## Rationale 
+
+* The automated refactoring process missed several critical naming inconsistencies and documentation updates
+* Project name standardization was incomplete across documentation and code comments
+* Class name references were inconsistent between planned names and actual implementation
+* Method calls and parameter names needed alignment with the new naming conventions
+* Import statements required correction to match actual class names
+* Documentation needed to accurately reflect the final implementation state
+
+## Implementation Details
+
+* **Project Rebranding**: Complete transition from "Daily Scalper" to "Trading Strategy Backtester" across 35+ files
+* **Class Name Consistency**: Fixed BaseStrategy/AbstractTradingStrategy inconsistencies in documentation and imports
+* **Exception Class Updates**: Corrected DailyScalperError → TradingStrategyBacktesterError throughout codebase
+* **Method Call Corrections**: Fixed rank_strategies → sort_strategies_by_performance and parameter name updates
+* **Import Statement Fixes**: Updated all strategy implementations to use correct AbstractTradingStrategy imports
+* **Documentation Accuracy**: Aligned all documentation with actual implementation details
+* **Metadata Cleanup**: Updated author information and simplified module descriptions
+* **File Structure**: Removed obsolete files and cleaned up module organization
+
+## Technical Impact
+
+* **Naming Integrity**: Achieved complete consistency in class names, method names, and project references
+* **Import Reliability**: All import statements now work correctly with actual class names
+* **Documentation Accuracy**: All documentation files now accurately reflect the current codebase
+* **Professional Standards**: Complete professional branding and naming conventions applied
+* **Code Quality**: Eliminated all naming conflicts and inconsistencies
+
+## User Contribution Significance
+
+* **Critical Bug Fixes**: Resolved method call errors that would have caused runtime failures
+* **Consistency Achievement**: Completed the professional naming transformation that was partially incomplete
+* **Documentation Synchronization**: Ensured all documentation matches actual implementation
+* **Quality Assurance**: Applied final polish to achieve production-ready code quality
+* **Project Completion**: Delivered the final missing pieces for a fully professional codebase

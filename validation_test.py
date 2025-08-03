@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive validation script for the Daily Scalper refactored codebase.
+Comprehensive validation script for the Trading Strategy Backtester refactored codebase.
 Tests imports, functionality, integration, and compatibility across all modules.
 """
 
@@ -25,9 +25,9 @@ def test_imports() -> Dict[str, Any]:
     # Test core modules
     core_modules = [
         'config',
-        'main', 
-        'app',
-        'cli'
+        'main',
+        'core.trading_strategy_backtester',
+        'core.command_line_interface'
     ]
     
     for module in core_modules:
@@ -45,12 +45,12 @@ def test_imports() -> Dict[str, Any]:
     # Test strategy modules
     strategy_modules = [
         'strategies',
-        'strategies.base_strategy',
-        'strategies.strategy_registry',
-        'strategies.sma_strategy',
-        'strategies.rsi_strategy',
-        'strategies.bb_strategy',
-        'strategies.emarsi_strategy'
+        'strategies.base.abstract_trading_strategy',
+        'strategies.base.strategy_registry',
+        'strategies.implementations.sma_strategy',
+        'strategies.implementations.rsi_strategy',
+        'strategies.implementations.bb_strategy',
+        'strategies.implementations.ema_rsi_strategy'
     ]
     
     for module in strategy_modules:
@@ -65,14 +65,14 @@ def test_imports() -> Dict[str, Any]:
             results['errors'].append(error_msg)
             results['success'] = False
     
-    # Test backtest modules
-    backtest_modules = [
-        'backtest',
-        'backtest.backtest_engine',
-        'backtest.performance_metrics'
+    # Test backtesting modules
+    backtesting_modules = [
+        'backtesting',
+        'backtesting.strategy_backtest_engine',
+        'backtesting.performance_analyzer'
     ]
     
-    for module in backtest_modules:
+    for module in backtesting_modules:
         try:
             print(f"Testing import: {module}")
             exec(f"import {module}")
@@ -84,18 +84,23 @@ def test_imports() -> Dict[str, Any]:
             results['errors'].append(error_msg)
             results['success'] = False
     
-    # Test utils modules
-    utils_modules = [
+    # Test new module structure
+    new_modules = [
+        'market_data',
+        'market_data.market_data_provider',
+        'market_data.period_translator',
+        'visualization',
+        'visualization.backtest_chart_generator',
+        'persistence',
+        'persistence.strategy_results_persistence',
+        'ui',
+        'ui.components',
+        'ui.theme',
         'utils',
-        'utils.data_loader',
-        'utils.period_translator',
-        'utils.strategy_saver',
-        'utils.theme',
-        'utils.ui_components',
-        'utils.visualizer'
+        'utils.logging_config'
     ]
     
-    for module in utils_modules:
+    for module in new_modules:
         try:
             print(f"Testing import: {module}")
             exec(f"import {module}")
@@ -155,20 +160,20 @@ def test_core_integration() -> Dict[str, Any]:
                 results['errors'].append(error_msg)
                 results['success'] = False
         
-        # Test app module classes
-        print("Testing app module...")
-        from app import DailyScalper
+        # Test core application classes
+        print("Testing core application module...")
+        from core.trading_strategy_backtester import TradingStrategyBacktester
         
         # Test app instantiation
-        app = DailyScalper()
-        print("✓ DailyScalper instantiated successfully")
-        results['tests_passed'].append("DailyScalper instantiation")
+        app = TradingStrategyBacktester()
+        print("✓ TradingStrategyBacktester instantiated successfully")
+        results['tests_passed'].append("TradingStrategyBacktester instantiation")
         
         # Test CLI module
         print("Testing CLI module...")
-        import cli
-        print("✓ CLI module imported successfully")
-        results['tests_passed'].append("CLI module import")
+        from core.command_line_interface import main, parse_arguments
+        print("✓ CLI module functions imported successfully")
+        results['tests_passed'].append("CLI module functions import")
         
     except Exception as e:
         error_msg = f"Core integration test failed: {str(e)}"
@@ -195,7 +200,7 @@ def test_strategy_system() -> Dict[str, Any]:
     try:
         # Test strategy registry
         print("Testing strategy registry...")
-        from strategies.strategy_registry import get_strategy_names, create_strategy
+        from strategies.base.strategy_registry import get_strategy_names, create_strategy
         
         strategies = get_strategy_names()
         print(f"✓ Strategy registry loaded with {len(strategies)} strategies")
@@ -237,17 +242,17 @@ def test_utils_integration() -> Dict[str, Any]:
     }
     
     try:
-        # Test data loader
-        print("Testing data loader...")
-        from utils.data_loader import DataLoader
+        # Test market data provider
+        print("Testing market data provider...")
+        from market_data.market_data_provider import MarketDataProvider
         
-        data_loader = DataLoader()
-        print("✓ DataLoader instantiated successfully")
-        results['tests_passed'].append("DataLoader instantiation")
+        data_provider = MarketDataProvider()
+        print("✓ MarketDataProvider instantiated successfully")
+        results['tests_passed'].append("MarketDataProvider instantiation")
         
         # Test period translator
         print("Testing period translator...")
-        from utils.period_translator import PeriodTranslator
+        from market_data.period_translator import PeriodTranslator
         
         translator = PeriodTranslator()
         description = translator.get_period_description("1y")
@@ -256,7 +261,7 @@ def test_utils_integration() -> Dict[str, Any]:
         
         # Test theme
         print("Testing theme...")
-        from utils.theme import THEME, ThemeManager
+        from ui.theme import THEME, ThemeManager
         
         theme_manager = ThemeManager()
         validated_theme = theme_manager.validate_theme(THEME)
@@ -265,28 +270,28 @@ def test_utils_integration() -> Dict[str, Any]:
         
         # Test UI components
         print("Testing UI components...")
-        from utils.ui_components import ui_modern_table, ui_block_header, ui_error_message
+        from ui.components import ui_modern_table, ui_block_header, ui_error_message
         
         # Test creating a modern table
         table = ui_modern_table("Test Table")
         print("✓ UI components functions imported and callable")
         results['tests_passed'].append("UI components functions")
         
-        # Test strategy saver
-        print("Testing strategy saver...")
-        from utils.strategy_saver import StrategySaver
+        # Test strategy results persistence
+        print("Testing strategy results persistence...")
+        from persistence.strategy_results_persistence import StrategyResultsPersistence
         
-        saver = StrategySaver()
-        print("✓ StrategySaver instantiated successfully")
-        results['tests_passed'].append("StrategySaver instantiation")
+        persistence = StrategyResultsPersistence()
+        print("✓ StrategyResultsPersistence instantiated successfully")
+        results['tests_passed'].append("StrategyResultsPersistence instantiation")
         
-        # Test visualizer
-        print("Testing visualizer...")
-        from utils.visualizer import Visualizer
+        # Test chart generator
+        print("Testing chart generator...")
+        from visualization.backtest_chart_generator import BacktestChartGenerator
         
-        visualizer = Visualizer()
-        print("✓ Visualizer instantiated successfully")
-        results['tests_passed'].append("Visualizer instantiation")
+        chart_generator = BacktestChartGenerator()
+        print("✓ BacktestChartGenerator instantiated successfully")
+        results['tests_passed'].append("BacktestChartGenerator instantiation")
         
     except Exception as e:
         error_msg = f"Utils integration test failed: {str(e)}"
@@ -311,23 +316,23 @@ def test_backtest_system() -> Dict[str, Any]:
     }
     
     try:
-        # Test backtest engine
-        print("Testing backtest engine...")
-        from backtest.backtest_engine import BacktestEngine
-        from utils.data_loader import DataLoader
+        # Test strategy backtest engine
+        print("Testing strategy backtest engine...")
+        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from market_data.market_data_provider import MarketDataProvider
         
-        data_loader = DataLoader()
-        engine = BacktestEngine()  # BacktestEngine doesn't take data_loader as parameter
-        print("✓ BacktestEngine instantiated successfully")
-        results['tests_passed'].append("BacktestEngine instantiation")
+        data_provider = MarketDataProvider()
+        engine = StrategyBacktestEngine()
+        print("✓ StrategyBacktestEngine instantiated successfully")
+        results['tests_passed'].append("StrategyBacktestEngine instantiation")
         
-        # Test performance metrics
-        print("Testing performance metrics...")
-        from backtest.performance_metrics import PerformanceMetrics
+        # Test performance analyzer
+        print("Testing performance analyzer...")
+        from backtesting.performance_analyzer import PerformanceAnalyzer
         
-        metrics = PerformanceMetrics()
-        print("✓ PerformanceMetrics instantiated successfully")
-        results['tests_passed'].append("PerformanceMetrics instantiation")
+        analyzer = PerformanceAnalyzer()
+        print("✓ PerformanceAnalyzer instantiated successfully")
+        results['tests_passed'].append("PerformanceAnalyzer instantiation")
         
     except Exception as e:
         error_msg = f"Backtest system test failed: {str(e)}"
@@ -356,10 +361,9 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         print("Testing custom exceptions...")
         
         exception_imports = [
-            "from app import DailyScalperError, DataLoadError, StrategyError, BacktestError",
-            "from strategies.base_strategy import StrategyError, ParameterValidationError, DataValidationError",
-            "from backtest.backtest_engine import BacktestError, DataValidationError, StrategyExecutionError",
-            "from utils.data_loader import DataLoadError, CacheError, ValidationError"
+            "from strategies.base.abstract_trading_strategy import StrategyError, ParameterValidationError, DataValidationError",
+            "from backtesting.strategy_backtest_engine import BacktestError, DataValidationError, StrategyExecutionError",
+            "from market_data.market_data_provider import DataLoadError, CacheError, ValidationError"
         ]
         
         for import_stmt in exception_imports:
@@ -378,10 +382,10 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         
         # Import all modules to check for type conflicts
         import config
-        import app
-        from strategies.strategy_registry import get_strategy_names
-        from backtest.backtest_engine import BacktestEngine
-        from utils.data_loader import DataLoader
+        from core.trading_strategy_backtester import TradingStrategyBacktester
+        from strategies.base.strategy_registry import get_strategy_names
+        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from market_data.market_data_provider import MarketDataProvider
         
         print("✓ All major modules imported without type conflicts")
         results['tests_passed'].append("Type consistency check")
@@ -398,7 +402,7 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
 
 def main():
     """Run comprehensive validation tests."""
-    print("DAILY SCALPER CODEBASE VALIDATION")
+    print("Trading Strategy Backtester CODEBASE VALIDATION")
     print("=" * 60)
     print("Testing refactored codebase for consistency, compatibility, and functionality")
     print("=" * 60)

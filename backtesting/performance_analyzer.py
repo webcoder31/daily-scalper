@@ -12,9 +12,6 @@ Key Features:
 - Professional performance reporting
 - Comprehensive error handling and validation
 - Statistical analysis and significance testing
-
-Author: Daily Scalper Development Team
-Version: 2.0.0
 """
 
 from typing import Dict, Any, List, Optional, Union, Tuple
@@ -75,7 +72,7 @@ class ProfitabilityCriteria:
     min_win_rate: float = 0.3
 
 
-class PerformanceMetrics:
+class PerformanceAnalyzer:
     """
     Advanced performance metrics calculator for trading strategy analysis.
     
@@ -87,25 +84,25 @@ class PerformanceMetrics:
         Basic usage of performance metrics:
         
         ```python
-        from backtest import PerformanceMetrics
+        from backtest import PerformanceAnalyzer
         
         # Calculate advanced metrics
-        advanced_metrics = PerformanceMetrics.calculate_advanced_metrics(results)
+        advanced_metrics = PerformanceAnalyzer.compute_extended_performance_stats(results)
         
         # Check profitability
-        is_profitable = PerformanceMetrics.is_strategy_profitable(advanced_metrics)
+        is_profitable = PerformanceAnalyzer.meets_profitability_criteria(advanced_metrics)
         
         # Generate report
-        report = PerformanceMetrics.generate_performance_report(results)
+        report = PerformanceAnalyzer.create_detailed_analysis_report(results)
         
         # Compare strategies
-        ranked_strategies = PerformanceMetrics.rank_strategies(strategy_results)
+        ranked_strategies = PerformanceAnalyzer.sort_strategies_by_performance(strategy_results)
         ```
     """
 
 
     @staticmethod
-    def calculate_advanced_metrics(results: Dict[str, Any]) -> Dict[str, float]:
+    def compute_extended_performance_stats(results: Dict[str, Any]) -> Dict[str, float]:
         """
         Calculate comprehensive advanced performance metrics from backtest results.
         
@@ -126,7 +123,7 @@ class PerformanceMetrics:
             logger.info("Calculating advanced performance metrics")
             
             # Validate input data
-            PerformanceMetrics._validate_results_data(results)
+            PerformanceAnalyzer._validate_results_data(results)
             
             portfolio = results['portfolio']
             metrics = results['metrics'].copy()
@@ -139,13 +136,13 @@ class PerformanceMetrics:
                 return metrics
             
             # Calculate advanced risk metrics
-            advanced_metrics = PerformanceMetrics._calculate_risk_metrics(returns, metrics)
+            advanced_metrics = PerformanceAnalyzer._calculate_risk_metrics(returns, metrics)
             
             # Calculate additional portfolio metrics
-            portfolio_metrics = PerformanceMetrics._calculate_portfolio_metrics(portfolio, returns)
+            portfolio_metrics = PerformanceAnalyzer._calculate_portfolio_metrics(portfolio, returns)
             
             # Calculate benchmark comparison metrics
-            benchmark_metrics = PerformanceMetrics._calculate_benchmark_metrics(
+            benchmark_metrics = PerformanceAnalyzer._calculate_benchmark_metrics(
                 results.get('data'), returns, metrics
             )
             
@@ -379,7 +376,7 @@ class PerformanceMetrics:
 
 
     @staticmethod
-    def is_strategy_profitable(
+    def meets_profitability_criteria(
         metrics: Dict[str, float], 
         criteria: Optional[ProfitabilityCriteria] = None,
         min_return: Optional[float] = None,
@@ -448,7 +445,7 @@ class PerformanceMetrics:
 
 
     @staticmethod
-    def rank_strategies(
+    def sort_strategies_by_performance(
         strategies_results: List[Dict[str, Any]], 
         ranking_weights: Optional[Dict[str, float]] = None
     ) -> List[Dict[str, Any]]:
@@ -495,7 +492,7 @@ class PerformanceMetrics:
             # Calculate composite scores
             scored_strategies = []
             for result in strategies_results:
-                score = PerformanceMetrics._calculate_strategy_score(result['metrics'], weights)
+                score = PerformanceAnalyzer._calculate_strategy_score(result['metrics'], weights)
                 result_copy = result.copy()
                 result_copy['ranking_score'] = score
                 scored_strategies.append(result_copy)
@@ -554,7 +551,7 @@ class PerformanceMetrics:
 
 
     @staticmethod
-    def generate_performance_report(
+    def create_detailed_analysis_report(
         results: Dict[str, Any], 
         include_advanced: bool = True,
         include_trades: bool = True
@@ -581,7 +578,7 @@ class PerformanceMetrics:
             logger.info("Generating performance report")
             
             # Validate input data
-            PerformanceMetrics._validate_results_data(results)
+            PerformanceAnalyzer._validate_results_data(results)
             
             strategy = results['strategy']
             metrics = results['metrics']
@@ -591,7 +588,7 @@ class PerformanceMetrics:
             # Calculate advanced metrics if requested
             if include_advanced:
                 try:
-                    metrics = PerformanceMetrics.calculate_advanced_metrics(results)
+                    metrics = PerformanceAnalyzer.compute_extended_performance_stats(results)
                 except Exception as e:
                     logger.warning(f"Advanced metrics calculation failed in report: {str(e)}")
             
@@ -599,31 +596,31 @@ class PerformanceMetrics:
             report_sections = []
             
             # Header section
-            report_sections.append(PerformanceMetrics._generate_header_section(
+            report_sections.append(PerformanceAnalyzer._generate_header_section(
                 strategy, symbol, period
             ))
             
             # Financial results section
-            report_sections.append(PerformanceMetrics._generate_financial_section(
+            report_sections.append(PerformanceAnalyzer._generate_financial_section(
                 metrics, results.get('parameters', {})
             ))
             
             # Risk metrics section
-            report_sections.append(PerformanceMetrics._generate_risk_section(metrics))
+            report_sections.append(PerformanceAnalyzer._generate_risk_section(metrics))
             
             # Trading statistics section
             if include_trades:
-                report_sections.append(PerformanceMetrics._generate_trading_section(metrics))
+                report_sections.append(PerformanceAnalyzer._generate_trading_section(metrics))
             
             # Advanced metrics section
             if include_advanced:
-                report_sections.append(PerformanceMetrics._generate_advanced_section(metrics))
+                report_sections.append(PerformanceAnalyzer._generate_advanced_section(metrics))
             
             # Strategy parameters section
-            report_sections.append(PerformanceMetrics._generate_parameters_section(strategy))
+            report_sections.append(PerformanceAnalyzer._generate_parameters_section(strategy))
             
             # Evaluation section
-            report_sections.append(PerformanceMetrics._generate_evaluation_section(metrics))
+            report_sections.append(PerformanceAnalyzer._generate_evaluation_section(metrics))
             
             # Combine all sections
             full_report = '\n'.join(report_sections)
@@ -715,9 +712,9 @@ Max Drawdown Duration: {metrics.get('max_drawdown_duration', 0):.0f} days
         """Generate strategy parameters section."""
         parameters_text = "--- STRATEGY PARAMETERS ---\n"
         
-        strategy_params = strategy.get('parameters', {})
-        if strategy_params:
-            for key, value in strategy_params.items():
+        strategy_parameters = strategy.get('parameters', {})
+        if strategy_parameters:
+            for key, value in strategy_parameters.items():
                 parameters_text += f"{key}: {value}\n"
         else:
             parameters_text += "No parameters configured\n"
@@ -728,7 +725,7 @@ Max Drawdown Duration: {metrics.get('max_drawdown_duration', 0):.0f} days
     @staticmethod
     def _generate_evaluation_section(metrics: Dict[str, float]) -> str:
         """Generate evaluation section."""
-        is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
+        is_profitable = PerformanceAnalyzer.meets_profitability_criteria(metrics)
         
         evaluation_text = "--- STRATEGY EVALUATION ---\n"
         evaluation_text += f"Profitable Strategy: {'✅ YES' if is_profitable else '❌ NO'}\n"
@@ -776,14 +773,14 @@ Max Drawdown Duration: {metrics.get('max_drawdown_duration', 0):.0f} days
                 raise StrategyComparisonError("At least 2 strategies required for comparison")
             
             # Rank strategies
-            ranked_strategies = PerformanceMetrics.rank_strategies(strategy_results)
+            ranked_strategies = PerformanceAnalyzer.sort_strategies_by_performance(strategy_results)
             
             # Calculate comparison metrics
             comparison_data = {
                 'total_strategies': len(strategy_results),
                 'profitable_strategies': sum(
                     1 for result in strategy_results 
-                    if PerformanceMetrics.is_strategy_profitable(result['metrics'])
+                    if PerformanceAnalyzer.meets_profitability_criteria(result['metrics'])
                 ),
                 'best_strategy': ranked_strategies[0],
                 'worst_strategy': ranked_strategies[-1],
@@ -850,7 +847,7 @@ Max Drawdown Duration: {metrics.get('max_drawdown_duration', 0):.0f} days
             ReportGenerationError: If report generation fails.
         """
         try:
-            comparison_data = PerformanceMetrics.compare_strategies_detailed(strategy_results)
+            comparison_data = PerformanceAnalyzer.compare_strategies_detailed(strategy_results)
             
             report = f"""
 === STRATEGY COMPARISON REPORT ===
@@ -903,11 +900,11 @@ Score: {comparison_data['best_strategy']['ranking_score']:.3f}
             DataValidationError: If results data is invalid.
         """
         try:
-            PerformanceMetrics._validate_results_data(results)
+            PerformanceAnalyzer._validate_results_data(results)
             
             # Get metrics (with advanced if requested)
             if include_advanced:
-                metrics = PerformanceMetrics.calculate_advanced_metrics(results)
+                metrics = PerformanceAnalyzer.compute_extended_performance_stats(results)
             else:
                 metrics = results['metrics']
             
@@ -953,7 +950,7 @@ Score: {comparison_data['best_strategy']['ranking_score']:.3f}
                     'period_start': results['backtest_period']['start'],
                     'period_end': results['backtest_period']['end'],
                     'duration_days': results['backtest_period']['duration_days'],
-                    'is_profitable': PerformanceMetrics.is_strategy_profitable(metrics)
+                    'is_profitable': PerformanceAnalyzer.meets_profitability_criteria(metrics)
                 }
             }
             

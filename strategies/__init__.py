@@ -1,5 +1,5 @@
 """
-Trading Strategies Module for Daily Scalper.
+Trading Strategies Module for Trading Strategy Backtester.
 
 This module provides a comprehensive collection of trading strategies for cryptocurrency
 backtesting and analysis. It includes a robust architecture with:
@@ -30,19 +30,16 @@ Usage:
     
     # Generate trading signals
     buy_signals, sell_signals = strategy.generate_signals(data)
-
-Author: Daily Scalper Development Team
-Version: 2.0.0
 """
 
 from typing import List
 
 # Import base classes
-from .base_strategy import BaseStrategy
-from .strategy_registry import (
-    register_strategy, 
-    get_strategy_names, 
-    create_strategy, 
+from .base.abstract_trading_strategy import AbstractTradingStrategy
+from .base.strategy_registry import (
+    register_strategy,
+    get_strategy_names,
+    create_strategy,
     get_strategy_parameter_info,
     get_strategy_class,
     get_strategy_class_by_classname,
@@ -50,15 +47,15 @@ from .strategy_registry import (
 )
 
 # Import strategy implementations (these will auto-register with the decorator)
-from .sma_strategy import SMAStrategy
-from .rsi_strategy import RSIStrategy
-from .bb_strategy import BBStrategy
-from .emarsi_strategy import EMARSIStrategy
+from .implementations.sma_strategy import SMAStrategy
+from .implementations.rsi_strategy import RSIStrategy
+from .implementations.bb_strategy import BBStrategy
+from .implementations.ema_rsi_strategy import EMARSIStrategy
 
 # Public API exports
 __all__: List[str] = [
     # Base classes
-    'BaseStrategy',
+    'AbstractTradingStrategy',
     
     # Registry functions
     'register_strategy',
@@ -77,5 +74,4 @@ __all__: List[str] = [
 ]
 
 # Module metadata
-__version__ = "2.0.0"
-__author__ = "Daily Scalper Development Team"
+__version__ = "1.0.0"

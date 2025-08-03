@@ -85,7 +85,7 @@ class StrategyFileError(Exception):
         super().__init__(message)
 
 
-class StrategySaver:
+class StrategyResultsPersistence:
     """
     Class for saving and managing high-performing trading strategy results.
     
@@ -101,7 +101,7 @@ class StrategySaver:
         charts_dir: Subdirectory for HTML chart files.
         
     Example:
-        >>> saver = StrategySaver(results_dir="results")
+        >>> saver = StrategyResultsPersistence(results_dir="results")
         >>> save_id = saver.save_strategy_results(backtest_results)
         >>> strategies = saver.list_saved_strategies()
         >>> best = saver.get_best_strategies(top_n=5)
@@ -431,9 +431,9 @@ class StrategySaver:
         
         try:
             # Import here to avoid circular imports
-            from backtest.performance_metrics import PerformanceMetrics
+            from backtesting.performance_analyzer import PerformanceAnalyzer
             
-            report = PerformanceMetrics.generate_performance_report(results)
+            report = PerformanceAnalyzer.generate_performance_report(results)
             
             with open(report_file, 'w', encoding='utf-8') as f:
                 f.write(report)
@@ -454,23 +454,23 @@ class StrategySaver:
         """
         try:
             # Import here to avoid circular imports
-            from utils.visualizer import Visualizer
+            from visualization.backtest_chart_generator import BacktestChartGenerator
             
             # Save main chart
             main_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['main_chart']}"
-            main_fig = Visualizer.plot_backtest_results(results)
+            main_fig = BacktestChartGenerator.plot_backtest_results(results)
             main_fig.write_html(str(main_chart_path))
             logger.debug(f"Main chart saved: {main_chart_path}")
             
             # Save metrics chart
             metrics_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['metrics_chart']}"
-            metrics_fig = Visualizer.plot_performance_metrics(results)
+            metrics_fig = BacktestChartGenerator.plot_performance_metrics(results)
             metrics_fig.write_html(str(metrics_chart_path))
             logger.debug(f"Metrics chart saved: {metrics_chart_path}")
             
             # Save drawdown chart
             drawdown_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['drawdown_chart']}"
-            drawdown_fig = Visualizer.plot_drawdown(results)
+            drawdown_fig = BacktestChartGenerator.plot_drawdown(results)
             drawdown_fig.write_html(str(drawdown_chart_path))
             logger.debug(f"Drawdown chart saved: {drawdown_chart_path}")
             

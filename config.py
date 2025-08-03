@@ -1,5 +1,5 @@
 """
-Global configuration for the Daily Scalper application.
+Global configuration for the Trading Strategy Backtester application.
 
 This module contains all configuration constants and settings used throughout
 the application, including backtest parameters, data retrieval settings,

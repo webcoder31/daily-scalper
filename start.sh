@@ -1,7 +1,7 @@
 #!/bin/bash
-# Startup script for Daily Scalper
+# Startup script for Trading Strategy Backtester
 
-echo "🚀 Daily Scalper - Starting..."
+echo "🚀 Trading Strategy Backtester - Starting..."
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then

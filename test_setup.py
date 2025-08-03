@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Test script to verify the installation and proper functioning
-of the Daily Scalper application.
+of the Trading Strategy Backtester application.
 """
 
 import sys
@@ -19,9 +19,13 @@ def test_imports():
     
     try:
         # Test main imports
-        from strategies import BaseStrategy, SMAStrategy
-        from backtest import BacktestEngine, PerformanceMetrics
-        from utils import DataLoader, Visualizer, StrategySaver
+        from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+        from strategies.implementations.sma_strategy import SMAStrategy
+        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.performance_analyzer import PerformanceAnalyzer
+        from market_data.market_data_provider import MarketDataProvider
+        from visualization.backtest_chart_generator import BacktestChartGenerator
+        from persistence.strategy_results_persistence import StrategyResultsPersistence
         print("✅ All modules imported successfully")
         return True
     except ImportError as e:
@@ -59,7 +63,7 @@ def test_strategy_creation():
     print("\n🎯 Testing strategy creation...")
     
     try:
-        from strategies import SMAStrategy
+        from strategies.implementations.sma_strategy import SMAStrategy
         
         strategy = SMAStrategy(short_window=10, long_window=20)
         print(f"✅ Strategy created: {strategy.name}")
@@ -76,9 +80,9 @@ def test_data_loading():
     print("\n📥 Testing data loading...")
     
     try:
-        from utils import DataLoader
+        from market_data.market_data_provider import MarketDataProvider
         
-        loader = DataLoader()
+        loader = MarketDataProvider()
         symbols = loader.get_available_symbols()
         print(f"✅ DataLoader initialized")
         print(f"   Available symbols: {len(symbols)} (e.g.: {symbols[:3]})")
@@ -93,9 +97,9 @@ def test_backtest_engine():
     print("\n⚡ Testing backtest engine...")
     
     try:
-        from backtest import BacktestEngine
+        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
         
-        engine = BacktestEngine(initial_cash=10000, commission=0.001)
+        engine = StrategyBacktestEngine(initial_cash=10000, commission=0.001)
         print(f"✅ BacktestEngine initialized")
         print(f"   Initial capital: ${engine.initial_cash:,.2f}")
         print(f"   Commission: {engine.commission:.3%}")
@@ -109,7 +113,7 @@ def test_file_structure():
     """Checks the file structure."""
     print("\n📁 Testing file structure...")
     
-    required_dirs = ['data', 'results', 'strategies', 'backtest', 'utils']
+    required_dirs = ['cache', 'results', 'strategies', 'backtesting', 'market_data', 'visualization', 'persistence', 'core', 'ui', 'utils']
     required_files = ['main.py', 'requirements.txt', 'README.md']
     
     all_good = True
@@ -139,8 +143,8 @@ def run_mini_backtest():
         import pandas as pd
         import numpy as np
         from datetime import datetime, timedelta
-        from strategies import SMAStrategy
-        from backtest import BacktestEngine
+        from strategies.implementations.sma_strategy import SMAStrategy
+        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
         
         # Creating simulated data
         dates = pd.date_range(start='2023-01-01', end='2023-12-31', freq='D')
@@ -169,9 +173,9 @@ def run_mini_backtest():
         
         # Testing strategy
         strategy = SMAStrategy(short_window=10, long_window=20)
-        engine = BacktestEngine(initial_cash=10000)
+        engine = StrategyBacktestEngine(initial_cash=10000)
         
-        results = engine.run_backtest(strategy, data)
+        results = engine.execute_strategy_evaluation(strategy, data)
         
         print(f"✅ Mini backtest successful!")
         print(f"   Return: {results['metrics']['total_return']:.2%}")
@@ -189,7 +193,7 @@ def run_mini_backtest():
 def main():
     """Main test function."""
     print("=" * 60)
-    print("🧪 DAILY SCALPER - VALIDATION TESTS")
+    print("🧪 Trading Strategy Backtester - VALIDATION TESTS")
     print("=" * 60)
     
     tests = [

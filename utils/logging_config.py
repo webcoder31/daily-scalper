@@ -1,12 +1,9 @@
 """
-Centralized logging configuration for the Daily Scalper application.
+Centralized logging configuration for the Trading Strategy Backtester application.
 
 This module provides centralized logging configuration that can be controlled
 via command line arguments. It supports different log levels and optional
 logging output.
-
-Author: Daily Scalper Development Team
-Version: 1.0.0
 """
 
 import logging
@@ -178,7 +175,7 @@ def setup_application_logging(
     file_only: bool = False
 ) -> None:
     """
-    Setup logging for the Daily Scalper application based on command line arguments.
+    Setup logging for the Trading Strategy Backtester application based on command line arguments.
     
     This is a convenience function that translates common command line arguments
     into appropriate logging configuration.

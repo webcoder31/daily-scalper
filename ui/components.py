@@ -1,5 +1,5 @@
 """
-Rich terminal UI components and interactive elements for the Daily Scalper application.
+Rich terminal UI components and interactive elements for the Trading Strategy Backtester application.
 
 This module provides comprehensive UI components built on the Rich library for
 creating interactive terminal interfaces. It includes menu systems, tables,
@@ -40,7 +40,7 @@ from rich.rule import Rule
 from rich.text import Text
 from rich.panel import Panel
 import readchar
-from utils.theme import THEME
+from ui.theme import THEME
 
 # Configure logging
 from utils.logging_config import get_logger

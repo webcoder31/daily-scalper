@@ -1,9 +1,9 @@
-# Strategy Implementation Guide for Daily Scalper
+# Strategy Implementation Guide for Trading Strategy Backtester
 
-This document provides a comprehensive guide on how to implement new trading strategies for the Daily Scalper application.
+This document provides a comprehensive guide on how to implement new trading strategies for the Trading Strategy Backtester application.
 
 ## Table of Contents
-- [Strategy Implementation Guide for Daily Scalper](#strategy-implementation-guide-for-daily-scalper)
+- [Strategy Implementation Guide for Trading Strategy Backtester](#strategy-implementation-guide-for-daily-scalper)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Strategy Architecture](#strategy-architecture)
@@ -14,7 +14,7 @@ This document provides a comprehensive guide on how to implement new trading str
     - [3. Define Your Strategy Class](#3-define-your-strategy-class)
     - [4. Implement Instance Methods](#4-implement-instance-methods)
     - [5. Implement Parameter Definitions Method](#5-implement-parameter-definitions-method)
-    - [6. Implement Label, Short Label and Short Description Methods](#6-implement-label-short-label-and-short-description-methods)
+    - [6. Implement Label, Abbreviated Name and Parameter Summary Methods](#6-implement-label-abbreviated-name-and-parameter-summary-methods)
     - [7. Implement Predefined Configurations](#7-implement-predefined-configurations)
     - [8. (Optional) Implement Additional Methods](#8-optional-implement-additional-methods)
   - [Required Methods](#required-methods)
@@ -29,10 +29,10 @@ This document provides a comprehensive guide on how to implement new trading str
 
 ## Overview
 
-The Daily Scalper application uses a registry-based strategy system that allows you to add new trading strategies without modifying the core application. Each strategy is automatically discovered and made available in the UI.
+The Trading Strategy Backtester application uses a registry-based strategy system that allows you to add new trading strategies without modifying the core application. Each strategy is automatically discovered and made available in the UI.
 
 Strategies must:
-1. Inherit from the `BaseStrategy` class
+1. Inherit from the `AbstractTradingStrategy` class
 2. Be decorated with `@register_strategy`
 3. Implement all required methods
 
@@ -40,7 +40,7 @@ Strategies must:
 
 The strategy system consists of these key components:
 
-- **BaseStrategy**: Abstract base class that all strategies must inherit from
+- **AbstractTradingStrategy**: Abstract base class that all strategies must inherit from
 - **Strategy Registry**: Manages strategy registration and discovery
 - **Strategy Implementations**: Concrete strategies (e.g., SMAStrategy, RSIStrategy, etc.)
 
@@ -48,22 +48,28 @@ The strategy system consists of these key components:
 
 ```
 strategies/
-├── __init__.py           # (No manual import required)
-├── base_strategy.py      # Abstract base class
-├── strategy_registry.py  # Registry system
-├── sma_strategy.py       # SMA Crossover strategy implementation
-├── rsi_strategy.py       # RSI strategy implementation
-└── your_strategy.py      # Your new strategy
+├── __init__.py                      # (No manual import required)
+├── base/                            # Base strategy components
+│   ├── __init__.py
+│   ├── abstract_trading_strategy.py # Abstract base class (AbstractTradingStrategy)
+│   └── strategy_registry.py         # Registry system
+└── implementations/                 # Strategy implementations
+    ├── __init__.py
+    ├── sma_strategy.py              # SMA Crossover strategy implementation
+    ├── rsi_strategy.py              # RSI strategy implementation
+    ├── bb_strategy.py               # Bollinger Bands strategy
+    ├── ema_rsi_strategy.py          # EMA + RSI strategy
+    └── your_strategy.py             # Your new strategy
 ```
 
 ## Step-by-Step Implementation Guide
 
 ### 1. Create a New Strategy File
 
-Create a new Python file in the `strategies/` directory with a descriptive name:
+Create a new Python file in the `strategies/implementations/` directory with a descriptive name:
 
 ```bash
-touch strategies/macd_strategy.py  # Replace with your strategy name
+touch strategies/implementations/macd_strategy.py  # Replace with your strategy name
 ```
 
 ### 2. Import Required Modules
@@ -76,15 +82,15 @@ MACD Strategy (Moving Average Convergence Divergence).
 from typing import Dict, Any, Tuple, List
 import pandas as pd
 import numpy as np
-from .base_strategy import BaseStrategy
-from .strategy_registry import register_strategy
+from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.strategy_registry import register_strategy
 ```
 
 ### 3. Define Your Strategy Class
 
 ```python
 @register_strategy
-class MACDStrategy(BaseStrategy):
+class MACDStrategy(AbstractTradingStrategy):
     """
     Strategy based on the MACD (Moving Average Convergence Divergence) indicator.
 
@@ -176,8 +182,8 @@ def get_explanation(self) -> str:
     slow = self.parameters['slow_period']
     signal = self.parameters['signal_period']
     return (f"{self.get_label()} with parameters: Fast={fast}, Slow={slow}, Signal={signal}.\n"
-            f"Buy when {self.get_short_label()} crosses above signal line, " 
-            f"sell when {self.get_short_label()} crosses below signal line.")
+            f"Buy when {self.get_abbreviated_name()} crosses above signal line, " 
+            f"sell when {self.get_abbreviated_name()} crosses below signal line.")
 ```
 
 ### 5. Implement Parameter Definitions Method
@@ -213,7 +219,7 @@ def get_parameter_definitions(cls) -> Dict[str, Dict[str, Any]]:
     }
 ```
 
-### 6. Implement Label, Short Label and Short Description Methods
+### 6. Implement Label, Abbreviated Name and Parameter Summary Methods
 
 ```python
 @classmethod
@@ -221,23 +227,23 @@ def get_label(cls) -> str:
     return "Moving Average Convergence Divergence"
 
 @classmethod
-def get_short_label(cls) -> str:
+def get_abbreviated_name(cls) -> str:
     return "MACD"
 
 @classmethod
-def get_short_description(cls, config: Dict[str, Any] = None) -> str:
+def get_parameter_summary(cls, config: Dict[str, Any] = None) -> str:
     if config and 'fast_period' in config and 'slow_period' in config and 'signal_period' in config:
-        return f"{cls.get_short_label()} {config['fast_period']}/{config['slow_period']}/{config['signal_period']}"
-    return cls.get_short_label()
+        return f"{cls.get_abbreviated_name()} {config['fast_period']}/{config['slow_period']}/{config['signal_period']}"
+    return cls.get_abbreviated_name()
 ```
 
 ### 7. Implement Predefined Configurations
 
-If this method is not defined, parameter variations will be automatically generated as a configuration set (see `base_strategy.py`)
+If this method is not defined, parameter variations will be automatically generated as a configuration set (see `abstract_trading_strategy.py`)
 
 ```python
 @classmethod
-def get_predefined_configurations(cls) -> List[Dict[str, Any]]:
+def get_comparison_parameter_sets(cls) -> List[Dict[str, Any]]:
     return [
         {'fast_period': 12, 'slow_period': 26, 'signal_period': 9},  # Standard
         {'fast_period': 8, 'slow_period': 17, 'signal_period': 9},   # Faster
@@ -264,11 +270,11 @@ def get_indicators(self) -> Dict[str, pd.Series]:
 | Method | Description | Return Type |
 |--------|-------------|-------------|
 | `get_label` *(class method)* | Strategy label | `str` |
-| `get_short_label` *(class method)* | Strategy short label | `str` |
-| `get_short_description` *(class method)* | Short description for UI | `str` |
+| `get_abbreviated_name` *(class method)* | Strategy short label | `str` |
+| `get_parameter_summary` *(class method)* | Short description for UI | `str` |
 | `get_parameter_definitions` *(class method)* | Define strategy parameters | `Dict[str, Dict[str, Any]]` |
-| `get_predefined_configurations` *(class method)* | Default parameter sets for strategy configuration comparison | `List[Dict[str, Any]]` |
-| `__init__` | instanciate strategy with parameters | `None` |
+| `get_comparison_parameter_sets` *(class method)* | Default parameter sets for strategy configuration comparison | `List[Dict[str, Any]]` |
+| `__init__` | Instantiate strategy with parameters | `None` |
 | `generate_signals` | Create buy/sell signals from OHLCV data set | `Tuple[pd.Series, pd.Series]` |
 | `get_explanation` | Explanation of the strategy | `str` |
 
@@ -284,7 +290,7 @@ def get_indicators(self) -> Dict[str, pd.Series]:
 ## Strategy Registration
 
 The `@register_strategy` decorator automatically registers your strategy with the system. No manual import or export in `__init__.py` is required. As long as your class:
-1. Inherits from `BaseStrategy`
+1. Inherits from `AbstractTradingStrategy`
 2. Is decorated with `@register_strategy`
 it will be discovered and available in the application menu.
 
@@ -333,11 +339,11 @@ Bollinger Bands Strategy.
 from typing import Dict, Any, Tuple, List
 import pandas as pd
 import numpy as np
-from .base_strategy import BaseStrategy
-from .strategy_registry import register_strategy
+from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.strategy_registry import register_strategy
 
 @register_strategy
-class BBStrategy(BaseStrategy):
+class BBStrategy(AbstractTradingStrategy):
     """
     Strategy based on Bollinger Bands.
 
@@ -350,7 +356,7 @@ class BBStrategy(BaseStrategy):
         return "Bollinger Bands"
 
     @classmethod
-    def get_short_label(cls) -> str:
+    def get_abbreviated_name(cls) -> str:
         return "BB"
 
     @classmethod
@@ -371,7 +377,7 @@ class BBStrategy(BaseStrategy):
         }
 
     @classmethod
-    def get_predefined_configurations(cls) -> List[Dict[str, Any]]:
+    def get_comparison_parameter_sets(cls) -> List[Dict[str, Any]]:
         return [
             {'period': 20, 'std_dev': 2.0},  # Standard
             {'period': 20, 'std_dev': 1.5},  # Tighter bands
@@ -381,10 +387,10 @@ class BBStrategy(BaseStrategy):
         ]
 
     @classmethod
-    def get_short_description(cls, config: Dict[str, Any] = None) -> str:
+    def get_parameter_summary(cls, config: Dict[str, Any] = None) -> str:
         if config and 'period' in config and 'std_dev' in config:
-            return f"{cls.get_short_label()} {config['period']}/{config['std_dev']:.2f}"
-        return cls.get_short_label()
+            return f"{cls.get_abbreviated_name()} {config['period']}/{config['std_dev']:.2f}"
+        return cls.get_abbreviated_name()
 
     def __init__(self, 
                  period: int = 20, 
@@ -453,18 +459,31 @@ class BBStrategy(BaseStrategy):
 
 1. **Strategy not appearing in the menu**:
    - Check that it's decorated with `@register_strategy`
-   - Verify the class inherits from `BaseStrategy`
-   - Ensure the file is in the `strategies/` directory
+   - Verify the class inherits from `AbstractTradingStrategy`
+   - Ensure the file is in the `strategies/implementations/` directory
 
 2. **Parameter validation errors**:
    - Ensure parameter definitions match the types expected
    - Check that ranges are valid for numeric parameters
 
-3. **Visualization issues**:
+3. **Import errors**:
+   - Verify import paths use the new structure:
+     ```python
+     from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+     from strategies.base.strategy_registry import register_strategy
+     ```
+
+4. **Method name errors**:
+   - Use the new method names:
+     - `get_abbreviated_name()` (not `get_short_label()`)
+     - `get_parameter_summary()` (not `get_short_description()`)
+     - `get_predefined_configurations()` (not `get_comparison_parameter_sets()`)
+
+5. **Visualization issues**:
    - Make sure your `indicators` dictionary contains valid Series objects
    - Verify all Series have the same index as the input data
 
-4. **Performance problems**:
+6. **Performance problems**:
    - Use vectorized operations (avoid loops)
    - Leverage pandas and numpy for calculations
    - Profile your code to identify bottlenecks
@@ -472,6 +491,7 @@ class BBStrategy(BaseStrategy):
 ### Getting Help
 
 If you need additional help implementing a strategy, consult:
-- The existing strategy implementations for examples
-- The `BaseStrategy` class for interface requirements
-- The `strategy_registry.py` for registration details
+- The existing strategy implementations in [`strategies/implementations/`](strategies/implementations/) for examples
+- The `AbstractTradingStrategy` class in [`strategies/base/abstract_trading_strategy.py`](strategies/base/abstract_trading_strategy.py) for interface requirements
+- The `strategy_registry.py` in [`strategies/base/strategy_registry.py`](strategies/base/strategy_registry.py) for registration details
+- The [`TECHNICAL_DOCUMENTATION.md`](TECHNICAL_DOCUMENTATION.md) for architectural details

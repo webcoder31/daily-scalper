@@ -1,7 +1,7 @@
 """
-Daily Scalper Application Core Logic.
+Trading Strategy Backtester Application Core Logic.
 
-This module contains the DailyScalper class which serves as the main application
+This module contains the TradingStrategyBacktester class which serves as the main application
 controller for running backtests, comparing strategies, and managing results.
 It provides a comprehensive interface for cryptocurrency trading strategy analysis.
 """
@@ -25,15 +25,19 @@ from rich.text import Text
 from rich import box
 
 # Application imports
-from backtest import BacktestEngine, PerformanceMetrics
-from utils import DataLoader, Visualizer, StrategySaver, PeriodTranslator
-from strategies.strategy_registry import (
+from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+from backtesting.performance_analyzer import PerformanceAnalyzer
+from market_data.market_data_provider import MarketDataProvider
+from visualization.backtest_chart_generator import BacktestChartGenerator
+from persistence.strategy_results_persistence import StrategyResultsPersistence
+from market_data.period_translator import PeriodTranslator
+from strategies.base.strategy_registry import (
     create_strategy,
     get_strategy_parameter_info,
     get_strategy_class
 )
-from utils.theme import THEME
-from utils.ui_components import (
+from ui.theme import THEME
+from ui.components import (
     ui_interactive_menu,
     ui_section_header,
     ui_error_message,
@@ -46,29 +50,29 @@ UI_WIDTH: int = 100
 console = Console(width=UI_WIDTH)
 
 
-class DailyScalperError(Exception):
-    """Base exception class for Daily Scalper application errors."""
+class TradingStrategyBacktesterError(Exception):
+    """Base exception class for Trading Strategy Backtester application errors."""
     pass
 
 
-class DataLoadError(DailyScalperError):
+class DataLoadError(TradingStrategyBacktesterError):
     """Exception raised when data loading fails."""
     pass
 
 
-class StrategyError(DailyScalperError):
+class StrategyError(TradingStrategyBacktesterError):
     """Exception raised when strategy operations fail."""
     pass
 
 
-class BacktestError(DailyScalperError):
+class BacktestError(TradingStrategyBacktesterError):
     """Exception raised when backtesting operations fail."""
     pass
 
 
-class DailyScalper:
+class TradingStrategyBacktester:
     """
-    Main application class for the Daily Scalper cryptocurrency trading strategy analyzer.
+    Main application class for the Trading Strategy Backtester cryptocurrency trading strategy analyzer.
     
     This class provides comprehensive functionality for backtesting trading strategies,
     comparing different configurations, and managing profitable strategy results.
@@ -79,29 +83,29 @@ class DailyScalper:
 
     def __init__(self) -> None:
         """
-        Initialize the Daily Scalper application.
+        Initialize the Trading Strategy Backtester application.
         
         Sets up all required components including data loader, backtest engine,
         and strategy saver. Displays initialization confirmation to the user.
         
         Raises:
-            DailyScalperError: If initialization of core components fails.
+            TradingStrategyBacktesterError: If initialization of core components fails.
         """
         try:
-            self.data_loader = DataLoader()
-            self.backtest_engine = BacktestEngine()
-            self.strategy_saver = StrategySaver()
+            self.data_loader = MarketDataProvider()
+            self.backtest_engine = StrategyBacktestEngine()
+            self.strategy_saver = StrategyResultsPersistence()
             
             console.print(ui_block_header(
-                "Daily Scalper", 
+                "Trading Strategy Backtester", 
                 "Application successfully initialized."
             ))
             
         except Exception as e:
-            raise DailyScalperError(f"Failed to initialize application: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Failed to initialize application: {str(e)}") from e
 
 
-    def _display_results(self, results: Dict[str, Any]) -> None:
+    def render_backtest_summary(self, results: Dict[str, Any]) -> None:
         """
         Display comprehensive backtest results in formatted tables.
         
@@ -209,7 +213,7 @@ class DailyScalper:
             console.print(trading_metric_table)
 
             # Final profitability evaluation
-            is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
+            is_profitable = PerformanceAnalyzer.meets_profitability_criteria(metrics)
             tested_strategy = f"{results['strategy_label']} for {results['symbol']}"
             status_text = f"✅ {tested_strategy} is PROFITABLE" if is_profitable \
                          else f"❌ {tested_strategy} is NOT PROFITABLE"
@@ -220,19 +224,19 @@ class DailyScalper:
             print()
             
         except KeyError as e:
-            raise DailyScalperError(f"Missing required data in results: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Missing required data in results: {str(e)}") from e
         except Exception as e:
-            raise DailyScalperError(f"Error displaying results: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Error displaying results: {str(e)}") from e
 
 
-    def backtest_strategy(
+    def execute_strategy_backtest(
         self,
         strategy_name: str,
         symbol: str = "BTC-USD",
         period: str = "1y",
-        strategy_params: Optional[Dict[str, Any]] = None,
-        show_plots: bool = True,
-        save_if_profitable: bool = True,
+        strategy_parameters: Optional[Dict[str, Any]] = None,
+        display_charts: bool = True,
+        auto_save_profitable_results: bool = True,
         batch_mode: bool = False
     ) -> Dict[str, Any]:
         """
@@ -246,10 +250,10 @@ class DailyScalper:
             strategy_name: Name of the strategy class to instantiate and test.
             symbol: Cryptocurrency symbol to analyze (e.g., 'BTC-USD').
             period: Time period for historical data (e.g., '1y', '6mo', '3mo').
-            strategy_params: Dictionary of parameters to configure the strategy.
+            strategy_parameters: Dictionary of parameters to configure the strategy.
                            If None, default parameters will be used.
-            show_plots: Whether to display interactive charts and visualizations.
-            save_if_profitable: Whether to automatically save profitable strategies.
+            display_charts: Whether to display interactive charts and visualizations.
+            auto_save_profitable_results: Whether to automatically save profitable strategies.
             batch_mode: Whether running in batch mode (affects display verbosity).
         
         Returns:
@@ -268,8 +272,8 @@ class DailyScalper:
             BacktestError: If the backtesting process encounters errors.
         """
         # Initialize strategy parameters
-        if strategy_params is None:
-            strategy_params = {}
+        if strategy_parameters is None:
+            strategy_parameters = {}
 
         try:
             # Get parameter information for display
@@ -277,7 +281,7 @@ class DailyScalper:
             
             # Build parameter description for user display
             param_desc = []
-            for name, value in strategy_params.items():
+            for name, value in strategy_parameters.items():
                 if name in param_info:
                     param_desc.append(f"{name}: {value}")
 
@@ -298,7 +302,7 @@ class DailyScalper:
             # Step 1: Load historical data
             console.print("Loading data...", style=THEME["table_border"])
             try:
-                data = self.data_loader.load_crypto_data(symbol=symbol, period=period)
+                data = self.data_loader.fetch_cryptocurrency_data(symbol=symbol, period=period)
                 if data.empty:
                     raise DataLoadError(f"No data available for {symbol} in period {period}")
                     
@@ -318,7 +322,7 @@ class DailyScalper:
             # Step 2: Create and initialize strategy
             console.print("Initializing strategy...", style=THEME["table_border"])
             try:
-                strategy = create_strategy(strategy_name, **strategy_params)
+                strategy = create_strategy(strategy_name, **strategy_parameters)
                 console.print("✅ Strategy ready\n", style=THEME["success"])
                 console.print(f"{strategy.get_explanation()}\n", style=THEME["success"])
             except Exception as e:
@@ -327,39 +331,39 @@ class DailyScalper:
             # Step 3: Execute backtest
             console.print("Executing backtest...", style=THEME["table_border"])
             try:
-                results = self.backtest_engine.run_backtest(strategy, data)
+                results = self.backtest_engine.execute_strategy_evaluation(strategy, data)
                 console.print("✅ Backtest completed\n", style=THEME["success"])
             except Exception as e:
                 raise BacktestError(f"Backtest execution failed: {str(e)}") from e
 
             # Add additional information to results
             results['strategy_instance'] = strategy
-            results['strategy_label'] = strategy.get_short_description(strategy_params)
+            results['strategy_label'] = strategy.get_short_description(strategy_parameters)
             results['symbol'] = symbol
 
             # Step 4: Calculate advanced performance metrics
             console.print("Calculating advanced metrics...", style=THEME["table_border"])
             try:
-                results['metrics'] = PerformanceMetrics.calculate_advanced_metrics(results)
+                results['metrics'] = PerformanceAnalyzer.compute_extended_performance_stats(results)
                 console.print("✅ Metrics computed\n", style=THEME["success"])
             except Exception as e:
                 console.print(f"Warning: Advanced metrics calculation failed: {str(e)}", 
                             style=THEME["warning"])
 
             # Step 5: Display comprehensive results
-            self._display_results(results)
+            self.render_backtest_summary(results)
 
             # Step 6: Generate visualizations
-            if show_plots:
+            if display_charts:
                 try:
                     console.print("Generating charts...", style=THEME["accent"])
-                    Visualizer.show_all_plots(results)
+                    BacktestChartGenerator.show_all_plots(results)
                 except Exception as e:
                     console.print(f"Warning: Visualization failed: {str(e)}", 
                                 style=THEME["warning"])
 
             # Step 7: Save profitable strategies
-            if save_if_profitable and PerformanceMetrics.is_strategy_profitable(results['metrics']):
+            if auto_save_profitable_results and PerformanceAnalyzer.meets_profitability_criteria(results['metrics']):
                 try:
                     console.print("\nProfitable strategy detected - Saving...", 
                                 style=THEME["dim"])
@@ -369,7 +373,7 @@ class DailyScalper:
                 except Exception as e:
                     console.print(f"Warning: Failed to save strategy: {str(e)}", 
                                 style=THEME["warning"])
-            elif save_if_profitable:
+            elif auto_save_profitable_results:
                 console.print("⚠️  Unprofitable strategy - Not saved", style=THEME["warning"])
 
             return results
@@ -379,10 +383,10 @@ class DailyScalper:
             raise
         except Exception as e:
             # Catch any unexpected errors
-            raise DailyScalperError(f"Unexpected error during backtesting: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Unexpected error during backtesting: {str(e)}") from e
 
 
-    def compare_strategies(
+    def analyze_strategy_variants(
         self,
         strategy_name: str,
         symbol: str = "BTC-USD",
@@ -405,7 +409,7 @@ class DailyScalper:
         
         Raises:
             StrategyError: If strategy class cannot be found or configurations fail.
-            DailyScalperError: If comparison process encounters errors.
+            TradingStrategyBacktesterError: If comparison process encounters errors.
         """
         try:
             # Get configurations from strategy class if none provided
@@ -439,23 +443,23 @@ class DailyScalper:
             progress_table.add_column("Status", justify="center", width=14)
 
             # Run backtests for each configuration
-            for i, strategy_params in enumerate(configurations, 1):
+            for i, strategy_parameters in enumerate(configurations, 1):
                 try:
                     # Get strategy description for display
                     strategy_class = get_strategy_class(strategy_name)
                     if strategy_class:
-                        strategy_short_desc = strategy_class.get_short_description(strategy_params)
+                        strategy_short_desc = strategy_class.get_short_description(strategy_parameters)
                     else:
-                        strategy_short_desc = ", ".join([f"{k}={v}" for k, v in strategy_params.items()])
+                        strategy_short_desc = ", ".join([f"{k}={v}" for k, v in strategy_parameters.items()])
 
                     # Run backtest for this configuration
-                    results = self.backtest_strategy(
+                    results = self.execute_strategy_backtest(
                         strategy_name,
                         symbol=symbol,
                         period=period,
-                        strategy_params=strategy_params,
-                        show_plots=False,
-                        save_if_profitable=False,
+                        strategy_parameters=strategy_parameters,
+                        display_charts=False,
+                        auto_save_profitable_results=False,
                         batch_mode=True
                     )
                     
@@ -511,7 +515,7 @@ class DailyScalper:
         except StrategyError:
             raise
         except Exception as e:
-            raise DailyScalperError(f"Strategy comparison failed: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Strategy comparison failed: {str(e)}") from e
 
 
     def _display_strategy_rankings(
@@ -527,7 +531,7 @@ class DailyScalper:
             results_list: List of backtest results to rank and display.
         """
         try:
-            ranked_strategies = PerformanceMetrics.rank_strategies(results_list)
+            ranked_strategies = PerformanceAnalyzer.sort_strategies_by_performance(results_list)
 
             ranking_table = ui_modern_table("Strategy Ranking")
             ranking_table.add_column("Rank", style=THEME["table_header"], width=5)
@@ -542,7 +546,7 @@ class DailyScalper:
                 metrics = result['metrics']
                 params = strategy['parameters']
 
-                is_profitable = PerformanceMetrics.is_strategy_profitable(metrics)
+                is_profitable = PerformanceAnalyzer.meets_profitability_criteria(metrics)
                 status = "✅ Profitable" if is_profitable else "❌ Not profitable"
 
                 # Get configuration display string
@@ -567,7 +571,7 @@ class DailyScalper:
             console.print(f"Error displaying rankings: {str(e)}", style=THEME["error"])
 
 
-    def show_saved_strategies(self) -> None:
+    def display_saved_results(self) -> None:
         """
         Display a comprehensive list of saved profitable strategies.
         
@@ -575,7 +579,7 @@ class DailyScalper:
         with their key performance metrics and configuration details.
         
         Raises:
-            DailyScalperError: If retrieving saved strategies fails.
+            TradingStrategyBacktesterError: If retrieving saved strategies fails.
         """
         try:
             # Retrieve list of saved strategies
@@ -632,4 +636,4 @@ class DailyScalper:
                 )
 
         except Exception as e:
-            raise DailyScalperError(f"Failed to retrieve saved strategies: {str(e)}") from e
+            raise TradingStrategyBacktesterError(f"Failed to retrieve saved strategies: {str(e)}") from e

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Functional test script for Daily Scalper core functionality.
+Functional test script for Trading Strategy Backtester core functionality.
 Tests the main application workflow without interactive components.
 """
 
@@ -13,18 +13,18 @@ from datetime import datetime, timedelta
 def test_core_functionality():
     """Test core application functionality."""
     print("=" * 60)
-    print("DAILY SCALPER FUNCTIONAL TEST")
+    print("Trading Strategy Backtester FUNCTIONAL TEST")
     print("=" * 60)
     
     try:
         # Test 1: Import and initialize core components
         print("1. Testing core component initialization...")
-        from app import DailyScalper
-        from utils.data_loader import DataLoader
-        from strategies.strategy_registry import create_strategy, get_strategy_names
+        from core.trading_strategy_backtester import TradingStrategyBacktester
+        from market_data.market_data_provider import MarketDataProvider
+        from strategies.base.strategy_registry import create_strategy, get_strategy_names
         
-        app = DailyScalper()
-        data_loader = DataLoader()
+        app = TradingStrategyBacktester()
+        data_provider = MarketDataProvider()
         print("✓ Core components initialized successfully")
         
         # Test 2: Test strategy creation
@@ -48,12 +48,12 @@ def test_core_functionality():
         # Test 4: Test backtest execution
         print("\n4. Testing backtest execution...")
         try:
-            results = app.backtest_strategy(
+            results = app.execute_strategy_backtest(
                 strategy_name=strategy_name,
                 symbol="BTC-USD",
                 period="1y",
-                show_plots=False,
-                save_if_profitable=False
+                display_charts=False,
+                auto_save_profitable_results=False
             )
             
             if results and 'metrics' in results:
@@ -85,7 +85,7 @@ def test_core_functionality():
         
         print("\n" + "=" * 60)
         print("🎉 ALL FUNCTIONAL TESTS PASSED!")
-        print("The Daily Scalper application is working correctly.")
+        print("The Trading Strategy Backtester application is working correctly.")
         print("=" * 60)
         return True
         

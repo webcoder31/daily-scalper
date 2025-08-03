@@ -1,8 +1,8 @@
 #!/bin/bash
-# Daily Scalper - Quick start script
+# Trading Strategy Backtester - Quick start script
 # This script sets up the virtual environment and launches the application
 
-echo "🚀 Setting up Daily Scalper..."
+echo "🚀 Setting up Trading Strategy Backtester..."
 
 # Create virtual environment if it doesn't exist
 if [ ! -d "venv" ]; then
@@ -15,7 +15,7 @@ echo "Activating virtual environment and installing dependencies..."
 source venv/bin/activate
 pip install -r requirements.txt
 
-echo "✅ Setup complete! Starting Daily Scalper..."
+echo "✅ Setup complete! Starting Trading Strategy Backtester..."
 echo ""
 
 # Launch application

@@ -1,7 +1,7 @@
 """
 UI theme configuration and styling module for Rich terminal interface.
 
-This module provides comprehensive theme configuration for the Daily Scalper
+This module provides comprehensive theme configuration for the Trading Strategy Backtester
 application's Rich-based terminal user interface. It includes color schemes,
 style definitions, validation, and theme management functionality.
 
@@ -442,7 +442,7 @@ class ThemeManager:
         return custom_theme
 
 
-# Default theme configuration for the Daily Scalper application
+# Default theme configuration for the Trading Strategy Backtester application
 THEME: Dict[str, str] = {
     # Core colors - primary application colors
     "primary": "bold bright_cyan",
