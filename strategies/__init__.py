@@ -35,7 +35,7 @@ Usage:
 from typing import List
 
 # Import base classes
-from .base.abstract_trading_strategy import AbstractTradingStrategy
+from .base.abstract_strategy import AbstractStrategy
 from .base.strategy_registry import (
     register_strategy,
     get_strategy_names,
@@ -55,7 +55,7 @@ from .implementations.ema_rsi_strategy import EMARSIStrategy
 # Public API exports
 __all__: List[str] = [
     # Base classes
-    'AbstractTradingStrategy',
+    'AbstractStrategy',
     
     # Registry functions
     'register_strategy',

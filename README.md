@@ -153,7 +153,7 @@ trading-strategy-backtester/
 │   ├── __init__.py
 │   ├── base/                             # Fundation for strategy implementation
 |   │   ├── __init__.py
-│   │   ├── abstract_trading_strategy.py  # Abstract strategy class
+│   │   ├── abstract_strategy.py          # Abstract strategy class
 │   │   └── strategy_registry.py          # Strategy registration system
 │   └── implementations/                  # Strategy implementations
 |       ├── __init__.py

@@ -21,7 +21,7 @@ import inspect
 import logging
 
 # Import base strategy and exceptions
-from .abstract_trading_strategy import AbstractTradingStrategy, StrategyError, ParameterValidationError
+from .abstract_strategy import AbstractStrategy, StrategyError, ParameterValidationError
 
 # Configure logging
 from utils.logging_config import get_logger
@@ -45,39 +45,39 @@ class DuplicateStrategyError(RegistryError):
 
 # Global registry of trading strategies
 # Maps class names to strategy classes
-STRATEGY_REGISTRY: Dict[str, Type[AbstractTradingStrategy]] = {}
+STRATEGY_REGISTRY: Dict[str, Type[AbstractStrategy]] = {}
 
 
-def register_strategy(cls: Type[AbstractTradingStrategy]) -> Type[AbstractTradingStrategy]:
+def register_strategy(cls: Type[AbstractStrategy]) -> Type[AbstractStrategy]:
     """
     Decorator to register a strategy class in the global registry.
     
-    This decorator validates that the class is a proper AbstractTradingStrategy subclass
+    This decorator validates that the class is a proper AbstractStrategy subclass
     and registers it for later retrieval. It should be applied to all concrete
     strategy implementations.
     
     Args:
-        cls: The strategy class to register. Must be a subclass of AbstractTradingStrategy.
+        cls: The strategy class to register. Must be a subclass of AbstractStrategy.
     
     Returns:
         The original class unchanged (decorator pattern).
     
     Raises:
-        RegistryError: If the class is not a valid AbstractTradingStrategy subclass.
+        RegistryError: If the class is not a valid AbstractStrategy subclass.
         DuplicateStrategyError: If a strategy with the same name is already registered.
     
     Example:
         @register_strategy
-        class MyStrategy(AbstractTradingStrategy):
+        class MyStrategy(AbstractStrategy):
             pass
     """
-    # Validate that the class is a proper AbstractTradingStrategy subclass
+    # Validate that the class is a proper AbstractStrategy subclass
     if not inspect.isclass(cls):
         raise RegistryError(f"Only classes can be registered as strategies, got {type(cls)}")
     
-    if not issubclass(cls, AbstractTradingStrategy):
+    if not issubclass(cls, AbstractStrategy):
         raise RegistryError(
-            f"Strategy class '{cls.__name__}' must inherit from AbstractTradingStrategy"
+            f"Strategy class '{cls.__name__}' must inherit from AbstractStrategy"
         )
     
     # Check for duplicate registration
@@ -126,7 +126,7 @@ def get_strategy_names() -> List[str]:
         return []
 
 
-def get_strategy_classes() -> Dict[str, Type[AbstractTradingStrategy]]:
+def get_strategy_classes() -> Dict[str, Type[AbstractStrategy]]:
     """
     Get all registered strategy classes mapped by their display labels.
     
@@ -160,7 +160,7 @@ def get_strategy_classes() -> Dict[str, Type[AbstractTradingStrategy]]:
         return {}
 
 
-def get_strategy_class(name: str) -> Optional[Type[AbstractTradingStrategy]]:
+def get_strategy_class(name: str) -> Optional[Type[AbstractStrategy]]:
     """
     Get a strategy class by its display label.
     
@@ -188,7 +188,7 @@ def get_strategy_class(name: str) -> Optional[Type[AbstractTradingStrategy]]:
         return None
 
 
-def get_strategy_class_by_classname(classname: str) -> Optional[Type[AbstractTradingStrategy]]:
+def get_strategy_class_by_classname(classname: str) -> Optional[Type[AbstractStrategy]]:
     """
     Get a strategy class by its Python class name.
     
@@ -215,7 +215,7 @@ def get_strategy_class_by_classname(classname: str) -> Optional[Type[AbstractTra
         return None
 
 
-def create_strategy(name: str, **params: Any) -> AbstractTradingStrategy:
+def create_strategy(name: str, **params: Any) -> AbstractStrategy:
     """
     Create a strategy instance by its display label or class name.
     
@@ -333,7 +333,7 @@ def get_strategy_parameter_info(name: str) -> Dict[str, Any]:
         ) from e
 
 
-def _extract_constructor_parameters(strategy_class: Type[AbstractTradingStrategy]) -> Dict[str, Any]:
+def _extract_constructor_parameters(strategy_class: Type[AbstractStrategy]) -> Dict[str, Any]:
     """
     Extract parameter information from strategy constructor using inspection.
     

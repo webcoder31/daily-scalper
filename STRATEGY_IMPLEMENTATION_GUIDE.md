@@ -32,7 +32,7 @@ This document provides a comprehensive guide on how to implement new trading str
 The Trading Strategy Backtester application uses a registry-based strategy system that allows you to add new trading strategies without modifying the core application. Each strategy is automatically discovered and made available in the UI.
 
 Strategies must:
-1. Inherit from the `AbstractTradingStrategy` class
+1. Inherit from the `AbstractStrategy` class
 2. Be decorated with `@register_strategy`
 3. Implement all required methods
 
@@ -40,7 +40,7 @@ Strategies must:
 
 The strategy system consists of these key components:
 
-- **AbstractTradingStrategy**: Abstract base class that all strategies must inherit from
+- **AbstractStrategy**: Abstract base class that all strategies must inherit from
 - **Strategy Registry**: Manages strategy registration and discovery
 - **Strategy Implementations**: Concrete strategies (e.g., SMAStrategy, RSIStrategy, etc.)
 
@@ -51,7 +51,7 @@ strategies/
 ├── __init__.py                      # (No manual import required)
 ├── base/                            # Base strategy components
 │   ├── __init__.py
-│   ├── abstract_trading_strategy.py # Abstract base class (AbstractTradingStrategy)
+│   ├── abstract_strategy.py         # Abstract base class (AbstractStrategy)
 │   └── strategy_registry.py         # Registry system
 └── implementations/                 # Strategy implementations
     ├── __init__.py
@@ -82,7 +82,7 @@ MACD Strategy (Moving Average Convergence Divergence).
 from typing import Dict, Any, Tuple, List
 import pandas as pd
 import numpy as np
-from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.abstract_strategy import AbstractStrategy
 from strategies.base.strategy_registry import register_strategy
 ```
 
@@ -90,7 +90,7 @@ from strategies.base.strategy_registry import register_strategy
 
 ```python
 @register_strategy
-class MACDStrategy(AbstractTradingStrategy):
+class MACDStrategy(AbstractStrategy):
     """
     Strategy based on the MACD (Moving Average Convergence Divergence) indicator.
 
@@ -239,7 +239,7 @@ def get_parameter_summary(cls, config: Dict[str, Any] = None) -> str:
 
 ### 7. Implement Predefined Configurations
 
-If this method is not defined, parameter variations will be automatically generated as a configuration set (see `abstract_trading_strategy.py`)
+If this method is not defined, parameter variations will be automatically generated as a configuration set (see `abstract_strategy.py`)
 
 ```python
 @classmethod
@@ -289,9 +289,13 @@ def get_indicators(self) -> Dict[str, pd.Series]:
 
 ## Strategy Registration
 
-The `@register_strategy` decorator automatically registers your strategy with the system. No manual import or export in `__init__.py` is required. As long as your class:
-1. Inherits from `AbstractTradingStrategy`
+The `@register_strategy` decorator automatically registers your strategy with the system. 
+No manual import or export in `__init__.py` is required. 
+
+As long as your class:
+1. Inherits from `AbstractStrategy`
 2. Is decorated with `@register_strategy`
+
 it will be discovered and available in the application menu.
 
 ---
@@ -339,11 +343,11 @@ Bollinger Bands Strategy.
 from typing import Dict, Any, Tuple, List
 import pandas as pd
 import numpy as np
-from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.abstract_strategy import AbstractStrategy
 from strategies.base.strategy_registry import register_strategy
 
 @register_strategy
-class BBStrategy(AbstractTradingStrategy):
+class BBStrategy(AbstractStrategy):
     """
     Strategy based on Bollinger Bands.
 
@@ -459,7 +463,7 @@ class BBStrategy(AbstractTradingStrategy):
 
 1. **Strategy not appearing in the menu**:
    - Check that it's decorated with `@register_strategy`
-   - Verify the class inherits from `AbstractTradingStrategy`
+   - Verify the class inherits from `AbstractStrategy`
    - Ensure the file is in the `strategies/implementations/` directory
 
 2. **Parameter validation errors**:
@@ -469,7 +473,7 @@ class BBStrategy(AbstractTradingStrategy):
 3. **Import errors**:
    - Verify import paths use the new structure:
      ```python
-     from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+     from strategies.base.abstract_strategy import AbstractStrategy
      from strategies.base.strategy_registry import register_strategy
      ```
 
@@ -492,6 +496,6 @@ class BBStrategy(AbstractTradingStrategy):
 
 If you need additional help implementing a strategy, consult:
 - The existing strategy implementations in [`strategies/implementations/`](strategies/implementations/) for examples
-- The `AbstractTradingStrategy` class in [`strategies/base/abstract_trading_strategy.py`](strategies/base/abstract_trading_strategy.py) for interface requirements
+- The `AbstractStrategy` class in [`strategies/base/abstract_strategy.py`](strategies/base/abstract_strategy.py) for interface requirements
 - The `strategy_registry.py` in [`strategies/base/strategy_registry.py`](strategies/base/strategy_registry.py) for registration details
 - The [`TECHNICAL_DOCUMENTATION.md`](TECHNICAL_DOCUMENTATION.md) for architectural details

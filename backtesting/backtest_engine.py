@@ -23,7 +23,7 @@ import warnings
 import logging
 from pathlib import Path
 
-from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.abstract_strategy import AbstractStrategy
 
 # Configure logging
 from utils.logging_config import get_logger
@@ -129,7 +129,7 @@ class BacktestEngine:
 
     def execute_strategy_evaluation(
         self, 
-        strategy: AbstractTradingStrategy, 
+        strategy: AbstractStrategy, 
         data: pd.DataFrame,
         start_date: Optional[Union[str, datetime, date]] = None,
         end_date: Optional[Union[str, datetime, date]] = None,
@@ -142,7 +142,7 @@ class BacktestEngine:
         signal generation, portfolio construction, and performance analysis.
         
         Args:
-            strategy: Trading strategy instance implementing AbstractTradingStrategy interface.
+            strategy: Trading strategy instance implementing AbstractStrategy interface.
             data: DataFrame containing OHLCV price data with DatetimeIndex.
             start_date: Optional start date for backtesting period.
             end_date: Optional end date for backtesting period.
@@ -233,7 +233,7 @@ class BacktestEngine:
             raise ValueError(f"Minimum data points must be at least 10, got: {min_data_points}")
 
 
-    def _validate_input_data(self, data: pd.DataFrame, strategy: AbstractTradingStrategy) -> None:
+    def _validate_input_data(self, data: pd.DataFrame, strategy: AbstractStrategy) -> None:
         """
         Validate input data format and content for backtesting.
         
@@ -333,7 +333,7 @@ class BacktestEngine:
 
     def _generate_signals(
         self, 
-        strategy: AbstractTradingStrategy, 
+        strategy: AbstractStrategy, 
         data: pd.DataFrame
     ) -> Tuple[pd.Series, pd.Series]:
         """
@@ -510,7 +510,7 @@ class BacktestEngine:
 
     def _construct_results(
         self,
-        strategy: AbstractTradingStrategy,
+        strategy: AbstractStrategy,
         portfolio: vbt.Portfolio,
         metrics: Dict[str, float],
         data: pd.DataFrame,

@@ -45,7 +45,7 @@ def test_imports() -> Dict[str, Any]:
     # Test strategy modules
     strategy_modules = [
         'strategies',
-        'strategies.base.abstract_trading_strategy',
+        'strategies.base.abstract_strategy',
         'strategies.base.strategy_registry',
         'strategies.implementations.sma_strategy',
         'strategies.implementations.rsi_strategy',
@@ -361,7 +361,7 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         print("Testing custom exceptions...")
         
         exception_imports = [
-            "from strategies.base.abstract_trading_strategy import StrategyError, ParameterValidationError, DataValidationError",
+            "from strategies.base.abstract_strategy import StrategyError, ParameterValidationError, DataValidationError",
             "from backtesting.backtest_engine import BacktestError, DataValidationError, StrategyExecutionError",
             "from market_data.market_data_provider import DataLoadError, CacheError, ValidationError"
         ]

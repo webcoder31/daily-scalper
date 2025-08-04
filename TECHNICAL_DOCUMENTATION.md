@@ -61,7 +61,7 @@ trading-strategy-backtester/
 │   ├── __init__.py
 │   ├── base/                             # Fundation for strategy implementation
 |   │   ├── __init__.py
-│   │   ├── abstract_trading_strategy.py  # Abstract strategy class
+│   │   ├── abstract_strategy.py          # Abstract strategy class
 │   │   └── strategy_registry.py          # Strategy registration system
 │   └── implementations/                  # Strategy implementations
 |       ├── __init__.py
@@ -106,9 +106,9 @@ The central orchestrator that coordinates all backtesting operations.
 
 ### Strategy System
 
-#### AbstractTradingStrategy (Abstract Base Class)
+#### AbstractStrategy (Abstract Base Class)
 
-**Location**: [`strategies/base/abstract_trading_strategy.py`](strategies/base/abstract_trading_strategy.py)
+**Location**: [`strategies/base/abstract_strategy.py`](strategies/base/abstract_strategy.py)
 
 Abstract base class that all trading strategies must inherit from.
 
@@ -128,10 +128,10 @@ Automatic strategy discovery and registration system using decorators.
 **Usage**:
 ```python
 from strategies.base.strategy_registry import register_strategy
-from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+from strategies.base.abstract_strategy import AbstractStrategy
 
 @register_strategy
-class MyStrategy(AbstractTradingStrategy):
+class MyStrategy(AbstractStrategy):
     # Implementation here
 ```
 
@@ -312,17 +312,17 @@ setup_application_logging(
 
 1. **Create Strategy File**: Add new file in [`strategies/implementations/`](strategies/implementations/)
 
-2. **Implement Base Class**: Inherit from `AbstractTradingStrategy`
+2. **Implement Base Class**: Inherit from `AbstractStrategy`
 
 3. **Add Registration Decorator**: Use `@register_strategy`
 
 4. **Implement Required Methods**:
    ```python
-   from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+   from strategies.base.abstract_strategy import AbstractStrategy
    from strategies.base.strategy_registry import register_strategy
    
    @register_strategy
-   class MyStrategy(AbstractTradingStrategy):
+   class MyStrategy(AbstractStrategy):
        @classmethod
        def get_label(cls) -> str:
            return "My Trading Strategy"
@@ -361,7 +361,7 @@ The application uses custom exceptions for better error handling:
 from core.strategy_backtester import TradingStrategyBacktesterError
 
 # Strategy exceptions
-from strategies.base.abstract_trading_strategy import StrategyError
+from strategies.base.abstract_strategy import StrategyError
 
 # Data exceptions
 from market_data.market_data_provider import DataLoadError

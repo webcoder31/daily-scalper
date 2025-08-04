@@ -5,7 +5,7 @@ This module defines the abstract base class that all trading strategies must inh
 It provides a consistent interface and common functionality for strategy implementation,
 parameter management, and signal generation.
 
-The AbstractTradingStrategy class enforces the Strategy Pattern design, ensuring all concrete
+The AbstractStrategy class enforces the Strategy Pattern design, ensuring all concrete
 strategy implementations follow the same interface while allowing for flexible
 customization of trading logic.
 """
@@ -31,7 +31,7 @@ class DataValidationError(StrategyError):
     pass
 
 
-class AbstractTradingStrategy(ABC):
+class AbstractStrategy(ABC):
     """
     Abstract base class for all trading strategies.
     

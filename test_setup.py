@@ -19,7 +19,7 @@ def test_imports():
     
     try:
         # Test main imports
-        from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
+        from strategies.base.abstract_strategy import AbstractStrategy
         from strategies.implementations.sma_strategy import SMAStrategy
         from backtesting.backtest_engine import BacktestEngine
         from backtesting.performance_analyzer import PerformanceAnalyzer
