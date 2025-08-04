@@ -1,19 +1,19 @@
 """
 Strategy results persistence and management module.
 
-This module provides the StrategySaver class for saving, loading, and managing
+This module provides the StrategyArchiver class for saving, loading, and managing
 high-performing trading strategy results. It includes comprehensive file handling,
 data serialization, and result management capabilities with robust error handling.
 
 Classes:
-    StrategySaver: Main class for strategy results persistence
+    StrategyArchiver: Main class for strategy results persistence
     StrategySaveError: Custom exception for strategy saving errors
     StrategyLoadError: Custom exception for strategy loading errors
     StrategyFileError: Custom exception for file operation errors
 
 Example:
-    >>> from utils.strategy_saver import StrategySaver
-    >>> saver = StrategySaver(results_dir="results")
+    >>> from persistence.strategy_archiver import StrategyArchiver
+    >>> saver = StrategyArchiver(results_dir="results")
     >>> save_id = saver.save_strategy_results(backtest_results)
     >>> loaded_results = saver.load_strategy_results(save_id)
 """
@@ -85,7 +85,7 @@ class StrategyFileError(Exception):
         super().__init__(message)
 
 
-class StrategyResultsPersistence:
+class StrategyArchiver:
     """
     Class for saving and managing high-performing trading strategy results.
     
@@ -101,7 +101,7 @@ class StrategyResultsPersistence:
         charts_dir: Subdirectory for HTML chart files.
         
     Example:
-        >>> saver = StrategyResultsPersistence(results_dir="results")
+        >>> saver = StrategyArchiver(results_dir="results")
         >>> save_id = saver.save_strategy_results(backtest_results)
         >>> strategies = saver.list_saved_strategies()
         >>> best = saver.get_best_strategies(top_n=5)
@@ -125,7 +125,7 @@ class StrategyResultsPersistence:
 
     def __init__(self, results_dir: str = "results") -> None:
         """
-        Initialize the StrategySaver with directory structure.
+        Initialize the StrategyArchiver with directory structure.
         
         Args:
             results_dir: Main directory for storing strategy results.
@@ -143,7 +143,7 @@ class StrategyResultsPersistence:
         # Create directory structure
         self._create_directory_structure()
         
-        logger.info(f"StrategySaver initialized with results directory: {self.results_dir}")
+        logger.info(f"StrategyArchiver initialized with results directory: {self.results_dir}")
     
 
     def _create_directory_structure(self) -> None:
@@ -346,7 +346,7 @@ class StrategyResultsPersistence:
             'buy_signals': buy_signals_dict,
             'sell_signals': sell_signals_dict,
             'metadata': {
-                'saved_by': 'StrategySaver',
+                'saved_by': 'StrategyArchiver',
                 'version': '1.0.0',
                 'python_version': f"{pd.__version__}",  # Using pandas version as proxy
                 'save_timestamp': now.isoformat()

@@ -145,7 +145,7 @@ daily-scalper/
 ├── visualization/                        # Chart generation
 │   └── backtest_chart_generator.py       # Interactive visualizations
 ├── persistence/                          # Data persistence
-│   └── strategy_results_persistence.py   # Results management
+│   └── strategy_archiver.py              # Strategy results management
 ├── ui/                                   # User interface components
 │   ├── components.py                     # UI components and menus
 │   └── theme.py                          # Theme and styling
@@ -196,7 +196,7 @@ Creates interactive visualizations:
 - `generate_backtest_chart()` - Create strategy performance charts
 - `display_all_charts()` - Show comprehensive visualization suite
 
-### StrategyResultsPersistence
+### StrategyArchiver
 Manages strategy result storage:
 - `persist_strategy_results()` - Save profitable strategies
 - `retrieve_strategy_results()` - Load saved strategies

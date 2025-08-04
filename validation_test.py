@@ -92,7 +92,7 @@ def test_imports() -> Dict[str, Any]:
         'visualization',
         'visualization.backtest_chart_generator',
         'persistence',
-        'persistence.strategy_results_persistence',
+        'persistence.strategy_archiver',
         'ui',
         'ui.components',
         'ui.theme',
@@ -279,11 +279,11 @@ def test_utils_integration() -> Dict[str, Any]:
         
         # Test strategy results persistence
         print("Testing strategy results persistence...")
-        from persistence.strategy_results_persistence import StrategyResultsPersistence
+        from persistence.strategy_archiver import StrategyArchiver
         
-        persistence = StrategyResultsPersistence()
-        print("✓ StrategyResultsPersistence instantiated successfully")
-        results['tests_passed'].append("StrategyResultsPersistence instantiation")
+        persistence = StrategyArchiver()
+        print("✓ StrategyArchiver instantiated successfully")
+        results['tests_passed'].append("StrategyArchiver instantiation")
         
         # Test chart generator
         print("Testing chart generator...")

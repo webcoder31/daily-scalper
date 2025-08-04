@@ -29,7 +29,7 @@ from backtesting.strategy_backtest_engine import StrategyBacktestEngine
 from backtesting.performance_analyzer import PerformanceAnalyzer
 from market_data.market_data_provider import MarketDataProvider
 from visualization.backtest_chart_generator import BacktestChartGenerator
-from persistence.strategy_results_persistence import StrategyResultsPersistence
+from persistence.strategy_archiver import StrategyArchiver
 from market_data.period_translator import PeriodTranslator
 from strategies.base.strategy_registry import (
     create_strategy,
@@ -94,7 +94,7 @@ class TradingStrategyBacktester:
         try:
             self.data_loader = MarketDataProvider()
             self.backtest_engine = StrategyBacktestEngine()
-            self.strategy_saver = StrategyResultsPersistence()
+            self.strategy_archiver = StrategyArchiver()
             
             console.print(ui_block_header(
                 "Trading Strategy Backtester", 
@@ -367,7 +367,7 @@ class TradingStrategyBacktester:
                 try:
                     console.print("\nProfitable strategy detected - Saving...", 
                                 style=THEME["dim"])
-                    save_id = self.strategy_saver.save_strategy_results(results)
+                    save_id = self.strategy_archiver.save_strategy_results(results)
                     results['save_id'] = save_id
                     console.print(f"✅ Strategy saved: {save_id}", style=THEME["success"])
                 except Exception as e:
@@ -583,7 +583,7 @@ class TradingStrategyBacktester:
         """
         try:
             # Retrieve list of saved strategies
-            strategies = self.strategy_saver.list_saved_strategies()
+            strategies = self.strategy_archiver.list_saved_strategies()
 
             # Create status message
             status_text = ("No saved strategies available." if not strategies 

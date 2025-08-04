@@ -58,7 +58,7 @@ daily-scalper/
 │   └── backtest_chart_generator.py       # Interactive visualizations
 ├── persistence/                          # Data persistence
 │   ├── __init__.py
-│   └── strategy_results_persistence.py   # Results management
+│   └── strategy_archiver.py              # Strategy results management
 ├── ui/                                   # User interface components
 │   ├── __init__.py
 │   ├── components.py                     # UI components and menus
@@ -94,7 +94,7 @@ The central orchestrator that coordinates all backtesting operations.
 - `PerformanceAnalyzer` for metrics calculation
 - `MarketDataProvider` for data loading
 - `BacktestChartGenerator` for visualization
-- `StrategyResultsPersistence` for result storage
+- `StrategyArchiver` for result storage
 
 ### Strategy System
 
@@ -209,9 +209,9 @@ Creates interactive charts using Plotly for strategy analysis.
 
 ### Persistence
 
-#### StrategyResultsPersistence
+#### StrategyArchiver
 
-**Location**: [`persistence/strategy_results_persistence.py`](persistence/strategy_results_persistence.py)
+**Location**: [`persistence/strategy_archiver.py`](persistence/strategy_archiver.py)
 
 Manages saving and loading of strategy results and configurations.
 
@@ -286,7 +286,7 @@ setup_application_logging(
 4. **Backtest Execution**: `StrategyBacktestEngine.execute_strategy_evaluation()`
 5. **Metrics Calculation**: `PerformanceAnalyzer.compute_extended_performance_stats()`
 6. **Visualization**: `BacktestChartGenerator.display_all_charts()`
-7. **Persistence**: `StrategyResultsPersistence.persist_strategy_results()` (if profitable)
+7. **Persistence**: `StrategyArchiver.persist_strategy_results()` (if profitable)
 
 ### Strategy Comparison
 
