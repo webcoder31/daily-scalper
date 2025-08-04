@@ -73,9 +73,9 @@ trading-strategy-backtester/
 │   ├── __init__.py
 │   ├── components.py                     # UI components and menus
 │   └── theme.py                          # Theme and styling
-├── utils/                                # General utilities
+├── logging/                              # Application logging
 │   ├── __init__.py
-│   └── logging_config.py                 # Centralized logging configuration
+│   └── logging_manager.py                # Logging configuration manager
 └── visualization/                        # Chart generation
     ├── __init__.py
     └── backtest_chart_generator.py       # Interactive visualizations
@@ -258,12 +258,12 @@ All configuration is centralized in [`config.py`](config.py):
 
 ### Logging Configuration
 
-**Location**: [`utils/logging_config.py`](utils/logging_config.py)
+**Location**: [`logging/logging_manager.py`](logging/logging_manager.py)
 
 Centralized logging system with flexible control:
 
 ```python
-from utils.logging_config import setup_application_logging
+from logging.logging_manager import setup_application_logging
 
 # Configure logging based on command line arguments
 setup_application_logging(

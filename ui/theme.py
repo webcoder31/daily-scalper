@@ -26,7 +26,7 @@ import logging
 from enum import Enum
 
 # Configure logging
-from utils.logging_config import get_logger
+from logging.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

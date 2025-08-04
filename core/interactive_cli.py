@@ -39,7 +39,7 @@ from strategies.base.strategy_registry import (
     get_strategy_parameter_info
 )
 from ui.theme import THEME
-from utils.logging_config import setup_application_logging, LoggingConfig
+from logging.logging_manager import setup_application_logging, LoggingManager
 
 # Console configuration
 UI_WIDTH: int = 100
@@ -486,7 +486,7 @@ Examples:
     )
     logging_group.add_argument(
         '--log-level',
-        choices=LoggingConfig.get_available_levels(),
+        choices=LoggingManager.get_available_levels(),
         help='Set specific log level (overrides --verbose)'
     )
     logging_group.add_argument(

@@ -113,7 +113,7 @@ def test_file_structure():
     """Checks the file structure."""
     print("\n📁 Testing file structure...")
     
-    required_dirs = ['cache', 'results', 'strategies', 'backtesting', 'market_data', 'visualization', 'persistence', 'core', 'ui', 'utils']
+    required_dirs = ['cache', 'results', 'strategies', 'backtesting', 'market_data', 'visualization', 'persistence', 'core', 'ui', 'logging']
     required_files = ['main.py', 'requirements.txt', 'README.md']
     
     all_good = True

@@ -96,8 +96,8 @@ def test_imports() -> Dict[str, Any]:
         'ui',
         'ui.components',
         'ui.theme',
-        'utils',
-        'utils.logging_config'
+        'logging',
+        'logging.logging_manager'
     ]
     
     for module in new_modules:
@@ -294,7 +294,7 @@ def test_utils_integration() -> Dict[str, Any]:
         results['tests_passed'].append("BacktestChartGenerator instantiation")
         
     except Exception as e:
-        error_msg = f"Utils integration test failed: {str(e)}"
+        error_msg = f"logging integration test failed: {str(e)}"
         print(f"✗ {error_msg}")
         results['errors'].append(error_msg)
         results['success'] = False

@@ -165,9 +165,9 @@ trading-strategy-backtester/
 │   ├── __init__.py
 │   ├── components.py                     # UI components and menus
 │   └── theme.py                          # Theme and styling
-├── utils/                                # General utilities
+├── logging/                              # Application logging
 │   ├── __init__.py
-│   └── logging_config.py                 # Centralized logging configuration
+│   └── logging_manager.py                # Logging configuration manager
 └── visualization/                        # Chart generation
     ├── __init__.py
     └── backtest_chart_generator.py       # Interactive visualizations

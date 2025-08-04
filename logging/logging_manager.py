@@ -12,7 +12,7 @@ from typing import Optional, Dict, Any
 from pathlib import Path
 
 
-class LoggingConfig:
+class LoggingManager:
     """
     Centralized logging configuration manager.
     
@@ -188,7 +188,7 @@ def setup_application_logging(
         file_only: If True, logs only to file (no console output). Requires log_file.
     """
     if quiet:
-        LoggingConfig.configure_logging(enabled=False)
+        LoggingManager.configure_logging(enabled=False)
         return
     
     # Determine log level
@@ -199,7 +199,7 @@ def setup_application_logging(
     else:
         level = 'WARNING'  # Default: only warnings and errors
     
-    LoggingConfig.configure_logging(
+    LoggingManager.configure_logging(
         enabled=True,
         level=level,
         log_file=log_file,
@@ -238,6 +238,6 @@ def configure_module_logging(level: str = 'INFO') -> logging.Logger:
     logger = logging.getLogger()
     if not logger.handlers:
         # Only configure if no handlers exist (avoid duplicate configuration)
-        LoggingConfig.configure_logging(enabled=True, level=level)
+        LoggingManager.configure_logging(enabled=True, level=level)
     
     return logger
