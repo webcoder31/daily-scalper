@@ -27,7 +27,7 @@ def test_imports() -> Dict[str, Any]:
         'config',
         'main',
         'core.strategy_backtester',
-        'core.command_line_interface'
+        'core.interactive_cli'
     ]
     
     for module in core_modules:
@@ -171,7 +171,7 @@ def test_core_integration() -> Dict[str, Any]:
         
         # Test CLI module
         print("Testing CLI module...")
-        from core.command_line_interface import main, parse_arguments
+        from core.interactive_cli import main, parse_arguments
         print("✓ CLI module functions imported successfully")
         results['tests_passed'].append("CLI module functions import")
         

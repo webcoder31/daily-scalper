@@ -44,7 +44,7 @@ trading-strategy-backtester/
 ├── cache/                                # Cached market data (created at runtime)
 ├── core/                                 # Core application logic
 │   ├── __init__.py
-│   ├── command_line_interface.py         # CLI and menu system
+│   ├── interactive_cli.py                # CLI and menu system
 │   └── strategy_backtester.py            # Main application controller
 ├── market_data/                          # Market data management
 │   ├── __init__.py
@@ -232,7 +232,7 @@ Manages saving and loading of strategy results and configurations.
 
 #### Command Line Interface
 
-**Location**: [`core/command_line_interface.py`](core/command_line_interface.py)
+**Location**: [`core/interactive_cli.py`](core/interactive_cli.py)
 
 Handles all user interaction through Rich-based terminal interface.
 

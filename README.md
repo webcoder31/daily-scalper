@@ -96,7 +96,7 @@ python main.py --file-only
 ### Application Architecture
 
 - The entrypoint is [`main.py`](main.py), which launches the interactive CLI.
-- The CLI/menu logic is in [`core/command_line_interface.py`](core/command_line_interface.py).
+- The CLI/menu logic is in [`core/interactive_cli.py`](core/interactive_cli.py).
 - The core application logic is in [`core/strategy_backtester.py`](core/strategy_backtester.py).
 
 ### Menu Options
@@ -136,7 +136,7 @@ trading-strategy-backtester/
 ├── cache/                                # Cached market data (created at runtime)
 ├── core/                                 # Core application logic
 │   ├── __init__.py
-│   ├── command_line_interface.py         # CLI and menu system
+│   ├── interactive_cli.py                # CLI and menu system
 │   └── strategy_backtester.py            # Main application controller
 ├── market_data/                          # Market data management
 │   ├── __init__.py

@@ -12,7 +12,7 @@ interface from the cli module.
 import sys
 from typing import NoReturn
 
-from core.command_line_interface import main
+from core.interactive_cli import main
 
 
 def run_application() -> NoReturn:
