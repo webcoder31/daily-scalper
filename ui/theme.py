@@ -15,7 +15,7 @@ Constants:
     THEME_CATEGORIES: Theme category definitions
 
 Example:
-    >>> from utils.theme import THEME, ThemeManager
+    >>> from ui.theme import THEME, ThemeManager
     >>> manager = ThemeManager()
     >>> validated_theme = manager.validate_theme(THEME)
     >>> custom_color = manager.get_color("primary")

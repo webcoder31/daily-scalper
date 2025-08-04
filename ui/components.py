@@ -21,17 +21,15 @@ Classes:
     MenuNavigationError: Custom exception for menu navigation errors
 
 Example:
-    >>> from utils.ui_components import ui_interactive_menu, ui_modern_table
+    >>> from ui.components import ui_interactive_menu, ui_modern_table
     >>> entries = [{"option": "1", "desc": "Test Option"}]
     >>> selection = ui_interactive_menu(entries, title="Test Menu")
     >>> table = ui_modern_table("Test Table")
 """
 
 import traceback
-import os
 from typing import Union, List, Dict, Any, Optional, Tuple
 from pathlib import Path
-import logging
 from rich.table import Table
 from rich.console import Console, Group
 from rich.live import Live

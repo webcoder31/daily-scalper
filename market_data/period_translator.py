@@ -11,7 +11,7 @@ Classes:
     PeriodValidationError: Custom exception for period validation errors
 
 Example:
-    >>> from utils.period_translator import PeriodTranslator
+    >>> from market_data.period_translator import PeriodTranslator
     >>> translator = PeriodTranslator()
     >>> description = translator.translate_period("1y")
     >>> print(description)  # "1 year"

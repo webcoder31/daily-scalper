@@ -1,20 +1,20 @@
 """
 Market data loading and caching module for cryptocurrency trading strategies.
 
-This module provides the DataLoader class for fetching, caching, and validating
+This module provides the MarketDataProvider class for fetching, caching, and validating
 cryptocurrency market data from Yahoo Finance. It includes intelligent caching,
 data validation, and comprehensive error handling.
 
 Classes:
-    DataLoader: Main class for loading and managing market data
+    MarketDataProvider: Main class for loading and managing market data
     DataLoadError: Custom exception for data loading errors
     CacheError: Custom exception for cache-related errors
     ValidationError: Custom exception for data validation errors
 
 Example:
-    >>> from utils.data_loader import DataLoader
-    >>> loader = DataLoader(cache_dir="cache")
-    >>> data = loader.load_crypto_data("BTC-USD", "1y")
+    >>> from market_data.market_data_provider import MarketDataProvider
+    >>> loader = MarketDataProvider(cache_dir="cache")
+    >>> data = loader.fetch_cryptocurrency_data("BTC-USD", "1y")
     >>> print(f"Loaded {len(data)} data points")
 """
 
@@ -96,9 +96,9 @@ class MarketDataProvider:
         cache_max_age_hours: Maximum age of cached data in hours before refresh.
         
     Example:
-        >>> loader = MarketDataProvider(cache_dir="data", cache_max_age_hours=24)
+        >>> loader = MarketDataProvider(cache_dir="cache", cache_max_age_hours=24)
         >>> data = loader.fetch_cryptocurrency_data("BTC-USD", "1y")
-        >>> symbols = loader.get_supported_cryptocurrency_symbols()
+        >>> symbols = loader.get_available_symbols()
     """
     
     # Valid period values for yfinance
@@ -112,7 +112,7 @@ class MarketDataProvider:
 
     def __init__(self, cache_dir: str = "cache", cache_max_age_hours: int = 24) -> None:
         """
-        Initialize the DataLoader with caching configuration.
+        Initialize the MarketDataProvider with caching configuration.
         
         Args:
             cache_dir: Directory for storing cached data files.

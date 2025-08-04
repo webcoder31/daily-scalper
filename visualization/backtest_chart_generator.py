@@ -7,14 +7,14 @@ technical indicators, and performance metrics with robust error handling and
 customization options.
 
 Classes:
-    Visualizer: Main class for creating interactive visualizations
+    BacktestChartGenerator: Main class for creating interactive visualizations
     VisualizationError: Custom exception for visualization errors
     ChartConfigurationError: Custom exception for chart configuration errors
     DataVisualizationError: Custom exception for data visualization errors
 
 Example:
-    >>> from utils.visualizer import Visualizer
-    >>> visualizer = Visualizer()
+    >>> from visualization.backtest_chart_generator import BacktestChartGenerator
+    >>> visualizer = BacktestChartGenerator()
     >>> fig = visualizer.plot_backtest_results(backtest_results)
     >>> fig.show()
 """
