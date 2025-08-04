@@ -532,25 +532,25 @@ class BacktestChartGenerator:
             
             # Main backtest chart
             try:
-                main_fig = Visualizer.plot_backtest_results(results)
+                main_fig = BacktestChartGenerator.plot_backtest_results(results)
                 main_fig.show()
                 logger.debug("Main backtest chart displayed")
             except Exception as e:
                 logger.error(f"Failed to display main chart: {e}")
                 raise
-            
+
             # Performance metrics chart
             try:
-                metrics_fig = Visualizer.plot_performance_metrics(results)
+                metrics_fig = BacktestChartGenerator.plot_performance_metrics(results)
                 metrics_fig.show()
                 logger.debug("Performance metrics chart displayed")
             except Exception as e:
                 logger.warning(f"Failed to display metrics chart: {e}")
                 # Don't raise - this is optional
-            
+
             # Drawdown chart
             try:
-                drawdown_fig = Visualizer.plot_drawdown(results)
+                drawdown_fig = BacktestChartGenerator.plot_drawdown(results)
                 drawdown_fig.show()
                 logger.debug("Drawdown chart displayed")
             except Exception as e:
