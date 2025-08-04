@@ -25,7 +25,7 @@ from rich.text import Text
 from rich import box
 
 # Application imports
-from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+from backtesting.backtest_engine import BacktestEngine
 from backtesting.performance_analyzer import PerformanceAnalyzer
 from market_data.market_data_provider import MarketDataProvider
 from visualization.backtest_chart_generator import BacktestChartGenerator
@@ -93,7 +93,7 @@ class TradingStrategyBacktester:
         """
         try:
             self.data_loader = MarketDataProvider()
-            self.backtest_engine = StrategyBacktestEngine()
+            self.backtest_engine = BacktestEngine()
             self.strategy_archiver = StrategyArchiver()
             
             console.print(ui_block_header(

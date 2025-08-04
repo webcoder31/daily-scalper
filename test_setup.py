@@ -21,7 +21,7 @@ def test_imports():
         # Test main imports
         from strategies.base.abstract_trading_strategy import AbstractTradingStrategy
         from strategies.implementations.sma_strategy import SMAStrategy
-        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.backtest_engine import BacktestEngine
         from backtesting.performance_analyzer import PerformanceAnalyzer
         from market_data.market_data_provider import MarketDataProvider
         from visualization.backtest_chart_generator import BacktestChartGenerator
@@ -97,9 +97,9 @@ def test_backtest_engine():
     print("\n⚡ Testing backtest engine...")
     
     try:
-        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.backtest_engine import BacktestEngine
         
-        engine = StrategyBacktestEngine(initial_cash=10000, commission=0.001)
+        engine = BacktestEngine(initial_cash=10000, commission=0.001)
         print(f"✅ BacktestEngine initialized")
         print(f"   Initial capital: ${engine.initial_cash:,.2f}")
         print(f"   Commission: {engine.commission:.3%}")
@@ -144,7 +144,7 @@ def run_mini_backtest():
         import numpy as np
         from datetime import datetime, timedelta
         from strategies.implementations.sma_strategy import SMAStrategy
-        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.backtest_engine import BacktestEngine
         
         # Creating simulated data
         dates = pd.date_range(start='2023-01-01', end='2023-12-31', freq='D')
@@ -173,7 +173,7 @@ def run_mini_backtest():
         
         # Testing strategy
         strategy = SMAStrategy(short_window=10, long_window=20)
-        engine = StrategyBacktestEngine(initial_cash=10000)
+        engine = BacktestEngine(initial_cash=10000)
         
         results = engine.execute_strategy_evaluation(strategy, data)
         

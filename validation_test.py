@@ -68,7 +68,7 @@ def test_imports() -> Dict[str, Any]:
     # Test backtesting modules
     backtesting_modules = [
         'backtesting',
-        'backtesting.strategy_backtest_engine',
+        'backtesting.backtest_engine',
         'backtesting.performance_analyzer'
     ]
     
@@ -318,13 +318,13 @@ def test_backtest_system() -> Dict[str, Any]:
     try:
         # Test strategy backtest engine
         print("Testing strategy backtest engine...")
-        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.backtest_engine import BacktestEngine
         from market_data.market_data_provider import MarketDataProvider
         
         data_provider = MarketDataProvider()
-        engine = StrategyBacktestEngine()
-        print("✓ StrategyBacktestEngine instantiated successfully")
-        results['tests_passed'].append("StrategyBacktestEngine instantiation")
+        engine = BacktestEngine()
+        print("✓ BacktestEngine instantiated successfully")
+        results['tests_passed'].append("BacktestEngine instantiation")
         
         # Test performance analyzer
         print("Testing performance analyzer...")
@@ -362,7 +362,7 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         
         exception_imports = [
             "from strategies.base.abstract_trading_strategy import StrategyError, ParameterValidationError, DataValidationError",
-            "from backtesting.strategy_backtest_engine import BacktestError, DataValidationError, StrategyExecutionError",
+            "from backtesting.backtest_engine import BacktestError, DataValidationError, StrategyExecutionError",
             "from market_data.market_data_provider import DataLoadError, CacheError, ValidationError"
         ]
         
@@ -384,7 +384,7 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         import config
         from core.trading_strategy_backtester import TradingStrategyBacktester
         from strategies.base.strategy_registry import get_strategy_names
-        from backtesting.strategy_backtest_engine import StrategyBacktestEngine
+        from backtesting.backtest_engine import BacktestEngine
         from market_data.market_data_provider import MarketDataProvider
         
         print("✓ All major modules imported without type conflicts")

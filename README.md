@@ -137,7 +137,7 @@ daily-scalper/
 │       ├── bb_strategy.py                # Bollinger Bands strategy
 │       └── ema_rsi_strategy.py           # EMA + RSI strategy
 ├── backtesting/                          # Backtesting engine and analysis
-│   ├── strategy_backtest_engine.py       # Backtesting execution
+│   ├── backtest_engine.py       # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
 ├── market_data/                          # Market data management
 │   ├── market_data_provider.py           # Data fetching and caching
@@ -178,7 +178,7 @@ Handles cryptocurrency data fetching and caching:
 - `get_supported_cryptocurrency_symbols()` - Get available trading pairs
 - `is_cached_data_fresh()` - Check cache validity
 
-### StrategyBacktestEngine
+### BacktestEngine
 Executes vectorized backtests using vectorbt:
 - `execute_strategy_evaluation()` - Run strategy backtest simulation
 - `build_vectorbt_portfolio()` - Construct trading portfolio

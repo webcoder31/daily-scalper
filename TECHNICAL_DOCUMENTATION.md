@@ -47,7 +47,7 @@ daily-scalper/
 │       └── ema_rsi_strategy.py           # EMA + RSI strategy
 ├── backtesting/                          # Backtesting engine and analysis
 │   ├── __init__.py
-│   ├── strategy_backtest_engine.py       # Backtesting execution
+│   ├── backtest_engine.py       # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
 ├── market_data/                          # Market data management
 │   ├── __init__.py
@@ -90,7 +90,7 @@ The central orchestrator that coordinates all backtesting operations.
 - `render_backtest_summary()` - Generate formatted results display
 
 **Dependencies**:
-- `StrategyBacktestEngine` for backtest execution
+- `BacktestEngine` for backtest execution
 - `PerformanceAnalyzer` for metrics calculation
 - `MarketDataProvider` for data loading
 - `BacktestChartGenerator` for visualization
@@ -138,9 +138,9 @@ All concrete strategies are located in [`strategies/implementations/`](strategie
 
 ### Backtesting Engine
 
-#### StrategyBacktestEngine
+#### BacktestEngine
 
-**Location**: [`backtesting/strategy_backtest_engine.py`](backtesting/strategy_backtest_engine.py)
+**Location**: [`backtesting/backtest_engine.py`](backtesting/backtest_engine.py)
 
 Executes vectorized backtests using vectorbt for high performance.
 
@@ -283,7 +283,7 @@ setup_application_logging(
 1. **Data Loading**: `MarketDataProvider.fetch_cryptocurrency_data()`
 2. **Strategy Initialization**: Create strategy instance with parameters
 3. **Signal Generation**: `strategy.generate_signals(data)`
-4. **Backtest Execution**: `StrategyBacktestEngine.execute_strategy_evaluation()`
+4. **Backtest Execution**: `BacktestEngine.execute_strategy_evaluation()`
 5. **Metrics Calculation**: `PerformanceAnalyzer.compute_extended_performance_stats()`
 6. **Visualization**: `BacktestChartGenerator.display_all_charts()`
 7. **Persistence**: `StrategyArchiver.persist_strategy_results()` (if profitable)
@@ -359,7 +359,7 @@ from strategies.base.abstract_trading_strategy import StrategyError
 from market_data.market_data_provider import DataLoadError
 
 # Backtesting exceptions
-from backtesting.strategy_backtest_engine import BacktestError
+from backtesting.backtest_engine import BacktestError
 ```
 
 ### Performance Considerations

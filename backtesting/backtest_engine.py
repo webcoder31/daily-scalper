@@ -55,7 +55,7 @@ class MetricsCalculationError(BacktestError):
     pass
 
 
-class StrategyBacktestEngine:
+class BacktestEngine:
     """
     Advanced backtesting engine for evaluating cryptocurrency trading strategies.
     
@@ -73,11 +73,11 @@ class StrategyBacktestEngine:
         Basic usage of the backtesting engine:
         
         ```python
-        from backtest import StrategyBacktestEngine
+        from backtest import BacktestEngine
         from strategies import SMACrossoverStrategy
         
         # Initialize engine with custom parameters
-        engine = StrategyBacktestEngine(
+        engine = BacktestEngine(
             initial_cash=10000.0,
             commission=0.001,
             slippage=0.0001
