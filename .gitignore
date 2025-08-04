@@ -1,7 +1,7 @@
 # Cached datasets of cryptocurrencies
-data/
+cache/
 
-# Backtest results and reports
+# Backtest results, charts and reports
 results/
 
 # Python files
