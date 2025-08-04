@@ -3,7 +3,7 @@
 This document provides a comprehensive guide on how to implement new trading strategies for the Trading Strategy Backtester application.
 
 ## Table of Contents
-- [Strategy Implementation Guide for Trading Strategy Backtester](#strategy-implementation-guide-for-daily-scalper)
+- [Strategy Implementation Guide for Trading Strategy Backtester](#strategy-implementation-guide-for-trading-strategy-backtester)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Strategy Architecture](#strategy-architecture)

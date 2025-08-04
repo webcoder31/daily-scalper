@@ -1,7 +1,7 @@
 """
 Trading Strategy Backtester Application Core Logic.
 
-This module contains the TradingStrategyBacktester class which serves as the main application
+This module contains the StrategyBacktester class which serves as the main application
 controller for running backtests, comparing strategies, and managing results.
 It provides a comprehensive interface for cryptocurrency trading strategy analysis.
 """
@@ -70,7 +70,7 @@ class BacktestError(TradingStrategyBacktesterError):
     pass
 
 
-class TradingStrategyBacktester:
+class StrategyBacktester:
     """
     Main application class for the Trading Strategy Backtester cryptocurrency trading strategy analyzer.
     

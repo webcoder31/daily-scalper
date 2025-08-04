@@ -1,12 +1,14 @@
 # Trading Strategy Backtester
 
-A user-friendly Python application for testing, evaluating, and saving cryptocurrency trading strategies.
+A user-friendly Python application for testing, evaluating, 
+and saving cryptocurrency trading strategies.
 
 ---
 
 ## Overview
 
-Trading Strategy Backtester lets you backtest and compare crypto trading strategies with an interactive menu and clear visualizations. No coding required for basic use.
+Trading Strategy Backtester lets you backtest and compare crypto trading strategies 
+with an interactive menu and clear visualizations. No coding required for basic use.
 
 ---
 
@@ -34,7 +36,7 @@ Trading Strategy Backtester lets you backtest and compare crypto trading strateg
 1. **Clone the project**
    ```bash
    git clone <your-repo-url>
-   cd daily-scalper
+   cd trading-strategy-backtester
    ```
 
 2. **Create a virtual environment (recommended)**
@@ -95,7 +97,7 @@ python main.py --file-only
 
 - The entrypoint is [`main.py`](main.py), which launches the interactive CLI.
 - The CLI/menu logic is in [`core/command_line_interface.py`](core/command_line_interface.py).
-- The core application logic is in [`core/trading_strategy_backtester.py`](core/trading_strategy_backtester.py).
+- The core application logic is in [`core/strategy_backtester.py`](core/strategy_backtester.py).
 
 ### Menu Options
 
@@ -121,45 +123,54 @@ Each strategy can be customized via the menu with various parameter configuratio
 The application follows a professional modular architecture:
 
 ```
-daily-scalper/
+trading-strategy-backtester/
 ├── main.py                               # Entry point
 ├── config.py                             # Global configuration
-├── core/                                 # Core application logic
-│   ├── trading_strategy_backtester.py    # Main application controller
-│   └── command_line_interface.py         # CLI and menu system
-├── strategies/                           # Trading strategies
-│   ├── base/                             # Strategies
-│   │   ├── abstract_trading_strategy.py  # Base strategy class
-│   │   └── strategy_registry.py          # Strategy registration system
-│   └── implementations/                  # Strategy implementations
-│       ├── sma_strategy.py               # SMA Crossover strategy
-│       ├── rsi_strategy.py               # RSI strategy
-│       ├── bb_strategy.py                # Bollinger Bands strategy
-│       └── ema_rsi_strategy.py           # EMA + RSI strategy
+├── functional_test.py                    # Functional testing
+├── test_setup.py                         # Setup validation
+├── validation_test.py                    # Comprehensive validation
 ├── backtesting/                          # Backtesting engine and analysis
-│   ├── backtest_engine.py       # Backtesting execution
+│   ├── __init__.py
+│   ├── backtest_engine.py                # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
+├── cache/                                # Cached market data (created at runtime)
+├── core/                                 # Core application logic
+│   ├── __init__.py
+│   ├── command_line_interface.py         # CLI and menu system
+│   └── strategy_backtester.py            # Main application controller
 ├── market_data/                          # Market data management
+│   ├── __init__.py
 │   ├── market_data_provider.py           # Data fetching and caching
 │   └── period_translator.py              # Period string conversions
-├── visualization/                        # Chart generation
-│   └── backtest_chart_generator.py       # Interactive visualizations
 ├── persistence/                          # Data persistence
+│   ├── __init__.py
 │   └── strategy_archiver.py              # Strategy results management
+├── results/                              # Output directory (created at runtime)
+│   ├── charts/                           # Generated charts (created at runtime)
+│   ├── reports/                          # Performance reports (created at runtime)
+│   └── strategies/                       # Saved strategy results (created at runtime)
+├── strategies/                           # Trading strategies
+│   ├── __init__.py
+│   ├── base/                             # Fundation for strategy implementation
+|   │   ├── __init__.py
+│   │   ├── abstract_trading_strategy.py  # Abstract strategy class
+│   │   └── strategy_registry.py          # Strategy registration system
+│   └── implementations/                  # Strategy implementations
+|       ├── __init__.py
+│       ├── bb_strategy.py                # Bollinger Bands strategy
+│       ├── ema_rsi_strategy.py           # EMA + RSI strategy
+│       ├── rsi_strategy.py               # RSI strategy
+│       └── sma_strategy.py               # SMA Crossover strategy
 ├── ui/                                   # User interface components
+│   ├── __init__.py
 │   ├── components.py                     # UI components and menus
 │   └── theme.py                          # Theme and styling
 ├── utils/                                # General utilities
+│   ├── __init__.py
 │   └── logging_config.py                 # Centralized logging configuration
-├── cache/                                # Cached market data
-├── results/                              # Output directory (created at runtime)
-│   ├── strategies/                       # Saved strategy results
-│   ├── reports/                          # Performance reports
-│   └── charts/                           # Generated charts
-└── tests/                                # Test files
-    ├── test_setup.py                     # Setup validation
-    ├── functional_test.py                # Functional testing
-    └── validation_test.py                # Comprehensive validation
+└── visualization/                        # Chart generation
+    ├── __init__.py
+    └── backtest_chart_generator.py       # Interactive visualizations
 ```
 
 ---

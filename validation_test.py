@@ -26,7 +26,7 @@ def test_imports() -> Dict[str, Any]:
     core_modules = [
         'config',
         'main',
-        'core.trading_strategy_backtester',
+        'core.strategy_backtester',
         'core.command_line_interface'
     ]
     
@@ -162,12 +162,12 @@ def test_core_integration() -> Dict[str, Any]:
         
         # Test core application classes
         print("Testing core application module...")
-        from core.trading_strategy_backtester import TradingStrategyBacktester
+        from core.strategy_backtester import StrategyBacktester
         
         # Test app instantiation
-        app = TradingStrategyBacktester()
-        print("✓ TradingStrategyBacktester instantiated successfully")
-        results['tests_passed'].append("TradingStrategyBacktester instantiation")
+        app = StrategyBacktester()
+        print("✓ StrategyBacktester instantiated successfully")
+        results['tests_passed'].append("StrategyBacktester instantiation")
         
         # Test CLI module
         print("Testing CLI module...")
@@ -382,7 +382,7 @@ def test_cross_module_compatibility() -> Dict[str, Any]:
         
         # Import all modules to check for type conflicts
         import config
-        from core.trading_strategy_backtester import TradingStrategyBacktester
+        from core.strategy_backtester import StrategyBacktester
         from strategies.base.strategy_registry import get_strategy_names
         from backtesting.backtest_engine import BacktestEngine
         from market_data.market_data_provider import MarketDataProvider

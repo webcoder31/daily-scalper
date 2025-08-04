@@ -25,7 +25,7 @@ from config import (
     VISUALIZATION_CONFIG,
     POPULAR_CRYPTO_SYMBOLS
 )
-from core.trading_strategy_backtester import TradingStrategyBacktester, TradingStrategyBacktesterError
+from core.strategy_backtester import StrategyBacktester, TradingStrategyBacktesterError
 from market_data.period_translator import PeriodTranslator
 from ui.components import (
     ui_interactive_menu,
@@ -93,7 +93,7 @@ def prompt_user_for_input(
         raise UserCancelledError("User cancelled input") from None
 
 
-def handle_single_strategy_test(app: TradingStrategyBacktester) -> None:
+def handle_single_strategy_test(app: StrategyBacktester) -> None:
     """
     Interactive menu for testing a single trading strategy configuration.
     
@@ -101,7 +101,7 @@ def handle_single_strategy_test(app: TradingStrategyBacktester) -> None:
     parameters, and executing a backtest with optional visualization and saving.
     
     Args:
-        app: The TradingStrategyBacktester application instance.
+        app: The StrategyBacktester application instance.
     
     Raises:
         CLIError: If menu operations encounter errors.
@@ -211,7 +211,7 @@ def handle_single_strategy_test(app: TradingStrategyBacktester) -> None:
         console.print(ui_error_message(f"Unexpected error: {str(e)}", "System Error"))
 
 
-def handle_strategy_comparison(app: TradingStrategyBacktester) -> None:
+def handle_strategy_comparison(app: StrategyBacktester) -> None:
     """
     Interactive menu for comparing multiple strategy configurations.
     
@@ -219,7 +219,7 @@ def handle_strategy_comparison(app: TradingStrategyBacktester) -> None:
     of the same strategy, either using predefined configurations or custom ones.
     
     Args:
-        app: The TradingStrategyBacktester application instance.
+        app: The StrategyBacktester application instance.
     
     Raises:
         CLIError: If menu operations encounter errors.
@@ -342,12 +342,12 @@ def _collect_custom_configurations(strategy_name: str) -> List[Dict[str, Any]]:
     return configurations
 
 
-def handle_saved_results_display(app: TradingStrategyBacktester) -> None:
+def handle_saved_results_display(app: StrategyBacktester) -> None:
     """
     Display saved profitable strategies.
     
     Args:
-        app: The TradingStrategyBacktester application instance.
+        app: The StrategyBacktester application instance.
     """
     try:
         app.display_saved_results()
@@ -532,7 +532,7 @@ def main() -> int:
         )
         
         # Initialize the application
-        app = TradingStrategyBacktester()
+        app = StrategyBacktester()
 
         # Main menu loop
         while True:

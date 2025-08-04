@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This document is for developers and contributors. It covers the internal architecture, code structure, extension points, and best practices for maintaining and extending Trading Strategy Backtester.
+This document is for developers and contributors. It covers the internal 
+architecture, code structure, extension points, and best practices for maintaining 
+and extending Trading Strategy Backtester.
 
 For installation and user instructions, see [`README.md`](README.md).
 
@@ -10,7 +12,10 @@ For installation and user instructions, see [`README.md`](README.md).
 
 ## Architecture Overview
 
-Trading Strategy Backtester is a modular, object-oriented Python application for backtesting and analyzing cryptocurrency trading strategies. It follows professional software engineering principles with clear separation of concerns, comprehensive type annotations, and robust error handling.
+Trading Strategy Backtester is a modular, object-oriented Python application for 
+backtesting and analyzing cryptocurrency trading strategies. It follows professional 
+software engineering principles with clear separation of concerns, comprehensive 
+type annotations, and robust error handling.
 
 ### Core Design Principles
 
@@ -26,39 +31,44 @@ Trading Strategy Backtester is a modular, object-oriented Python application for
 ## Project Structure
 
 ```
-daily-scalper/
+trading-strategy-backtester/
 ├── main.py                               # Entry point
 ├── config.py                             # Global configuration
-├── core/                                 # Core application logic
-│   ├── __init__.py
-│   ├── trading_strategy_backtester.py    # Main application controller
-│   └── command_line_interface.py         # CLI and menu system
-├── strategies/                           # Trading strategies
-│   ├── __init__.py
-│   ├── base/                             # Base strategy components
-│   │   ├── __init__.py
-│   │   ├── abstract_trading_strategy.py  # Abstract base class
-│   │   └── strategy_registry.py          # Strategy registration system
-│   └── implementations/                  # Concrete strategy implementations
-│       ├── __init__.py
-│       ├── sma_strategy.py               # SMA Crossover strategy
-│       ├── rsi_strategy.py               # RSI strategy
-│       ├── bb_strategy.py                # Bollinger Bands strategy
-│       └── ema_rsi_strategy.py           # EMA + RSI strategy
+├── functional_test.py                    # Functional testing
+├── test_setup.py                         # Setup validation
+├── validation_test.py                    # Comprehensive validation
 ├── backtesting/                          # Backtesting engine and analysis
 │   ├── __init__.py
-│   ├── backtest_engine.py       # Backtesting execution
+│   ├── backtest_engine.py                # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
+├── cache/                                # Cached market data (created at runtime)
+├── core/                                 # Core application logic
+│   ├── __init__.py
+│   ├── command_line_interface.py         # CLI and menu system
+│   └── strategy_backtester.py            # Main application controller
 ├── market_data/                          # Market data management
 │   ├── __init__.py
 │   ├── market_data_provider.py           # Data fetching and caching
 │   └── period_translator.py              # Period string conversions
-├── visualization/                        # Chart generation
-│   ├── __init__.py
-│   └── backtest_chart_generator.py       # Interactive visualizations
 ├── persistence/                          # Data persistence
 │   ├── __init__.py
 │   └── strategy_archiver.py              # Strategy results management
+├── results/                              # Output directory (created at runtime)
+│   ├── charts/                           # Generated charts (created at runtime)
+│   ├── reports/                          # Performance reports (created at runtime)
+│   └── strategies/                       # Saved strategy results (created at runtime)
+├── strategies/                           # Trading strategies
+│   ├── __init__.py
+│   ├── base/                             # Fundation for strategy implementation
+|   │   ├── __init__.py
+│   │   ├── abstract_trading_strategy.py  # Abstract strategy class
+│   │   └── strategy_registry.py          # Strategy registration system
+│   └── implementations/                  # Strategy implementations
+|       ├── __init__.py
+│       ├── bb_strategy.py                # Bollinger Bands strategy
+│       ├── ema_rsi_strategy.py           # EMA + RSI strategy
+│       ├── rsi_strategy.py               # RSI strategy
+│       └── sma_strategy.py               # SMA Crossover strategy
 ├── ui/                                   # User interface components
 │   ├── __init__.py
 │   ├── components.py                     # UI components and menus
@@ -66,20 +76,18 @@ daily-scalper/
 ├── utils/                                # General utilities
 │   ├── __init__.py
 │   └── logging_config.py                 # Centralized logging configuration
-├── cache/                                # Cached market data (created at runtime)
-└── results/                              # Output directory (created at runtime)
-    ├── strategies/                       # Saved strategy results
-    ├── reports/                          # Performance reports
-    └── charts/                           # Generated charts
+└── visualization/                        # Chart generation
+    ├── __init__.py
+    └── backtest_chart_generator.py       # Interactive visualizations
 ```
 
 ---
 
 ## Core Components
 
-### TradingStrategyBacktester (Main Application Controller)
+### StrategyBacktester (Main Application Controller)
 
-**Location**: [`core/trading_strategy_backtester.py`](core/trading_strategy_backtester.py)
+**Location**: [`core/strategy_backtester.py`](core/strategy_backtester.py)
 
 The central orchestrator that coordinates all backtesting operations.
 
@@ -350,7 +358,7 @@ The application uses custom exceptions for better error handling:
 
 ```python
 # Core exceptions
-from core.trading_strategy_backtester import TradingStrategyBacktesterError
+from core.strategy_backtester import TradingStrategyBacktesterError
 
 # Strategy exceptions
 from strategies.base.abstract_trading_strategy import StrategyError

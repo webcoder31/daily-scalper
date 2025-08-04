@@ -19,11 +19,11 @@ def test_core_functionality():
     try:
         # Test 1: Import and initialize core components
         print("1. Testing core component initialization...")
-        from core.trading_strategy_backtester import TradingStrategyBacktester
+        from core.strategy_backtester import StrategyBacktester
         from market_data.market_data_provider import MarketDataProvider
         from strategies.base.strategy_registry import create_strategy, get_strategy_names
         
-        app = TradingStrategyBacktester()
+        app = StrategyBacktester()
         data_provider = MarketDataProvider()
         print("✓ Core components initialized successfully")
         
