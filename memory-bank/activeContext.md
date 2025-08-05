@@ -147,7 +147,7 @@ This file tracks the project's current status, including recent changes, current
 - ✅ **Data Loading**: MarketDataProvider successfully loads and caches data
 - ✅ **Backtesting**: StrategyBacktestEngine executes backtests with full metrics
 - ✅ **Performance Analysis**: PerformanceAnalyzer computes advanced metrics correctly
-- ✅ **Visualization**: BacktestChartGenerator ready for chart generation
+- ✅ **Visualization**: BacktestChartBuilder ready for chart generation
 - ✅ **Persistence**: StrategyResultsPersistence handles result saving/loading
 
 #### 4.3 Import and Module Testing (✅ Complete)

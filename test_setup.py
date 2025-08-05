@@ -24,7 +24,7 @@ def test_imports():
         from backtesting.backtest_engine import BacktestEngine
         from backtesting.performance_analyzer import PerformanceAnalyzer
         from market_data.market_data_provider import MarketDataProvider
-        from visualization.backtest_chart_generator import BacktestChartGenerator
+        from charting.backtest_chart_builder import BacktestChartBuilder
         from persistence.strategy_archiver import StrategyArchiver
         print("✅ All modules imported successfully")
         return True
@@ -113,7 +113,7 @@ def test_file_structure():
     """Checks the file structure."""
     print("\n📁 Testing file structure...")
     
-    required_dirs = ['cache', 'results', 'strategies', 'backtesting', 'market_data', 'visualization', 'persistence', 'core', 'ui', 'logging']
+    required_dirs = ['cache', 'results', 'strategies', 'backtesting', 'market_data', 'charting', 'persistence', 'core', 'ui', 'logger']
     required_files = ['main.py', 'requirements.txt', 'README.md']
     
     all_good = True

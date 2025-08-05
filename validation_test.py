@@ -89,8 +89,8 @@ def test_imports() -> Dict[str, Any]:
         'market_data',
         'market_data.market_data_provider',
         'market_data.period_translator',
-        'visualization',
-        'visualization.backtest_chart_generator',
+        'charting',
+        'charting.backtest_chart_builder',
         'persistence',
         'persistence.strategy_archiver',
         'ui',
@@ -287,11 +287,11 @@ def test_utils_integration() -> Dict[str, Any]:
         
         # Test chart generator
         print("Testing chart generator...")
-        from visualization.backtest_chart_generator import BacktestChartGenerator
+        from charting.backtest_chart_builder import BacktestChartBuilder
         
-        chart_generator = BacktestChartGenerator()
-        print("✓ BacktestChartGenerator instantiated successfully")
-        results['tests_passed'].append("BacktestChartGenerator instantiation")
+        chart_generator = BacktestChartBuilder()
+        print("✓ BacktestChartBuilder instantiated successfully")
+        results['tests_passed'].append("BacktestChartBuilder instantiation")
         
     except Exception as e:
         error_msg = f"logging integration test failed: {str(e)}"

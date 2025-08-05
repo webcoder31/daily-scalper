@@ -16,15 +16,14 @@ access for all available trading strategies while maintaining type safety
 and comprehensive error handling.
 """
 
-from typing import Dict, Any, Type, List, Optional, Union
+from typing import Dict, Any, Type, List, Optional
 import inspect
-import logging
 
 # Import base strategy and exceptions
 from .abstract_strategy import AbstractStrategy, StrategyError, ParameterValidationError
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

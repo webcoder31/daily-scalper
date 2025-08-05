@@ -225,7 +225,7 @@ This file records architectural and implementation decisions using a list format
 * **Core Class Renaming Strategy**:
   - DailyScalper → TradingStrategyBacktester (main application controller)
   - DataLoader → MarketDataProvider (data fetching and caching)
-  - Visualizer → BacktestChartGenerator (chart generation)
+  - Visualizer → BacktestChartBuilder (chart generation)
   - StrategySaver → StrategyResultsPersistence (results management)
   - BacktestEngine → StrategyBacktestEngine (backtesting execution)
   - PerformanceMetrics → PerformanceAnalyzer (metrics calculation)

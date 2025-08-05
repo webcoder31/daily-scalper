@@ -28,7 +28,7 @@ from rich import box
 from backtesting.backtest_engine import BacktestEngine
 from backtesting.performance_analyzer import PerformanceAnalyzer
 from market_data.market_data_provider import MarketDataProvider
-from visualization.backtest_chart_generator import BacktestChartGenerator
+from charting.backtest_chart_builder import BacktestChartBuilder
 from persistence.strategy_archiver import StrategyArchiver
 from market_data.period_translator import PeriodTranslator
 from strategies.base.strategy_registry import (
@@ -77,7 +77,7 @@ class StrategyBacktester:
     This class provides comprehensive functionality for backtesting trading strategies,
     comparing different configurations, and managing profitable strategy results.
     It serves as the primary interface between the user and the underlying
-    backtesting engine, data loading, and visualization components.
+    backtesting engine, data loading, and charting components.
     """
 
 
@@ -244,7 +244,7 @@ class StrategyBacktester:
         
         This method performs a complete backtesting workflow including data loading,
         strategy initialization, backtest execution, metrics calculation, result
-        display, visualization, and optional saving of profitable strategies.
+        display, charting, and optional saving of profitable strategies.
         
         Args:
             strategy_name: Name of the strategy class to instantiate and test.
@@ -357,7 +357,7 @@ class StrategyBacktester:
             if display_charts:
                 try:
                     console.print("Generating charts...", style=THEME["accent"])
-                    BacktestChartGenerator.show_all_plots(results)
+                    BacktestChartBuilder.display_charts(results)
                 except Exception as e:
                     console.print(f"Warning: Visualization failed: {str(e)}", 
                                 style=THEME["warning"])

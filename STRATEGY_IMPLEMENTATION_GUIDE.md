@@ -162,7 +162,7 @@ def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
     # Sell when MACD crosses below signal line
     sell_signals = (macd < macd_signal) & (macd.shift(1) >= macd_signal.shift(1))
 
-    # Store indicators for visualization
+    # Store indicators for charting
     self.indicators = {
         'macd': macd,
         'signal': macd_signal,
@@ -258,7 +258,7 @@ def get_comparison_parameter_sets(cls) -> List[Dict[str, Any]]:
 ```python
 def get_indicators(self) -> Dict[str, pd.Series]:
     """
-    Return the calculated indicators for visualization.
+    Return the calculated indicators for charting.
     """
     return getattr(self, 'indicators', {})
 ```
@@ -483,7 +483,7 @@ class BBStrategy(AbstractStrategy):
      - `get_parameter_summary()` (not `get_short_description()`)
      - `get_predefined_configurations()` (not `get_comparison_parameter_sets()`)
 
-5. **Visualization issues**:
+5. **Charting issues**:
    - Make sure your `indicators` dictionary contains valid Series objects
    - Verify all Series have the same index as the input data
 

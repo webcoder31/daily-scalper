@@ -20,13 +20,12 @@ import numpy as np
 import vectorbt as vbt
 from datetime import datetime, date
 import warnings
-import logging
 from pathlib import Path
 
 from strategies.base.abstract_strategy import AbstractStrategy
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

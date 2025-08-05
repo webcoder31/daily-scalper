@@ -197,7 +197,7 @@ class BBStrategy(AbstractStrategy):
             previous_below_upper = close_prices.shift(1) <= upper_band.shift(1)
             sell_signals = current_above_upper & previous_below_upper
             
-            # Store calculated indicators for visualization and analysis
+            # Store calculated indicators for charting and analysis
             self.indicators = {
                 'middle_band': middle_band,
                 'upper_band': upper_band,
@@ -322,7 +322,7 @@ class BBStrategy(AbstractStrategy):
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Get calculated technical indicators for visualization and analysis.
+        Get calculated technical indicators for charting and analysis.
         
         Returns the Bollinger Bands components and additional indicators that were
         calculated during signal generation. This data can be used for plotting

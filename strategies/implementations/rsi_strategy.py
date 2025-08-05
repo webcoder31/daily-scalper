@@ -202,7 +202,7 @@ class RSIStrategy(AbstractStrategy):
             previous_not_overbought = rsi.shift(1) <= overbought
             sell_signals = current_overbought & previous_not_overbought
             
-            # Store calculated indicators for visualization and analysis
+            # Store calculated indicators for charting and analysis
             self.indicators = {
                 'rsi': rsi,
                 'oversold_line': pd.Series(oversold, index=data.index, name='Oversold'),
@@ -376,7 +376,7 @@ class RSIStrategy(AbstractStrategy):
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Get calculated technical indicators for visualization and analysis.
+        Get calculated technical indicators for charting and analysis.
         
         Returns the RSI values and threshold lines that were calculated during
         signal generation. This data can be used for plotting charts or further

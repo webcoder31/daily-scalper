@@ -18,16 +18,14 @@ Example:
     >>> print(f"Loaded {len(data)} data points")
 """
 
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 from pathlib import Path
 import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
-import os
-import logging
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

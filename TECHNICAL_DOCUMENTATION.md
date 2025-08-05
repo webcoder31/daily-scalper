@@ -76,9 +76,9 @@ trading-strategy-backtester/
 ├── logging/                              # Application logging
 │   ├── __init__.py
 │   └── logging_manager.py                # Logging configuration manager
-└── visualization/                        # Chart generation
+└── charting/                             # Chart generation
     ├── __init__.py
-    └── backtest_chart_generator.py       # Interactive visualizations
+    └── backtest_chart_builder.py         # Interactive chart builder
 ```
 
 ---
@@ -101,7 +101,7 @@ The central orchestrator that coordinates all backtesting operations.
 - `BacktestEngine` for backtest execution
 - `PerformanceAnalyzer` for metrics calculation
 - `MarketDataProvider` for data loading
-- `BacktestChartGenerator` for visualization
+- `BacktestChartBuilder` for charting
 - `StrategyArchiver` for result storage
 
 ### Strategy System
@@ -202,17 +202,17 @@ Handles cryptocurrency data fetching, caching, and validation.
 - Configurable cache expiration
 - Support for multiple timeframes
 
-### Visualization
+### Charting
 
-#### BacktestChartGenerator
+#### BacktestChartBuilder
 
-**Location**: [`visualization/backtest_chart_generator.py`](visualization/backtest_chart_generator.py)
+**Location**: [`charting/backtest_chart_builder.py`](charting/backtest_chart_builder.py)
 
 Creates interactive charts using Plotly for strategy analysis.
 
 **Key Methods**:
-- `generate_backtest_chart()` - Create comprehensive strategy charts
-- `display_all_charts()` - Show complete visualization suite
+- `create_backtest_charts()` - Create comprehensive strategy charts
+- `display_charts()` - Show complete chart suite
 - Chart generation with buy/sell signals, indicators, and performance metrics
 
 ### Persistence
@@ -293,7 +293,7 @@ setup_application_logging(
 3. **Signal Generation**: `strategy.generate_signals(data)`
 4. **Backtest Execution**: `BacktestEngine.execute_strategy_evaluation()`
 5. **Metrics Calculation**: `PerformanceAnalyzer.compute_extended_performance_stats()`
-6. **Visualization**: `BacktestChartGenerator.display_all_charts()`
+6. **Charting**: `BacktestChartBuilder.display_charts()`
 7. **Persistence**: `StrategyArchiver.persist_strategy_results()` (if profitable)
 
 ### Strategy Comparison
@@ -432,7 +432,7 @@ Add new metrics to `PerformanceAnalyzer` for specialized analysis requirements.
 
 ### Enhanced Visualizations
 
-Extend `BacktestChartGenerator` with additional chart types and indicators.
+Extend `BacktestChartBuilder` with additional chart types and indicators.
 
 ### Alternative UI Interfaces
 

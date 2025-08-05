@@ -41,7 +41,7 @@ import readchar
 from ui.theme import THEME
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

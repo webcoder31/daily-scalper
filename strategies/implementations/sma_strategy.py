@@ -169,7 +169,7 @@ class SMAStrategy(AbstractStrategy):
             previous_bearish = sma_short.shift(1) >= sma_long.shift(1)
             sell_signals = current_bearish & previous_bearish
             
-            # Store calculated indicators for visualization and analysis
+            # Store calculated indicators for charting and analysis
             self.indicators = {
                 'sma_short': sma_short,
                 'sma_long': sma_long,
@@ -283,7 +283,7 @@ class SMAStrategy(AbstractStrategy):
     
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Get calculated technical indicators for visualization and analysis.
+        Get calculated technical indicators for charting and analysis.
         
         Returns the moving averages and related data that were calculated during
         signal generation. This data can be used for plotting charts or further

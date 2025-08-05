@@ -3,7 +3,7 @@ Global configuration for the Trading Strategy Backtester application.
 
 This module contains all configuration constants and settings used throughout
 the application, including backtest parameters, data retrieval settings,
-profitability criteria, and visualization options.
+profitability criteria, and charting options.
 """
 
 from typing import Dict, List, Union, Any
@@ -63,14 +63,14 @@ Contains:
 """
 
 
-VISUALIZATION_CONFIG: ConfigDict = {
+CHARTING_CONFIG: ConfigDict = {
     'default_height': 800,
     'show_volume': True,
     'show_signals': True,
     'show_indicators': True,
 }
 """
-Configuration settings for chart visualization.
+Configuration settings for chart creation.
 
 Contains:
     default_height: Default height of charts in pixels
@@ -123,14 +123,14 @@ def get_profitability_criteria() -> CriteriaDict:
     return PROFITABILITY_CRITERIA.copy()
 
 
-def get_visualization_config() -> ConfigDict:
+def get_charting_config() -> ConfigDict:
     """
-    Get the visualization configuration.
+    Get the charting configuration.
     
     Returns:
-        Dictionary containing visualization configuration parameters.
+        Dictionary containing charting configuration parameters.
     """
-    return VISUALIZATION_CONFIG.copy()
+    return CHARTING_CONFIG.copy()
 
 
 def get_popular_symbols() -> List[str]:

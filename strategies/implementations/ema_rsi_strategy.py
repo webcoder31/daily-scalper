@@ -263,7 +263,7 @@ class EMARSIStrategy(AbstractStrategy):
             # Sell signal: EMA bearish crossover OR RSI below exit threshold
             sell_signals = ema_bearish_crossover | (rsi < rsi_exit_threshold)
             
-            # Store calculated indicators for visualization and analysis
+            # Store calculated indicators for charting and analysis
             self.indicators = {
                 'ema_fast': ema_fast,
                 'ema_slow': ema_slow,
@@ -469,7 +469,7 @@ class EMARSIStrategy(AbstractStrategy):
 
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Get calculated technical indicators for visualization and analysis.
+        Get calculated technical indicators for charting and analysis.
         
         Returns all indicators calculated during signal generation, including
         EMAs, RSI, and derived metrics that can be used for plotting charts

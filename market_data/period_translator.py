@@ -19,10 +19,9 @@ Example:
 """
 
 from typing import Dict, List, Optional, Union, Tuple
-import logging
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

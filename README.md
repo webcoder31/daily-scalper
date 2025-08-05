@@ -168,16 +168,16 @@ trading-strategy-backtester/
 ├── logging/                              # Application logging
 │   ├── __init__.py
 │   └── logging_manager.py                # Logging configuration manager
-└── visualization/                        # Chart generation
+└── charting/                             # Chart generation
     ├── __init__.py
-    └── backtest_chart_generator.py       # Interactive visualizations
+    └── backtest_chart_builder.py         # Interactive chart builder
 ```
 
 ---
 
 ## Core Components
 
-### DailyScalper (Main Application Controller)
+### TradingStrategyBacktester (Main Application Controller)
 The main application controller that orchestrates backtesting operations:
 - `execute_strategy_backtest()` - Execute single strategy backtest
 - `analyze_strategy_variants()` - Compare multiple strategy configurations
@@ -202,10 +202,10 @@ Calculates comprehensive performance metrics:
 - `sort_strategies_by_performance()` - Rank strategy performance
 - `create_detailed_analysis_report()` - Generate performance reports
 
-### BacktestChartGenerator
+### BacktestChartBuilder
 Creates interactive visualizations:
-- `generate_backtest_chart()` - Create strategy performance charts
-- `display_all_charts()` - Show comprehensive visualization suite
+- `create_backtest_charts()` - Create strategy performance charts
+- `display_charts()` - Show comprehensive chart suite
 
 ### StrategyArchiver
 Manages strategy result storage:

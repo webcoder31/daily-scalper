@@ -19,15 +19,13 @@ Example:
 """
 
 import json
-import os
-from typing import Dict, Any, List, Optional, Union, Tuple
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 from datetime import datetime
 import pandas as pd
-import logging
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 
@@ -454,24 +452,24 @@ class StrategyArchiver:
         """
         try:
             # Import here to avoid circular imports
-            from visualization.backtest_chart_generator import BacktestChartGenerator
+            from charting.backtest_chart_builder import BacktestChartBuilder
             
             # Save main chart
             main_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['main_chart']}"
-            main_fig = BacktestChartGenerator.plot_backtest_results(results)
-            main_fig.write_html(str(main_chart_path))
+            main_chart = BacktestChartBuilder.create_backtest_charts(results)
+            main_chart.write_html(str(main_chart_path))
             logger.debug(f"Main chart saved: {main_chart_path}")
             
             # Save metrics chart
             metrics_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['metrics_chart']}"
-            metrics_fig = BacktestChartGenerator.plot_performance_metrics(results)
-            metrics_fig.write_html(str(metrics_chart_path))
+            metrics_chart = BacktestChartBuilder.create_performance_metrics_chart(results)
+            metrics_chart.write_html(str(metrics_chart_path))
             logger.debug(f"Metrics chart saved: {metrics_chart_path}")
             
             # Save drawdown chart
             drawdown_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['drawdown_chart']}"
-            drawdown_fig = BacktestChartGenerator.plot_drawdown(results)
-            drawdown_fig.write_html(str(drawdown_chart_path))
+            drawdown_chart = BacktestChartBuilder.create_drawdown_chart(results)
+            drawdown_chart.write_html(str(drawdown_chart_path))
             logger.debug(f"Drawdown chart saved: {drawdown_chart_path}")
             
         except Exception as e:

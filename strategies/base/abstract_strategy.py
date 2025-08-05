@@ -320,7 +320,7 @@ class AbstractStrategy(ABC):
 
     def get_indicators(self) -> Dict[str, pd.Series]:
         """
-        Get calculated technical indicators for visualization purposes.
+        Get calculated technical indicators for charting purposes.
         
         This method returns any technical indicators that were calculated
         during signal generation and can be used for plotting or analysis.

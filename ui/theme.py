@@ -21,12 +21,11 @@ Example:
     >>> custom_color = manager.get_color("primary")
 """
 
-from typing import Dict, List, Optional, Union, Any, Set
-import logging
+from typing import Dict, List, Optional, Any, Set
 from enum import Enum
 
 # Configure logging
-from logging.logging_manager import get_logger
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 

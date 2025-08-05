@@ -1,45 +1,43 @@
 """
-Interactive visualization module for cryptocurrency trading strategy backtests.
+Charting module for cryptocurrency trading strategy backtests.
 
-This module provides comprehensive visualization capabilities for backtest results
+This module provides comprehensive charting capabilities for backtest results
 using Plotly. It includes interactive charts for price data, portfolio performance,
 technical indicators, and performance metrics with robust error handling and
 customization options.
 
 Classes:
-    BacktestChartGenerator: Main class for creating interactive visualizations
-    VisualizationError: Custom exception for visualization errors
+    BacktestChartBuilder: Main class for creating interactive charts.
+    ChartError: Custom exception for chart errors
     ChartConfigurationError: Custom exception for chart configuration errors
-    DataVisualizationError: Custom exception for data visualization errors
+    ChartDataError: Custom exception for chart data errors
 
 Example:
-    >>> from visualization.backtest_chart_generator import BacktestChartGenerator
-    >>> visualizer = BacktestChartGenerator()
-    >>> fig = visualizer.plot_backtest_results(backtest_results)
-    >>> fig.show()
+    >>> from charting.backtest_chart_builder import BacktestChartBuilder
+    >>> chart_builder = BacktestChartBuilder()
+    >>> chart = chart_builder.create_backtest_charts(backtest_results)
+    >>> chart.show()
 """
 
-from typing import Dict, Any, Optional, List, Union, Tuple
+from typing import Dict, Any, Optional, List
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import plotly.express as px
+import plotly.express as px # Not used for now, but can be useful for future enhancements 
 import numpy as np
-import logging
-from datetime import datetime
 
-# Configure logging
-from logging.logging_manager import get_logger
+# Configure logging - use absolute import to avoid local logging module conflict
+from logger.logging_manager import get_logger
 logger = get_logger(__name__)
 
 
-class VisualizationError(Exception):
-    """Exception raised when visualization operations fail."""
+class ChartError(Exception):
+    """Exception raised when chart operations fail."""
     
 
     def __init__(self, message: str, chart_type: Optional[str] = None, cause: Optional[Exception] = None) -> None:
         """
-        Initialize VisualizationError.
+        Initialize ChartError.
         
         Args:
             message: Error message describing the issue.
@@ -69,13 +67,13 @@ class ChartConfigurationError(Exception):
         super().__init__(message)
 
 
-class DataVisualizationError(Exception):
-    """Exception raised when data preparation for visualization fails."""
+class ChartDataError(Exception):
+    """Exception raised when data preparation for chart creation fails."""
     
 
     def __init__(self, message: str, data_type: Optional[str] = None, cause: Optional[Exception] = None) -> None:
         """
-        Initialize DataVisualizationError.
+        Initialize ChartDataError.
         
         Args:
             message: Error message describing the data issue.
@@ -87,11 +85,11 @@ class DataVisualizationError(Exception):
         super().__init__(message)
 
 
-class BacktestChartGenerator:
+class BacktestChartBuilder:
     """
-    Class for creating interactive visualizations of cryptocurrency trading backtest results.
+    Class for creating interactive charts of cryptocurrency trading backtest results.
     
-    This class provides comprehensive visualization capabilities including candlestick charts,
+    This class provides comprehensive charting capabilities including candlestick charts,
     portfolio performance tracking, technical indicators, performance metrics, and drawdown
     analysis. All charts are interactive and built using Plotly with professional styling
     and robust error handling.
@@ -102,10 +100,10 @@ class BacktestChartGenerator:
         SUBPLOT_SPACING: Default spacing between subplots.
         
     Example:
-        >>> visualizer = BacktestChartGenerator()
-        >>> main_chart = visualizer.plot_backtest_results(results)
-        >>> metrics_chart = visualizer.plot_performance_metrics(results)
-        >>> drawdown_chart = visualizer.plot_drawdown(results)
+        >>> chart_builder = BacktestChartBuilder()
+        >>> main_chart = chart_builder.create_backtest_charts(results)
+        >>> metrics_chart = chart_builder.create_performance_metrics_chart(results)
+        >>> drawdown_chart = chart_builder.create_drawdown_chart(results)
     """
     
     # Default color scheme for consistent chart styling
@@ -130,7 +128,7 @@ class BacktestChartGenerator:
     
 
     @staticmethod
-    def plot_backtest_results(
+    def create_backtest_charts(
         results: Dict[str, Any],
         show_signals: bool = True,
         show_indicators: bool = True
@@ -147,8 +145,8 @@ class BacktestChartGenerator:
             Interactive Plotly figure.
             
         Raises:
-            VisualizationError: If chart creation fails.
-            DataVisualizationError: If required data is missing.
+            ChartError: If chart creation fails.
+            ChartDataError: If required data is missing.
         """
         try:
             # Validate required data
@@ -156,7 +154,7 @@ class BacktestChartGenerator:
             missing_fields = [field for field in required_fields if field not in results]
             
             if missing_fields:
-                raise DataVisualizationError(
+                raise ChartDataError(
                     f"Missing required fields: {missing_fields}",
                     data_type="backtest_results"
                 )
@@ -169,13 +167,13 @@ class BacktestChartGenerator:
             
             # Validate data types
             if not isinstance(data, pd.DataFrame) or data.empty:
-                raise DataVisualizationError(
+                raise ChartDataError(
                     "Data must be a non-empty pandas DataFrame",
                     data_type="price_data"
                 )
             
             # Create subplots
-            fig = make_subplots(
+            chart = make_subplots(
                 rows=3, cols=1,
                 shared_xaxes=True,
                 vertical_spacing=0.05,
@@ -184,7 +182,7 @@ class BacktestChartGenerator:
             )
             
             # Add candlestick chart
-            fig.add_trace(
+            chart.add_trace(
                 go.Candlestick(
                     x=data.index,
                     open=data['Open'],
@@ -204,7 +202,7 @@ class BacktestChartGenerator:
                     indicators = results['strategy_instance'].get_indicators()
                     for name, indicator in indicators.items():
                         if isinstance(indicator, (pd.Series, np.ndarray)) and len(indicator) == len(data):
-                            fig.add_trace(
+                            chart.add_trace(
                                 go.Scatter(
                                     x=data.index,
                                     y=indicator,
@@ -222,7 +220,7 @@ class BacktestChartGenerator:
                 if isinstance(buy_signals, pd.Series) and buy_signals.any():
                     buy_points = data[buy_signals]
                     if not buy_points.empty:
-                        fig.add_trace(
+                        chart.add_trace(
                             go.Scatter(
                                 x=buy_points.index,
                                 y=buy_points['Close'],
@@ -243,7 +241,7 @@ class BacktestChartGenerator:
                 if isinstance(sell_signals, pd.Series) and sell_signals.any():
                     sell_points = data[sell_signals]
                     if not sell_points.empty:
-                        fig.add_trace(
+                        chart.add_trace(
                             go.Scatter(
                                 x=sell_points.index,
                                 y=sell_points['Close'],
@@ -263,7 +261,7 @@ class BacktestChartGenerator:
             # Add portfolio value
             try:
                 portfolio_value = portfolio.value()
-                fig.add_trace(
+                chart.add_trace(
                     go.Scatter(
                         x=portfolio_value.index,
                         y=portfolio_value.values,
@@ -276,7 +274,7 @@ class BacktestChartGenerator:
                 
                 # Add initial capital reference line
                 initial_cash = results.get('parameters', {}).get('initial_cash', 10000)
-                fig.add_hline(
+                chart.add_hline(
                     y=initial_cash,
                     line_dash="dash",
                     line_color="#7f7f7f",
@@ -285,7 +283,7 @@ class BacktestChartGenerator:
                 )
             except Exception as e:
                 logger.error(f"Failed to add portfolio chart: {e}")
-                raise VisualizationError(
+                raise ChartError(
                     f"Failed to create portfolio chart: {str(e)}",
                     chart_type="portfolio",
                     cause=e
@@ -293,7 +291,7 @@ class BacktestChartGenerator:
             
             # Add volume chart
             if 'Volume' in data.columns:
-                fig.add_trace(
+                chart.add_trace(
                     go.Bar(
                         x=data.index,
                         y=data['Volume'],
@@ -308,7 +306,7 @@ class BacktestChartGenerator:
             total_return = results.get('metrics', {}).get('total_return', 0)
             strategy_name = strategy.get('name', 'Unknown Strategy')
             
-            fig.update_layout(
+            chart.update_layout(
                 title=f"Backtest: {strategy_name} - Return: {total_return:.2%}",
                 height=800,
                 showlegend=True,
@@ -317,20 +315,20 @@ class BacktestChartGenerator:
             )
             
             # Update axes
-            fig.update_yaxes(title_text="Price ($)", row=1, col=1)
-            fig.update_yaxes(title_text="Value ($)", row=2, col=1)
-            fig.update_yaxes(title_text="Volume", row=3, col=1)
+            chart.update_yaxes(title_text="Price ($)", row=1, col=1)
+            chart.update_yaxes(title_text="Value ($)", row=2, col=1)
+            chart.update_yaxes(title_text="Volume", row=3, col=1)
             
             # Remove range selector for candlestick
-            fig.update_layout(xaxis_rangeslider_visible=False)
+            chart.update_layout(xaxis_rangeslider_visible=False)
             
             logger.info(f"Backtest chart created successfully for {strategy_name}")
-            return fig
+            return chart
             
-        except (VisualizationError, DataVisualizationError):
+        except (ChartError, ChartDataError):
             raise
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Unexpected error creating backtest chart: {str(e)}",
                 chart_type="backtest_results",
                 cause=e
@@ -338,7 +336,7 @@ class BacktestChartGenerator:
     
 
     @staticmethod
-    def plot_performance_metrics(results: Dict[str, Any]) -> go.Figure:
+    def create_performance_metrics_chart(results: Dict[str, Any]) -> go.Figure:
         """
         Create a radar chart of performance metrics.
         
@@ -349,12 +347,12 @@ class BacktestChartGenerator:
             Interactive Plotly figure with performance metrics.
             
         Raises:
-            VisualizationError: If metrics chart creation fails.
-            DataVisualizationError: If metrics data is invalid.
+            ChartError: If metrics chart creation fails.
+            ChartDataError: If metrics data is invalid.
         """
         try:
             if 'metrics' not in results:
-                raise DataVisualizationError(
+                raise ChartDataError(
                     "Results must contain 'metrics' field",
                     data_type="performance_metrics"
                 )
@@ -370,19 +368,19 @@ class BacktestChartGenerator:
                 'Alpha vs B&H'
             ]
             
-            # Normalize values to 0-100 scale for better visualization
+            # Normalize values to 0-100 scale for better display
             values = [
                 min(max(metrics.get('total_return', 0) * 100, -100), 100) + 100,  # Scale to 0-200
                 min(max(metrics.get('sharpe_ratio', 0) * 20, -100), 100) + 100,   # Scale and shift
-                metrics.get('win_rate', 0) * 100,                                  # Already 0-1
+                metrics.get('win_rate', 0) * 100,                                 # Already 0-1
                 min(metrics.get('profit_factor', 0) * 20, 100),                   # Scale down
-                min(max((metrics.get('alpha', 0) + 0.5) * 100, 0), 100)          # Shift and scale
+                min(max((metrics.get('alpha', 0) + 0.5) * 100, 0), 100)           # Shift and scale
             ]
             
             # Create radar chart
-            fig = go.Figure()
+            chart = go.Figure()
             
-            fig.add_trace(go.Scatterpolar(
+            chart.add_trace(go.Scatterpolar(
                 r=values,
                 theta=categories,
                 fill='toself',
@@ -391,7 +389,7 @@ class BacktestChartGenerator:
                 fillcolor='rgba(31, 119, 180, 0.2)'
             ))
             
-            fig.update_layout(
+            chart.update_layout(
                 polar=dict(
                     radialaxis=dict(
                         visible=True,
@@ -405,12 +403,12 @@ class BacktestChartGenerator:
             )
             
             logger.info("Performance metrics radar chart created successfully")
-            return fig
+            return chart
             
-        except (VisualizationError, DataVisualizationError):
+        except (ChartError, ChartDataError):
             raise
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Unexpected error creating performance metrics chart: {str(e)}",
                 chart_type="performance_metrics",
                 cause=e
@@ -418,7 +416,7 @@ class BacktestChartGenerator:
     
 
     @staticmethod
-    def plot_drawdown(results: Dict[str, Any]) -> go.Figure:
+    def create_drawdown_chart(results: Dict[str, Any]) -> go.Figure:
         """
         Create a drawdown chart showing portfolio drawdown over time.
         
@@ -429,12 +427,12 @@ class BacktestChartGenerator:
             Interactive Plotly figure showing drawdown evolution.
             
         Raises:
-            VisualizationError: If drawdown chart creation fails.
-            DataVisualizationError: If portfolio data is invalid.
+            ChartError: If drawdown chart creation fails.
+            ChartDataError: If portfolio data is invalid.
         """
         try:
             if 'portfolio' not in results:
-                raise DataVisualizationError(
+                raise ChartDataError(
                     "Results must contain 'portfolio' field",
                     data_type="portfolio"
                 )
@@ -446,15 +444,15 @@ class BacktestChartGenerator:
                 drawdown = portfolio.drawdown()
                 
                 if drawdown.empty:
-                    raise DataVisualizationError(
+                    raise ChartDataError(
                         "Portfolio drawdown data is empty",
                         data_type="drawdown"
                     )
                 
                 # Create drawdown chart
-                fig = go.Figure()
+                chart = go.Figure()
                 
-                fig.add_trace(go.Scatter(
+                chart.add_trace(go.Scatter(
                     x=drawdown.index,
                     y=drawdown.values * 100,  # Convert to percentage
                     fill='tonexty',
@@ -464,7 +462,7 @@ class BacktestChartGenerator:
                     hovertemplate='Drawdown: %{y:.2f}%<br>Date: %{x}<extra></extra>'
                 ))
                 
-                fig.update_layout(
+                chart.update_layout(
                     title="Portfolio Drawdown Evolution",
                     xaxis_title="Date",
                     yaxis_title="Drawdown (%)",
@@ -473,11 +471,11 @@ class BacktestChartGenerator:
                 )
                 
                 # Add reference line at 0
-                fig.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")
+                chart.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")
                 
                 # Calculate max drawdown for annotation
                 max_drawdown = drawdown.min() * 100
-                fig.add_annotation(
+                chart.add_annotation(
                     text=f"Max Drawdown: {max_drawdown:.2f}%",
                     xref="paper", yref="paper",
                     x=0.02, y=0.98,
@@ -488,25 +486,25 @@ class BacktestChartGenerator:
                 )
                 
                 logger.info("Drawdown chart created successfully")
-                return fig
+                return chart
                 
             except AttributeError:
                 # Portfolio doesn't have drawdown method
-                raise DataVisualizationError(
+                raise ChartDataError(
                     "Portfolio object must have a 'drawdown' method",
                     data_type="portfolio_methods"
                 )
             except Exception as e:
-                raise VisualizationError(
+                raise ChartError(
                     f"Failed to calculate or plot drawdown: {str(e)}",
                     chart_type="drawdown",
                     cause=e
                 ) from e
                 
-        except (VisualizationError, DataVisualizationError):
+        except (ChartError, ChartDataError):
             raise
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Unexpected error creating drawdown chart: {str(e)}",
                 chart_type="drawdown",
                 cause=e
@@ -514,7 +512,7 @@ class BacktestChartGenerator:
     
 
     @staticmethod
-    def show_all_plots(results: Dict[str, Any]) -> None:
+    def display_charts(results: Dict[str, Any]) -> None:
         """
         Display all performance charts in sequence.
         
@@ -522,18 +520,18 @@ class BacktestChartGenerator:
             results: Dictionary containing complete backtest results.
             
         Raises:
-            VisualizationError: If any chart creation fails.
+            ChartError: If any chart creation fails.
             
         Example:
-            >>> Visualizer.show_all_plots(backtest_results)
+            >>> BacktestChartBuilder.display_charts(backtest_results)
         """
         try:
             logger.info("Displaying all performance charts")
             
             # Main backtest chart
             try:
-                main_fig = BacktestChartGenerator.plot_backtest_results(results)
-                main_fig.show()
+                main_chart = BacktestChartBuilder.create_backtest_charts(results)
+                main_chart.show()
                 logger.debug("Main backtest chart displayed")
             except Exception as e:
                 logger.error(f"Failed to display main chart: {e}")
@@ -541,8 +539,8 @@ class BacktestChartGenerator:
 
             # Performance metrics chart
             try:
-                metrics_fig = BacktestChartGenerator.plot_performance_metrics(results)
-                metrics_fig.show()
+                metrics_chart = BacktestChartBuilder.create_performance_metrics_chart(results)
+                metrics_chart.show()
                 logger.debug("Performance metrics chart displayed")
             except Exception as e:
                 logger.warning(f"Failed to display metrics chart: {e}")
@@ -550,8 +548,8 @@ class BacktestChartGenerator:
 
             # Drawdown chart
             try:
-                drawdown_fig = BacktestChartGenerator.plot_drawdown(results)
-                drawdown_fig.show()
+                drawdown_chart = BacktestChartBuilder.create_drawdown_chart(results)
+                drawdown_chart.show()
                 logger.debug("Drawdown chart displayed")
             except Exception as e:
                 logger.warning(f"Failed to display drawdown chart: {e}")
@@ -560,7 +558,7 @@ class BacktestChartGenerator:
             logger.info("All charts displayed successfully")
             
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Failed to display all charts: {str(e)}",
                 chart_type="all_plots",
                 cause=e
@@ -585,14 +583,14 @@ class BacktestChartGenerator:
             Interactive Plotly figure comparing multiple strategies.
             
         Raises:
-            VisualizationError: If comparison chart creation fails.
+            ChartError: If comparison chart creation fails.
             ValueError: If invalid parameters are provided.
             
         Example:
             >>> comparison_fig = Visualizer.create_comparison_chart(
             ...     [results1, results2], metric='portfolio_value'
             ... )
-            >>> comparison_fig.show()
+            >>> comparison_chart.show()
         """
         try:
             if not isinstance(results_list, list) or len(results_list) < 2:
@@ -601,7 +599,7 @@ class BacktestChartGenerator:
             if metric not in ['portfolio_value', 'drawdown']:
                 raise ValueError("metric must be 'portfolio_value' or 'drawdown'")
             
-            fig = go.Figure()
+            chart = go.Figure()
             colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
             
             for i, results in enumerate(results_list):
@@ -611,7 +609,7 @@ class BacktestChartGenerator:
                     
                     if metric == 'portfolio_value':
                         portfolio_value = results['portfolio'].value()
-                        fig.add_trace(go.Scatter(
+                        chart.add_trace(go.Scatter(
                             x=portfolio_value.index,
                             y=portfolio_value.values,
                             name=strategy_name,
@@ -621,7 +619,7 @@ class BacktestChartGenerator:
                     
                     elif metric == 'drawdown':
                         drawdown = results['portfolio'].drawdown() * 100
-                        fig.add_trace(go.Scatter(
+                        chart.add_trace(go.Scatter(
                             x=drawdown.index,
                             y=drawdown.values,
                             name=strategy_name,
@@ -637,7 +635,7 @@ class BacktestChartGenerator:
             chart_title = title or f"Strategy Comparison - {metric.replace('_', ' ').title()}"
             y_title = "Portfolio Value ($)" if metric == 'portfolio_value' else "Drawdown (%)"
             
-            fig.update_layout(
+            chart.update_layout(
                 title=chart_title,
                 xaxis_title="Date",
                 yaxis_title=y_title,
@@ -647,15 +645,15 @@ class BacktestChartGenerator:
             )
             
             if metric == 'drawdown':
-                fig.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")
+                chart.add_hline(y=0, line_dash="dash", line_color="#7f7f7f")
             
             logger.info(f"Comparison chart created for {len(results_list)} strategies")
-            return fig
+            return chart
             
-        except (ValueError, VisualizationError):
+        except (ValueError, ChartError):
             raise
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Unexpected error creating comparison chart: {str(e)}",
                 chart_type="comparison",
                 cause=e
@@ -663,8 +661,8 @@ class BacktestChartGenerator:
     
     
     @staticmethod
-    def save_chart(
-        fig: go.Figure,
+    def save_chart_to_html_file(
+        chart: go.Figure,
         filename: str,
         format: str = 'html',
         width: Optional[int] = None,
@@ -674,7 +672,7 @@ class BacktestChartGenerator:
         Save a Plotly figure to file.
         
         Args:
-            fig: Plotly figure to save.
+            chart: Plotly figure to save.
             filename: Output filename (without extension).
             format: Output format ('html', 'png', 'pdf', 'svg').
             width: Image width for static formats (optional).
@@ -684,12 +682,12 @@ class BacktestChartGenerator:
             Path to the saved file.
             
         Raises:
-            VisualizationError: If saving fails.
+            ChartError: If saving fails.
             ValueError: If invalid parameters are provided.
             
         Example:
-            >>> fig = visualizer.plot_backtest_results(results)
-            >>> saved_path = Visualizer.save_chart(fig, "backtest_chart", "html")
+            >>> chart = chart_builder.create_backtest_charts(results)
+            >>> saved_path = BacktestChartBuilder.save_chart_to_html_file(chart, "backtest_chart", "html")
         """
         try:
             if not isinstance(filename, str) or not filename.strip():
@@ -702,18 +700,18 @@ class BacktestChartGenerator:
             full_filename = f"{filename.strip()}.{format}"
             
             if format == 'html':
-                fig.write_html(full_filename)
+                chart.write_html(full_filename)
             else:
                 # For static formats, use write_image (requires kaleido)
                 try:
-                    fig.write_image(
+                    chart.write_image(
                         full_filename,
                         width=width,
                         height=height,
                         format=format
                     )
                 except Exception as e:
-                    raise VisualizationError(
+                    raise ChartError(
                         f"Failed to save static image. Make sure 'kaleido' is installed: {str(e)}",
                         chart_type="static_export",
                         cause=e
@@ -722,10 +720,10 @@ class BacktestChartGenerator:
             logger.info(f"Chart saved successfully: {full_filename}")
             return full_filename
             
-        except (ValueError, VisualizationError):
+        except (ValueError, ChartError):
             raise
         except Exception as e:
-            raise VisualizationError(
+            raise ChartError(
                 f"Unexpected error saving chart: {str(e)}",
                 chart_type="save_operation",
                 cause=e

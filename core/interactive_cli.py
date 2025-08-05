@@ -22,7 +22,7 @@ from config import (
     DEFAULT_BACKTEST_CONFIG,
     DEFAULT_DATA_CONFIG,
     PROFITABILITY_CRITERIA,
-    VISUALIZATION_CONFIG,
+    CHARTING_CONFIG,
     POPULAR_CRYPTO_SYMBOLS
 )
 from core.strategy_backtester import StrategyBacktester, TradingStrategyBacktesterError
@@ -39,7 +39,7 @@ from strategies.base.strategy_registry import (
     get_strategy_parameter_info
 )
 from ui.theme import THEME
-from logging.logging_manager import setup_application_logging, LoggingManager
+from logger.logging_manager import setup_application_logging, LoggingManager
 
 # Console configuration
 UI_WIDTH: int = 100
@@ -98,7 +98,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
     Interactive menu for testing a single trading strategy configuration.
     
     This function guides the user through selecting a strategy, configuring
-    parameters, and executing a backtest with optional visualization and saving.
+    parameters, and executing a backtest with optional charts and saving.
     
     Args:
         app: The StrategyBacktester application instance.
@@ -371,74 +371,74 @@ def handle_configuration_display() -> None:
 
     try:
         # Backtest configuration table
-        backtest_table = ui_modern_table("Backtest Parameters")
-        backtest_table.add_column("Parameter", width=48)
-        backtest_table.add_column("Value", justify="right", style="bold", width=48)
+        backtest_config_table = ui_modern_table("Backtest Parameters")
+        backtest_config_table.add_column("Parameter", width=48)
+        backtest_config_table.add_column("Value", justify="right", style="bold", width=48)
 
-        backtest_table.add_row(
+        backtest_config_table.add_row(
             "Initial Capital", 
             f"{DEFAULT_BACKTEST_CONFIG['initial_cash']:,.2f} USD"
         )
-        backtest_table.add_row(
+        backtest_config_table.add_row(
             "Commission", 
             f"{DEFAULT_BACKTEST_CONFIG['commission']:.3f} "
             f"({DEFAULT_BACKTEST_CONFIG['commission']*100:.1f}%)"
         )
-        backtest_table.add_row(
+        backtest_config_table.add_row(
             "Slippage", 
             f"{DEFAULT_BACKTEST_CONFIG['slippage']:.4f} "
             f"({DEFAULT_BACKTEST_CONFIG['slippage']*100:.2f}%)"
         )
 
-        console.print(backtest_table)
+        console.print(backtest_config_table)
 
         # Data configuration table
-        data_table = ui_modern_table("Data Configuration")
-        data_table.add_column("Parameter", width=48)
-        data_table.add_column("Value", justify="right", style="bold", width=48)
+        data_config_table = ui_modern_table("Data Configuration")
+        data_config_table.add_column("Parameter", width=48)
+        data_config_table.add_column("Value", justify="right", style="bold", width=48)
 
-        data_table.add_row(
+        data_config_table.add_row(
             "Default Symbol", 
             DEFAULT_DATA_CONFIG['default_symbol']
         )
-        data_table.add_row(
+        data_config_table.add_row(
             "Default Period",
             PeriodTranslator.get_period_description(DEFAULT_DATA_CONFIG['default_period'])
         )
-        data_table.add_row(
+        data_config_table.add_row(
             "Cache Enabled", 
             'Yes' if DEFAULT_DATA_CONFIG['cache_enabled'] else 'No'
         )
-        data_table.add_row(
+        data_config_table.add_row(
             "Cache Duration", 
             f"{DEFAULT_DATA_CONFIG['cache_max_age_hours']} hours"
         )
 
-        console.print(data_table)
+        console.print(data_config_table)
 
         # Profitability criteria table
-        profit_table = ui_modern_table("Profitability Criteria")
-        profit_table.add_column("Criterion", width=48)
-        profit_table.add_column("Value", justify="right", style="bold", width=48)
+        profitability_criteria_table = ui_modern_table("Profitability Criteria")
+        profitability_criteria_table.add_column("Criterion", width=48)
+        profitability_criteria_table.add_column("Value", justify="right", style="bold", width=48)
 
-        profit_table.add_row(
+        profitability_criteria_table.add_row(
             "Minimum Return", 
             f"{PROFITABILITY_CRITERIA['min_return']:.1%}"
         )
-        profit_table.add_row(
+        profitability_criteria_table.add_row(
             "Minimum Sharpe Ratio", 
             f"{PROFITABILITY_CRITERIA['min_sharpe']:.1f}"
         )
-        profit_table.add_row(
+        profitability_criteria_table.add_row(
             "Maximum Drawdown", 
             f"{PROFITABILITY_CRITERIA['max_drawdown']:.1%}"
         )
-        profit_table.add_row(
+        profitability_criteria_table.add_row(
             "Minimum Trades", 
             f"{PROFITABILITY_CRITERIA['min_trades']}"
         )
 
-        console.print(profit_table)
+        console.print(profitability_criteria_table)
 
         # Configuration modification instructions
         console.print(
