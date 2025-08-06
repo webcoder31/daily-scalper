@@ -460,12 +460,18 @@ class BacktestEngine:
             returns = portfolio.returns()
             volatility = returns.std() * np.sqrt(252) if len(returns) > 0 else 0.0
             
+            # Calculate winning and losing trades
+            winning_trades = trades.winning.count() if total_trades > 0 else 0
+            losing_trades = trades.losing.count() if total_trades > 0 else 0
+            
             metrics = {
                 'total_return': float(total_return) if not pd.isna(total_return) else 0.0,
                 'sharpe_ratio': float(sharpe_ratio) if not pd.isna(sharpe_ratio) else 0.0,
                 'max_drawdown': float(max_drawdown) if not pd.isna(max_drawdown) else 0.0,
                 'win_rate': float(win_rate) if not pd.isna(win_rate) else 0.0,
                 'total_trades': int(total_trades),
+                'winning_trades': int(winning_trades),
+                'losing_trades': int(losing_trades),
                 'avg_trade_duration': float(avg_trade_duration) if not pd.isna(avg_trade_duration) else 0.0,
                 'profit_factor': float(profit_factor) if not pd.isna(profit_factor) else 0.0,
                 'buy_hold_return': float(buy_hold_return),
@@ -498,6 +504,8 @@ class BacktestEngine:
             'max_drawdown': 0.0,
             'win_rate': 0.0,
             'total_trades': 0,
+            'winning_trades': 0,
+            'losing_trades': 0,
             'avg_trade_duration': 0.0,
             'profit_factor': 0.0,
             'buy_hold_return': 0.0,
