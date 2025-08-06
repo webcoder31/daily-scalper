@@ -100,7 +100,7 @@ def get_strategy_names() -> List[str]:
     """
     Get human-readable names of all registered strategies.
     
-    Returns the display labels (from get_label() method) of all registered
+    Returns the display labels (from get_name() method) of all registered
     strategies, which are more user-friendly than class names.
     
     Returns:
@@ -113,7 +113,7 @@ def get_strategy_names() -> List[str]:
         names = []
         for strategy_class in STRATEGY_REGISTRY.values():
             try:
-                label = strategy_class.get_label()
+                label = strategy_class.get_name()
                 names.append(label)
             except Exception as e:
                 logger.warning(f"Failed to get label for {strategy_class.__name__}: {e}")
@@ -129,7 +129,7 @@ def get_strategy_classes() -> Dict[str, Type[AbstractStrategy]]:
     """
     Get all registered strategy classes mapped by their display labels.
     
-    Creates a mapping from user-friendly strategy names (from get_label())
+    Creates a mapping from user-friendly strategy names (from get_name())
     to their corresponding strategy classes.
     
     Returns:
@@ -146,7 +146,7 @@ def get_strategy_classes() -> Dict[str, Type[AbstractStrategy]]:
         label_to_class = {}
         for strategy_class in STRATEGY_REGISTRY.values():
             try:
-                label = strategy_class.get_label()
+                label = strategy_class.get_name()
                 label_to_class[label] = strategy_class
             except Exception as e:
                 logger.warning(f"Failed to get label for {strategy_class.__name__}: {e}")
@@ -164,7 +164,7 @@ def get_strategy_class(name: str) -> Optional[Type[AbstractStrategy]]:
     Get a strategy class by its display label.
     
     Looks up a strategy class using its user-friendly display name
-    (from the get_label() method).
+    (from the get_name() method).
     
     Args:
         name: Display label of the strategy to find.
@@ -403,7 +403,7 @@ def list_registered_strategies() -> Dict[str, Dict[str, Any]]:
         try:
             info = {
                 'class_name': class_name,
-                'label': strategy_class.get_label(),
+                'label': strategy_class.get_name(),
                 'short_label': strategy_class.get_short_label(),
             }
             

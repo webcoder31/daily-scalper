@@ -231,15 +231,15 @@ class AbstractStrategy(ABC):
 
 
     @classmethod
-    def get_label(cls) -> str:
+    def get_name(cls) -> str:
         """
-        Get the full human-readable label of the strategy.
+        Get the human-readable name of the strategy.
         
         This method should be overridden by subclasses to provide a descriptive
         name for the strategy that will be displayed in user interfaces.
         
         Returns:
-            Full strategy label string.
+            Strategy name for display in user interfaces.
         """
         return "Base Strategy"
 

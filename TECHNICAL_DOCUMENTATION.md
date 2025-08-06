@@ -324,7 +324,7 @@ setup_application_logging(
    @register_strategy
    class MyStrategy(AbstractStrategy):
        @classmethod
-       def get_label(cls) -> str:
+       def get_name(cls) -> str:
            return "My Trading Strategy"
        
        @classmethod

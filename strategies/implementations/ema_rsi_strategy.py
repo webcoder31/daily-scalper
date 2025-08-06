@@ -188,7 +188,7 @@ class EMARSIStrategy(AbstractStrategy):
         }
         
         # Initialize base class
-        super().__init__(self.get_label(), parameters)
+        super().__init__(self.get_name(), parameters)
     
 
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
@@ -341,7 +341,7 @@ class EMARSIStrategy(AbstractStrategy):
         params = self.parameters
         
         return (
-            f"{self.get_label()} combining EMA crossover with RSI momentum filtering.\n\n"
+            f"{self.get_name()} combining EMA crossover with RSI momentum filtering.\n\n"
             f"EMA Configuration:\n"
             f"• Fast EMA: {params['ema_fast']} periods\n"
             f"• Slow EMA: {params['ema_slow']} periods\n\n"
@@ -359,12 +359,12 @@ class EMARSIStrategy(AbstractStrategy):
     
 
     @classmethod
-    def get_label(cls) -> str:
+    def get_name(cls) -> str:
         """
-        Get the full human-readable label of the strategy.
+        Get the human-readable name of the strategy.
         
         Returns:
-            Full strategy name for display in user interfaces.
+            Strategy name for display in user interfaces.
         """
         return "EMA + RSI Strategy"
 
@@ -381,7 +381,7 @@ class EMARSIStrategy(AbstractStrategy):
 
 
     @classmethod
-    def get_short_description(cls, config: Optional[Dict[str, Any]] = None) -> str:
+    def get_label(cls, config: Optional[Dict[str, Any]] = None) -> str:
         """
         Get a concise description of the strategy with optional parameter details.
         

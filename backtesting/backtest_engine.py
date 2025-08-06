@@ -150,6 +150,8 @@ class BacktestEngine:
         Returns:
             Comprehensive dictionary containing:
             - strategy: Strategy configuration and parameters
+            - strategy_instance: Instance of the strategy used
+            - strategy_label: Strategy short description with parameters
             - portfolio: Vectorbt portfolio object with trade history
             - metrics: Performance metrics and risk analysis
             - data: Filtered price data used in backtesting
@@ -542,6 +544,8 @@ class BacktestEngine:
         """
         return {
             'strategy': strategy.to_dict(),
+            'strategy_instance': strategy,
+            'strategy_label': strategy.get_label(strategy.parameters),
             'portfolio': portfolio,
             'metrics': metrics,
             'data': data,

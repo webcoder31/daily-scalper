@@ -145,7 +145,7 @@ class RSIStrategy(AbstractStrategy):
         }
         
         # Initialize base class
-        super().__init__(self.get_label(), parameters)
+        super().__init__(self.get_name(), parameters)
     
 
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
@@ -286,7 +286,7 @@ class RSIStrategy(AbstractStrategy):
         overbought = self.parameters['overbought_threshold']
         
         return (
-            f"{self.get_label()} Strategy with {period}-period RSI calculation.\n\n"
+            f"{self.get_name()} Strategy with {period}-period RSI calculation.\n\n"
             f"Signal Generation:\n"
             f"• BUY: When RSI crosses below {oversold:.1f} (enters oversold territory)\n"
             f"• SELL: When RSI crosses above {overbought:.1f} (enters overbought territory)\n\n"
@@ -299,7 +299,7 @@ class RSIStrategy(AbstractStrategy):
     
 
     @classmethod
-    def get_short_description(cls, config: Optional[Dict[str, Any]] = None) -> str:
+    def get_label(cls, config: Optional[Dict[str, Any]] = None) -> str:
         """
         Get a concise description of the strategy with optional parameter details.
         
@@ -321,12 +321,12 @@ class RSIStrategy(AbstractStrategy):
     
 
     @classmethod
-    def get_label(cls) -> str:
+    def get_name(cls) -> str:
         """
-        Get the full human-readable label of the strategy.
+        Get the human-readable name of the strategy.
         
         Returns:
-            Full strategy name for display in user interfaces.
+            Strategy name for display in user interfaces.
         """
         return "Relative Strength Index"
     

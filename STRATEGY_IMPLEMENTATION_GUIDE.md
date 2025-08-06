@@ -119,9 +119,9 @@ class MACDStrategy(AbstractStrategy):
             **kwargs
         }
 
-        # NOTE: Notice the use of get_label() class method 
+        # NOTE: Notice the use of get_name() class method 
         #       to name the strategy in order to ensure consistency.
-        super().__init__(self.get_label(), parameters)
+        super().__init__(self.get_name(), parameters)
 
         # Parameter validation
         if fast_period >= slow_period:
@@ -181,7 +181,7 @@ def get_explanation(self) -> str:
     fast = self.parameters['fast_period']
     slow = self.parameters['slow_period']
     signal = self.parameters['signal_period']
-    return (f"{self.get_label()} with parameters: Fast={fast}, Slow={slow}, Signal={signal}.\n"
+    return (f"{self.get_name()} with parameters: Fast={fast}, Slow={slow}, Signal={signal}.\n"
             f"Buy when {self.get_abbreviated_name()} crosses above signal line, " 
             f"sell when {self.get_abbreviated_name()} crosses below signal line.")
 ```
@@ -223,7 +223,7 @@ def get_parameter_definitions(cls) -> Dict[str, Dict[str, Any]]:
 
 ```python
 @classmethod
-def get_label(cls) -> str:
+def get_name(cls) -> str:
     return "Moving Average Convergence Divergence"
 
 @classmethod
@@ -269,8 +269,8 @@ def get_indicators(self) -> Dict[str, pd.Series]:
 
 | Method | Description | Return Type |
 |--------|-------------|-------------|
-| `get_label` *(class method)* | Strategy label | `str` |
-| `get_abbreviated_name` *(class method)* | Strategy short label | `str` |
+| `get_name` *(class method)* | Strategy name | `str` |
+| `get_abbreviated_name` *(class method)* | Strategy short name | `str` |
 | `get_parameter_summary` *(class method)* | Short description for UI | `str` |
 | `get_parameter_definitions` *(class method)* | Define strategy parameters | `Dict[str, Dict[str, Any]]` |
 | `get_comparison_parameter_sets` *(class method)* | Default parameter sets for strategy configuration comparison | `List[Dict[str, Any]]` |
@@ -356,7 +356,7 @@ class BBStrategy(AbstractStrategy):
     """
 
     @classmethod
-    def get_label(cls) -> str:
+    def get_name(cls) -> str:
         return "Bollinger Bands"
 
     @classmethod
@@ -405,7 +405,7 @@ class BBStrategy(AbstractStrategy):
             'std_dev': std_dev,
             **kwargs
         }
-        super().__init__(self.get_label(), parameters)
+        super().__init__(self.get_name(), parameters)
         if period < 2:
             raise ValueError("Period must be at least 2")
         if std_dev <= 0:
@@ -433,7 +433,7 @@ class BBStrategy(AbstractStrategy):
         period = self.parameters['period']
         std_dev = self.parameters['std_dev']
         return (
-            f"{self.get_label()} with period={period} and std_dev={std_dev:.2f}.\n"
+            f"{self.get_name()} with period={period} and std_dev={std_dev:.2f}.\n"
             f"Buy when price crosses below lower band, " 
             f"sell when price crosses above upper band."
         )

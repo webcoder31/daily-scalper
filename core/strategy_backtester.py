@@ -264,7 +264,7 @@ class StrategyBacktester:
             - backtest_period: Period information
             - symbol: Tested cryptocurrency symbol
             - strategy_instance: Strategy object instance
-            - strategy_label: Human-readable strategy description
+            - strategy_label: Strategy short description with parameters
         
         Raises:
             DataLoadError: If data loading fails or no data is available.
@@ -331,15 +331,10 @@ class StrategyBacktester:
             # Step 3: Execute backtest
             console.print("Executing backtest...", style=THEME["table_border"])
             try:
-                results = self.backtest_engine.execute_strategy_evaluation(strategy, data)
+                results = self.backtest_engine.execute_strategy_evaluation(strategy, data, symbol=symbol)
                 console.print("✅ Backtest completed\n", style=THEME["success"])
             except Exception as e:
                 raise BacktestError(f"Backtest execution failed: {str(e)}") from e
-
-            # Add additional information to results
-            results['strategy_instance'] = strategy
-            results['strategy_label'] = strategy.get_short_description(strategy_parameters)
-            results['symbol'] = symbol
 
             # Step 4: Calculate advanced performance metrics
             console.print("Calculating advanced metrics...", style=THEME["table_border"])
@@ -448,7 +443,7 @@ class StrategyBacktester:
                     # Get strategy description for display
                     strategy_class = get_strategy_class(strategy_name)
                     if strategy_class:
-                        strategy_short_desc = strategy_class.get_short_description(strategy_parameters)
+                        strategy_short_desc = strategy_class.get_label(strategy_parameters)
                     else:
                         strategy_short_desc = ", ".join([f"{k}={v}" for k, v in strategy_parameters.items()])
 
@@ -552,7 +547,7 @@ class StrategyBacktester:
                 # Get configuration display string
                 strategy_class = get_strategy_class(strategy_name)
                 if strategy_class:
-                    config_display = strategy_class.get_short_description(params)
+                    config_display = strategy_class.get_label(params)
                 else:
                     config_display = ", ".join([f"{k}={v}" for k, v in params.items()])
 

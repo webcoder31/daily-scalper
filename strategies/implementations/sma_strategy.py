@@ -111,7 +111,7 @@ class SMAStrategy(AbstractStrategy):
         }
         
         # Initialize base class
-        super().__init__(self.get_label(), parameters)
+        super().__init__(self.get_name(), parameters)
     
 
     def generate_signals(self, data: pd.DataFrame) -> Tuple[pd.Series, pd.Series]:
@@ -197,7 +197,7 @@ class SMAStrategy(AbstractStrategy):
         long_window = self.parameters['long_window']
         
         return (
-            f"{self.get_label()} Strategy with {short_window}-period and {long_window}-period moving averages.\n\n"
+            f"{self.get_name()} Strategy with {short_window}-period and {long_window}-period moving averages.\n\n"
             f"Signal Generation:\n"
             f"• BUY: When SMA{short_window} crosses above SMA{long_window} (bullish crossover)\n"
             f"• SELL: When SMA{short_window} crosses below SMA{long_window} (bearish crossover)\n\n"
@@ -208,7 +208,7 @@ class SMAStrategy(AbstractStrategy):
     
 
     @classmethod
-    def get_short_description(cls, config: Optional[Dict[str, Any]] = None) -> str:
+    def get_label(cls, config: Optional[Dict[str, Any]] = None) -> str:
         """
         Get a concise description of the strategy with optional parameter details.
         
@@ -228,12 +228,12 @@ class SMAStrategy(AbstractStrategy):
     
 
     @classmethod
-    def get_label(cls) -> str:
+    def get_name(cls) -> str:
         """
-        Get the full human-readable label of the strategy.
+        Get the human-readable name of the strategy.
         
         Returns:
-            Full strategy name for display in user interfaces.
+            Strategy name for display in user interfaces.
         """
         return "Simple Moving Average"
     
