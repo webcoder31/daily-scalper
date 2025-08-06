@@ -471,23 +471,17 @@ class BBStrategy(AbstractStrategy):
    - Check that ranges are valid for numeric parameters
 
 3. **Import errors**:
-   - Verify import paths use the new structure:
+   - Verify import paths:
      ```python
      from strategies.base.abstract_strategy import AbstractStrategy
      from strategies.base.strategy_registry import register_strategy
      ```
 
-4. **Method name errors**:
-   - Use the new method names:
-     - `get_abbreviated_name()` (not `get_short_label()`)
-     - `get_parameter_summary()` (not `get_short_description()`)
-     - `get_predefined_configurations()` (not `get_comparison_parameter_sets()`)
-
-5. **Charting issues**:
+4. **Charting issues**:
    - Make sure your `indicators` dictionary contains valid Series objects
    - Verify all Series have the same index as the input data
 
-6. **Performance problems**:
+5. **Performance problems**:
    - Use vectorized operations (avoid loops)
    - Leverage pandas and numpy for calculations
    - Profile your code to identify bottlenecks
