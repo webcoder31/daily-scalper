@@ -133,28 +133,28 @@ class StrategyBacktester:
             # Add cryptocurrency pair
             header_table.add_row(
                 "Crypto Pair",
-                f"[{THEME['success']}]{symbol}[/{THEME['success']}]"
+                f"[{THEME.success}]{symbol}[/{THEME.success}]"
             )
 
             # Add initial capital
             initial_cash = results['parameters']['initial_cash']
             header_table.add_row(
                 "Initial Capital",
-                f"[{THEME['success']}]${initial_cash:,.2f}[/{THEME['success']}]"
+                f"[{THEME.success}]${initial_cash:,.2f}[/{THEME.success}]"
             )
 
             # Add backtest period
             period_str = f"{period['start']} → {period['end']} ({period['duration_days']} days)"
             header_table.add_row(
                 "Backtest Period",
-                f"[{THEME['success']}]{period_str}[/{THEME['success']}]"
+                f"[{THEME.success}]{period_str}[/{THEME.success}]"
             )
 
             # Add strategy name
             strategy_name = strategy['name'].upper()
             header_table.add_row(
                 "Strategy",
-                f"[{THEME['highlight']}]{strategy_name}[/{THEME['highlight']}]"
+                f"[{THEME.highlight}]{strategy_name}[/{THEME.highlight}]"
             )
 
             # Add strategy parameters if available
@@ -163,7 +163,7 @@ class StrategyBacktester:
                 param_str = "\n".join([f"{k}: {v}" for k, v in params.items()])
                 header_table.add_row(
                     "Parameters",
-                    f"[{THEME['accent']}]{param_str}[/{THEME['accent']}]"
+                    f"[{THEME.accent}]{param_str}[/{THEME.accent}]"
                 )
 
             console.print(header_table)
@@ -217,7 +217,7 @@ class StrategyBacktester:
             tested_strategy = f"{results['strategy_label']} for {results['symbol']}"
             status_text = f"✅ {tested_strategy} is PROFITABLE" if is_profitable \
                          else f"❌ {tested_strategy} is NOT PROFITABLE"
-            status_style = THEME["success"] if is_profitable else THEME["error"]
+            status_style = THEME.success if is_profitable else THEME.error
 
             print()
             console.print(Text(status_text, style=status_style))
@@ -300,7 +300,7 @@ class StrategyBacktester:
                 console.print(ui_section_header(f"Running backtest with {param_str}"))
 
             # Step 1: Load historical data
-            console.print("Loading data...", style=THEME["table_border"])
+            console.print("Loading data...", style=THEME.table_border)
             try:
                 data = self.data_loader.fetch_cryptocurrency_data(symbol=symbol, period=period)
                 if data.empty:
@@ -310,7 +310,7 @@ class StrategyBacktester:
                     f"✅ {len(data)} data points loaded "
                     f"from {data.index[0].strftime('%Y-%m-%d')} "
                     f"to {data.index[-1].strftime('%Y-%m-%d')}\n",
-                    style=THEME["success"]
+                    style=THEME.success
                 )
             except Exception as e:
                 console.print(ui_error_message(
@@ -320,30 +320,30 @@ class StrategyBacktester:
                 raise DataLoadError(f"Data loading failed: {str(e)}") from e
 
             # Step 2: Create and initialize strategy
-            console.print("Initializing strategy...", style=THEME["table_border"])
+            console.print("Initializing strategy...", style=THEME.table_border)
             try:
                 strategy = create_strategy(strategy_name, **strategy_parameters)
-                console.print("✅ Strategy ready\n", style=THEME["success"])
-                console.print(f"{strategy.get_explanation()}\n", style=THEME["success"])
+                console.print("✅ Strategy ready\n", style=THEME.success)
+                console.print(f"{strategy.get_explanation()}\n", style=THEME.success)
             except Exception as e:
                 raise StrategyError(f"Strategy initialization failed: {str(e)}") from e
 
             # Step 3: Execute backtest
-            console.print("Executing backtest...", style=THEME["table_border"])
+            console.print("Executing backtest...", style=THEME.table_border)
             try:
                 results = self.backtest_engine.execute_strategy_evaluation(strategy, data, symbol=symbol)
-                console.print("✅ Backtest completed\n", style=THEME["success"])
+                console.print("✅ Backtest completed\n", style=THEME.success)
             except Exception as e:
                 raise BacktestError(f"Backtest execution failed: {str(e)}") from e
 
             # Step 4: Calculate advanced performance metrics
-            console.print("Calculating advanced metrics...", style=THEME["table_border"])
+            console.print("Calculating advanced metrics...", style=THEME.table_border)
             try:
                 results['metrics'] = PerformanceAnalyzer.compute_extended_performance_stats(results)
-                console.print("✅ Metrics computed\n", style=THEME["success"])
+                console.print("✅ Metrics computed\n", style=THEME.success)
             except Exception as e:
                 console.print(f"Warning: Advanced metrics calculation failed: {str(e)}", 
-                            style=THEME["warning"])
+                            style=THEME.warning)
 
             # Step 5: Display comprehensive results
             self.render_backtest_summary(results)
@@ -351,25 +351,25 @@ class StrategyBacktester:
             # Step 6: Generate visualizations
             if display_charts:
                 try:
-                    console.print("Generating charts...", style=THEME["accent"])
+                    console.print("Generating charts...", style=THEME.accent)
                     BacktestChartBuilder.display_charts(results)
                 except Exception as e:
                     console.print(f"Warning: Visualization failed: {str(e)}", 
-                                style=THEME["warning"])
+                                style=THEME.warning)
 
             # Step 7: Save profitable strategies
             if auto_save_profitable_results and PerformanceAnalyzer.meets_profitability_criteria(results['metrics']):
                 try:
                     console.print("\nProfitable strategy detected - Saving...", 
-                                style=THEME["dim"])
+                                style=THEME.dim)
                     save_id = self.strategy_archiver.save_strategy_results(results)
                     results['save_id'] = save_id
-                    console.print(f"✅ Strategy saved: {save_id}", style=THEME["success"])
+                    console.print(f"✅ Strategy saved: {save_id}", style=THEME.success)
                 except Exception as e:
                     console.print(f"Warning: Failed to save strategy: {str(e)}", 
-                                style=THEME["warning"])
+                                style=THEME.warning)
             elif auto_save_profitable_results:
-                console.print("⚠️  Unprofitable strategy - Not saved", style=THEME["warning"])
+                console.print("⚠️  Unprofitable strategy - Not saved", style=THEME.warning)
 
             return results
 
@@ -429,7 +429,7 @@ class StrategyBacktester:
 
             # Create progress table for real-time results
             progress_table = ui_modern_table("Comparison Results")
-            progress_table.add_column("Test", style=THEME["table_header"], width=8)
+            progress_table.add_column("Test", style=THEME.table_header, width=8)
             progress_table.add_column("Configuration", width=32)
             progress_table.add_column("Return", justify="right", width=12)
             progress_table.add_column("Sharpe", justify="right", width=10)
@@ -485,7 +485,7 @@ class StrategyBacktester:
 
                 except Exception as e:
                     console.print(f"Error testing configuration {i}: {str(e)}", 
-                                style=THEME["error"])
+                                style=THEME.error)
                     progress_table.add_row(
                         f"{i}/{len(configurations)}",
                         "Configuration Error",
@@ -505,7 +505,7 @@ class StrategyBacktester:
                 self._display_strategy_rankings(strategy_name, results_list)
             else:
                 console.print("❌ No valid results obtained for comparison.", 
-                            style=THEME["error"])
+                            style=THEME.error)
 
         except StrategyError:
             raise
@@ -529,7 +529,7 @@ class StrategyBacktester:
             ranked_strategies = PerformanceAnalyzer.sort_strategies_by_performance(results_list)
 
             ranking_table = ui_modern_table("Strategy Ranking")
-            ranking_table.add_column("Rank", style=THEME["table_header"], width=5)
+            ranking_table.add_column("Rank", style=THEME.table_header, width=5)
             ranking_table.add_column("Configuration", width=25)
             ranking_table.add_column("Return", justify="right", width=15)
             ranking_table.add_column("Sharpe", justify="right", width=15)
@@ -563,7 +563,7 @@ class StrategyBacktester:
             console.print(ranking_table)
             
         except Exception as e:
-            console.print(f"Error displaying rankings: {str(e)}", style=THEME["error"])
+            console.print(f"Error displaying rankings: {str(e)}", style=THEME.error)
 
 
     def display_saved_results(self) -> None:
@@ -591,7 +591,7 @@ class StrategyBacktester:
 
             # Create table for saved strategies
             saved_table = ui_modern_table("Profitable Strategies", show_line=True)
-            saved_table.add_column("ID", justify="left", style=THEME["table_header"], width=5)
+            saved_table.add_column("ID", justify="left", style=THEME.table_header, width=5)
             saved_table.add_column("Strategy", justify="left", width=35)
             saved_table.add_column("Crypto", justify="left", width=12)
             saved_table.add_column("Return", justify="right", width=12)
@@ -606,9 +606,9 @@ class StrategyBacktester:
                 
                 # Create multi-line strategy cell
                 strategy_cell = (
-                    Text(strategy.get('strategy_label', ''), style=THEME["highlight"]) + 
+                    Text(strategy.get('strategy_label', ''), style=THEME.highlight) + 
                     "\n" + 
-                    Text(strategy_info.get('name', 'N/A'), style=THEME["dim"])
+                    Text(strategy_info.get('name', 'N/A'), style=THEME.dim)
                 )
 
                 saved_table.add_row(
@@ -627,7 +627,7 @@ class StrategyBacktester:
             if len(strategies) > 10:
                 console.print(
                     f"{len(strategies) - 10} additional strategy(s) available...", 
-                    style=THEME["dim"]
+                    style=THEME.dim
                 )
 
         except Exception as e:

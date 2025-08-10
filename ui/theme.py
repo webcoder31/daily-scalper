@@ -441,40 +441,43 @@ class ThemeManager:
         return custom_theme
 
 
-# Default theme configuration for the Trading Strategy Backtester application
-THEME: Dict[str, str] = {
+from dataclasses import dataclass
+
+@dataclass
+class Theme:
     # Core colors - primary application colors
-    "primary": "bold bright_cyan",
-    "secondary": "white",
-    "accent": "bold bright_blue",
+    primary: str = "bold bright_cyan"
+    secondary: str = "white"
+    accent: str = "bold bright_blue"
     
     # Status colors - for success, error, warning, and info messages
-    "success": "bold green",
-    "error": "bold red",
-    "warning": "bold yellow",
-    "info": "dim",
+    success: str = "bold green"
+    error: str = "bold red"
+    warning: str = "bold yellow"
+    info: str = "dim"
     
     # Text styling
-    "dim": "dim",
-    "highlight": "bold bright_magenta",
+    dim: str = "dim"
+    highlight: str = "bold bright_magenta"
     
     # Table and border styles - for Rich table components
-    "table_border": "grey37",
-    "table_style": "white",
-    "table_title": "bold bright_blue",
-    "table_title_secondary": "bold bright_magenta",
-    "table_header": "grey37 bold",
+    table_border: str = "grey37"
+    table_style: str = "white"
+    table_title: str = "bold bright_blue"
+    table_title_secondary: str = "bold bright_magenta"
+    table_header: str = "grey37 bold"
     
     # Panel and selection styles
-    "selected": "bold bright_cyan",
-    "panel_border": "grey37",
+    selected: str = "bold bright_cyan"
+    panel_border: str = "grey37"
     
     # Status and prompt styles - for user interaction
-    "status": "bold bright_cyan",
-    "prompt": "bold bright_cyan underline",
-    "title": "bold bright_cyan underline",
-    "subtitle": "bold bright_blue",
-}
+    status: str = "bold bright_cyan"
+    prompt: str = "bold bright_cyan underline"
+    title: str = "bold bright_cyan underline"
+    subtitle: str = "bold bright_blue"
+
+THEME = Theme()
 
 
 # Valid Rich color names for reference and validation

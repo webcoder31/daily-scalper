@@ -84,12 +84,12 @@ class MenuNavigationError(Exception):
 def ui_interactive_menu(
     entries: List[Dict[str, str]],
     title: Optional[str] = None,
-    title_style: str = THEME["title"],
+    title_style: str = THEME.title,
     width: int = 100,
-    option_style: str = THEME["primary"],
-    desc_style: str = THEME["secondary"],
-    selected_style: str = THEME["selected"],
-    border_style: str = THEME["table_border"],
+    option_style: str = THEME.primary,
+    desc_style: str = THEME.secondary,
+    selected_style: str = THEME.selected,
+    border_style: str = THEME.table_border,
     default: int = 1,
     prompt_text: Optional[str] = None,
     print_selected: bool = True,
@@ -146,7 +146,7 @@ def ui_interactive_menu(
                 table = Table(
                     show_header=False,
                     box=box.SIMPLE,
-                    style=THEME["table_style"],
+                    style=THEME.table_style,
                     border_style=border_style,
                     width=width
                 )
@@ -350,7 +350,7 @@ def ui_modern_table(
             raise ValueError("title cannot be empty")
         
         # Use theme defaults with optional overrides
-        final_title_style = title_style or THEME["table_title"]
+        final_title_style = title_style or THEME.table_title
         final_box_style = box_style or box.SIMPLE
         
         table = Table(
@@ -360,9 +360,9 @@ def ui_modern_table(
             box=final_box_style,
             pad_edge=False,
             expand=expand,
-            style=THEME["table_style"],
-            header_style=THEME["table_header"],
-            border_style=THEME["table_border"],
+            style=THEME.table_style,
+            header_style=THEME.table_header,
+            border_style=THEME.table_border,
             show_lines=show_line,
         )
         
@@ -419,7 +419,7 @@ def ui_block_header(
             Text(content, justify="center"),
             title=title,
             padding=padding,
-            border_style=THEME["panel_border"],
+            border_style=THEME.panel_border,
             box=final_box_style
         )
         
@@ -467,7 +467,7 @@ def ui_section_header(
         if align not in ["left", "center", "right"]:
             raise ValueError("align must be 'left', 'center', or 'right'")
         
-        final_style = style or THEME["dim"]
+        final_style = style or THEME.dim
         
         rule = Rule(
             Text(label.upper(), style=final_style),
@@ -523,8 +523,8 @@ def ui_error_message(
             formatted_message,
             title=f"{icon} {title}",
             title_align="left",
-            border_style=THEME["error"],
-            style=THEME["error"],
+            border_style=THEME.error,
+            style=THEME.error,
             padding=(1, 2)
         )
         
@@ -537,8 +537,8 @@ def ui_error_message(
             f"Error displaying error message: {str(e)}\nOriginal message: {str(message)}",
             title="❌ Error Display Error",
             title_align="left",
-            border_style=THEME["error"],
-            style=THEME["error"],
+            border_style=THEME.error,
+            style=THEME.error,
             padding=(1, 2)
         )
         return Group(Text(""), fallback_panel)
@@ -620,8 +620,8 @@ def ui_success_message(message: str, title: str = "Success") -> Group:
             message,
             title=f"{icon} {title}",
             title_align="left",
-            border_style=THEME["success"],
-            style=THEME["success"],
+            border_style=THEME.success,
+            style=THEME.success,
             padding=(1, 2)
         )
         
@@ -658,8 +658,8 @@ def ui_warning_message(message: str, title: str = "Warning") -> Group:
             message,
             title=f"{icon} {title}",
             title_align="left",
-            border_style=THEME["warning"],
-            style=THEME["warning"],
+            border_style=THEME.warning,
+            style=THEME.warning,
             padding=(1, 2)
         )
         
@@ -696,8 +696,8 @@ def ui_info_message(message: str, title: str = "Information") -> Group:
             message,
             title=f"{icon} {title}",
             title_align="left",
-            border_style=THEME["info"],
-            style=THEME["info"],
+            border_style=THEME.info,
+            style=THEME.info,
             padding=(1, 2)
         )
         

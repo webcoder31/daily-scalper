@@ -127,7 +127,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
         selected_strategy_name = strategy_names[strategy_choice - 1]
 
         # Parameter collection - Symbol and Period
-        console.print("\nBacktest parameters:", style=THEME["table_title"])
+        console.print("\nBacktest parameters:", style=THEME.table_title)
         
         symbol = prompt_user_for_input(
             "Crypto pair", 
@@ -139,7 +139,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
 
         console.print(
             f"Available periods: {PeriodTranslator.get_available_periods()}",
-            style=THEME["dim"]
+            style=THEME.dim
         )
         
         period = prompt_user_for_input(
@@ -155,7 +155,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
         param_info = get_strategy_parameter_info(selected_strategy_name)
 
         if param_info:
-            console.print("\nStrategy parameters:", style=THEME["table_title"])
+            console.print("\nStrategy parameters:", style=THEME.table_title)
             
             for param_name, param_config in param_info.items():
                 param_type = param_config.get('type', str)
@@ -178,7 +178,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
                 strategy_parameters[param_name] = value
 
         # Chart and save options
-        console.print("\nOptional features:", style=THEME["table_title"])
+        console.print("\nOptional features:", style=THEME.table_title)
         
         display_charts = Confirm.ask("Show charts?", default=False)
         if display_charts is None:
@@ -191,7 +191,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
         # Execute the backtest
         console.print(
             f"\nTesting strategy '{selected_strategy_name}'...", 
-            style=THEME["accent"]
+            style=THEME.accent
         )
         
         app.execute_strategy_backtest(
@@ -204,7 +204,7 @@ def handle_single_strategy_test(app: StrategyBacktester) -> None:
         )
 
     except UserCancelledError:
-        console.print("Operation cancelled by user", style=THEME["warning"])
+        console.print("Operation cancelled by user", style=THEME.warning)
     except TradingStrategyBacktesterError as e:
         console.print(ui_error_message(str(e), "Backtest Error"))
     except Exception as e:
@@ -255,7 +255,7 @@ def handle_strategy_comparison(app: StrategyBacktester) -> None:
 
         console.print(
             f"Available periods: {PeriodTranslator.get_available_periods()}",
-            style=THEME["dim"]
+            style=THEME.dim
         )
         
         period = prompt_user_for_input(
@@ -276,7 +276,7 @@ def handle_strategy_comparison(app: StrategyBacktester) -> None:
         if custom_configs:
             configurations = _collect_custom_configurations(selected_strategy_name)
             if not configurations:
-                console.print("No configurations provided, using defaults", style=THEME["warning"])
+                console.print("No configurations provided, using defaults", style=THEME.warning)
 
         # Execute comparison
         app.analyze_strategy_variants(
@@ -286,10 +286,10 @@ def handle_strategy_comparison(app: StrategyBacktester) -> None:
             configurations=configurations
         )
         
-        console.print("✅ Comparison completed!", style=THEME["success"])
+        console.print("✅ Comparison completed!", style=THEME.success)
 
     except UserCancelledError:
-        console.print("Operation cancelled by user", style=THEME["warning"])
+        console.print("Operation cancelled by user", style=THEME.warning)
     except TradingStrategyBacktesterError as e:
         console.print(ui_error_message(str(e), "Comparison Error"))
     except Exception as e:
@@ -312,13 +312,13 @@ def _collect_custom_configurations(strategy_name: str) -> List[Dict[str, Any]]:
     configurations = []
     console.print(
         "\nEnter up to 5 configurations (leave blank to finish):", 
-        style=THEME["table_title"]
+        style=THEME.table_title
     )
 
     param_info = get_strategy_parameter_info(strategy_name)
     
     for i in range(1, 6):
-        console.print(f"\nConfiguration #{i}:", style=THEME["table_header"])
+        console.print(f"\nConfiguration #{i}:", style=THEME.table_header)
         config = {}
 
         for param_name, param_config in param_info.items():
@@ -443,7 +443,7 @@ def handle_configuration_display() -> None:
         # Configuration modification instructions
         console.print(
             "\nTo modify the configuration:\n", 
-            style=THEME["accent"] + " underline"
+            style=THEME.accent + " underline"
         )
         console.print("1. Edit the 'config.py' file")
         console.print("2. Restart the application")
@@ -452,7 +452,7 @@ def handle_configuration_display() -> None:
     except Exception as e:
         console.print(
             f"❌ Error reading configuration: {e}", 
-            style=THEME["error"]
+            style=THEME.error
         )
 
 
@@ -569,13 +569,13 @@ def main() -> int:
             except KeyboardInterrupt:
                 console.print(
                     "\nUser requested app interruption (CTRL+C)", 
-                    style=THEME["warning"]
+                    style=THEME.warning
                 )
                 break
             except Exception as e:
                 console.print(
                     f"❌ Unexpected error in menu: {e}", 
-                    style=THEME["error"]
+                    style=THEME.error
                 )
 
             # Wait for user acknowledgment before continuing
@@ -585,14 +585,14 @@ def main() -> int:
             except KeyboardInterrupt:
                 break
 
-        console.print("\nGoodbye.\n", style=THEME["highlight"])
+        console.print("\nGoodbye.\n", style=THEME.highlight)
         return 0
 
     except TradingStrategyBacktesterError as e:
-        console.print(f"❌ Application error: {e}", style=THEME["error"])
+        console.print(f"❌ Application error: {e}", style=THEME.error)
         return 1
     except Exception as e:
-        console.print(f"❌ Critical error: {e}", style=THEME["error"])
+        console.print(f"❌ Critical error: {e}", style=THEME.error)
         return 2
 
 
