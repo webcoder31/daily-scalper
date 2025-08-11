@@ -7,14 +7,14 @@ technical indicators, and performance metrics with robust error handling and
 customization options.
 
 Classes:
-    BacktestChartBuilder: Main class for creating interactive charts.
+    ChartBuilder: Main class for creating interactive charts.
     ChartError: Custom exception for chart errors
     ChartConfigurationError: Custom exception for chart configuration errors
     ChartDataError: Custom exception for chart data errors
 
 Example:
-    >>> from charting.backtest_chart_builder import BacktestChartBuilder
-    >>> chart_builder = BacktestChartBuilder()
+    >>> from charting.chart_builder import ChartBuilder
+    >>> chart_builder = ChartBuilder()
     >>> chart = chart_builder.create_backtest_charts(backtest_results)
     >>> chart.show()
 """
@@ -85,7 +85,7 @@ class ChartDataError(Exception):
         super().__init__(message)
 
 
-class BacktestChartBuilder:
+class ChartBuilder:
     """
     Class for creating interactive charts of cryptocurrency trading backtest results.
     
@@ -100,7 +100,7 @@ class BacktestChartBuilder:
         SUBPLOT_SPACING: Default spacing between subplots.
         
     Example:
-        >>> chart_builder = BacktestChartBuilder()
+        >>> chart_builder = ChartBuilder()
         >>> main_chart = chart_builder.create_backtest_charts(results)
         >>> metrics_chart = chart_builder.create_performance_metrics_chart(results)
         >>> drawdown_chart = chart_builder.create_drawdown_chart(results)
@@ -523,14 +523,14 @@ class BacktestChartBuilder:
             ChartError: If any chart creation fails.
             
         Example:
-            >>> BacktestChartBuilder.display_charts(backtest_results)
+            >>> ChartBuilder.display_charts(backtest_results)
         """
         try:
             logger.info("Displaying all performance charts")
             
             # Main backtest chart
             try:
-                main_chart = BacktestChartBuilder.create_backtest_charts(results)
+                main_chart = ChartBuilder.create_backtest_charts(results)
                 main_chart.show()
                 logger.debug("Main backtest chart displayed")
             except Exception as e:
@@ -539,7 +539,7 @@ class BacktestChartBuilder:
 
             # Performance metrics chart
             try:
-                metrics_chart = BacktestChartBuilder.create_performance_metrics_chart(results)
+                metrics_chart = ChartBuilder.create_performance_metrics_chart(results)
                 metrics_chart.show()
                 logger.debug("Performance metrics chart displayed")
             except Exception as e:
@@ -548,7 +548,7 @@ class BacktestChartBuilder:
 
             # Drawdown chart
             try:
-                drawdown_chart = BacktestChartBuilder.create_drawdown_chart(results)
+                drawdown_chart = ChartBuilder.create_drawdown_chart(results)
                 drawdown_chart.show()
                 logger.debug("Drawdown chart displayed")
             except Exception as e:
@@ -687,7 +687,7 @@ class BacktestChartBuilder:
             
         Example:
             >>> chart = chart_builder.create_backtest_charts(results)
-            >>> saved_path = BacktestChartBuilder.save_chart_to_html_file(chart, "backtest_chart", "html")
+            >>> saved_path = ChartBuilder.save_chart_to_html_file(chart, "backtest_chart", "html")
         """
         try:
             if not isinstance(filename, str) or not filename.strip():

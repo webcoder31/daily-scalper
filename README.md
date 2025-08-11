@@ -39,9 +39,12 @@ with an interactive menu and clear visualizations. No coding required for basic 
    cd trading-strategy-backtester
    ```
 
-2. **Create a virtual environment (recommended)**
+2. **Create and activate a virtual environment**
    ```bash
    python3 -m venv venv
+   ```
+
+   ```bash
    source venv/bin/activate  # On macOS/Linux
    # or
    venv\Scripts\activate     # On Windows
@@ -134,10 +137,16 @@ trading-strategy-backtester/
 │   ├── backtest_engine.py                # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
 ├── cache/                                # Cached market data (created at runtime)
+├── charting/                             # Chart generation
+│   ├── __init__.py
+│   └── chart_builder.py                  # Interactive chart builder
 ├── core/                                 # Core application logic
 │   ├── __init__.py
 │   ├── interactive_cli.py                # CLI and menu system
 │   └── strategy_backtester.py            # Main application controller
+├── logging/                              # Application logging
+│   ├── __init__.py
+│   └── logging_manager.py                # Logging configuration manager
 ├── market_data/                          # Market data management
 │   ├── __init__.py
 │   ├── market_data_provider.py           # Data fetching and caching
@@ -161,16 +170,10 @@ trading-strategy-backtester/
 │       ├── ema_rsi_strategy.py           # EMA + RSI strategy
 │       ├── rsi_strategy.py               # RSI strategy
 │       └── sma_strategy.py               # SMA Crossover strategy
-├── ui/                                   # User interface components
-│   ├── __init__.py
-│   ├── components.py                     # UI components and menus
-│   └── theme.py                          # Theme and styling
-├── logging/                              # Application logging
-│   ├── __init__.py
-│   └── logging_manager.py                # Logging configuration manager
-└── charting/                             # Chart generation
+└── ui/                                   # User interface components
     ├── __init__.py
-    └── backtest_chart_builder.py         # Interactive chart builder
+    ├── components.py                     # UI components and menus
+    └── theme.py                          # Theme and styling
 ```
 
 ---
@@ -202,7 +205,7 @@ Calculates comprehensive performance metrics:
 - `sort_strategies_by_performance()` - Rank strategy performance
 - `create_detailed_analysis_report()` - Generate performance reports
 
-### BacktestChartBuilder
+### ChartBuilder
 Creates interactive visualizations:
 - `create_backtest_charts()` - Create strategy performance charts
 - `display_charts()` - Show comprehensive chart suite

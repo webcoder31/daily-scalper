@@ -287,11 +287,11 @@ def test_utils_integration() -> Dict[str, Any]:
         
         # Test chart generator
         print("Testing chart generator...")
-        from charting.chart_builder import ChartBuilder
+        from charting.chart_builder import BacktestChartBuilder
         
-        chart_generator = ChartBuilder()
-        print("✓ ChartBuilder instantiated successfully")
-        results['tests_passed'].append("ChartBuilder instantiation")
+        chart_generator = BacktestChartBuilder()
+        print("✓ BacktestChartBuilder instantiated successfully")
+        results['tests_passed'].append("BacktestChartBuilder instantiation")
         
     except Exception as e:
         error_msg = f"logging integration test failed: {str(e)}"

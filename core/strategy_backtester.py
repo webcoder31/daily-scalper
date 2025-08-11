@@ -28,7 +28,7 @@ from rich import box
 from backtesting.backtest_engine import BacktestEngine
 from backtesting.performance_analyzer import PerformanceAnalyzer
 from market_data.market_data_provider import MarketDataProvider
-from charting.backtest_chart_builder import BacktestChartBuilder
+from charting.chart_builder import ChartBuilder
 from persistence.strategy_archiver import StrategyArchiver
 from market_data.period_translator import PeriodTranslator
 from strategies.base.strategy_registry import (
@@ -352,7 +352,7 @@ class StrategyBacktester:
             if display_charts:
                 try:
                     console.print("Generating charts...", style=THEME.accent)
-                    BacktestChartBuilder.display_charts(results)
+                    ChartBuilder.display_charts(results)
                 except Exception as e:
                     console.print(f"Warning: Visualization failed: {str(e)}", 
                                 style=THEME.warning)

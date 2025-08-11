@@ -42,10 +42,16 @@ trading-strategy-backtester/
 │   ├── backtest_engine.py                # Backtesting execution
 │   └── performance_analyzer.py           # Performance analysis and metrics
 ├── cache/                                # Cached market data (created at runtime)
+├── charting/                             # Chart generation
+│   ├── __init__.py
+│   └── chart_builder.py                  # Interactive chart builder
 ├── core/                                 # Core application logic
 │   ├── __init__.py
 │   ├── interactive_cli.py                # CLI and menu system
 │   └── strategy_backtester.py            # Main application controller
+├── logging/                              # Application logging
+│   ├── __init__.py
+│   └── logging_manager.py                # Logging configuration manager
 ├── market_data/                          # Market data management
 │   ├── __init__.py
 │   ├── market_data_provider.py           # Data fetching and caching
@@ -69,16 +75,10 @@ trading-strategy-backtester/
 │       ├── ema_rsi_strategy.py           # EMA + RSI strategy
 │       ├── rsi_strategy.py               # RSI strategy
 │       └── sma_strategy.py               # SMA Crossover strategy
-├── ui/                                   # User interface components
-│   ├── __init__.py
-│   ├── components.py                     # UI components and menus
-│   └── theme.py                          # Theme and styling
-├── logging/                              # Application logging
-│   ├── __init__.py
-│   └── logging_manager.py                # Logging configuration manager
-└── charting/                             # Chart generation
+└── ui/                                   # User interface components
     ├── __init__.py
-    └── backtest_chart_builder.py         # Interactive chart builder
+    ├── components.py                     # UI components and menus
+    └── theme.py                          # Theme and styling
 ```
 
 ---
@@ -101,7 +101,7 @@ The central orchestrator that coordinates all backtesting operations.
 - `BacktestEngine` for backtest execution
 - `PerformanceAnalyzer` for metrics calculation
 - `MarketDataProvider` for data loading
-- `BacktestChartBuilder` for charting
+- `ChartBuilder` for charting
 - `StrategyArchiver` for result storage
 
 ### Strategy System
@@ -204,9 +204,9 @@ Handles cryptocurrency data fetching, caching, and validation.
 
 ### Charting
 
-#### BacktestChartBuilder
+#### ChartBuilder
 
-**Location**: [`charting/backtest_chart_builder.py`](charting/backtest_chart_builder.py)
+**Location**: [`charting/chart_builder.py`](charting/chart_builder.py)
 
 Creates interactive charts using Plotly for strategy analysis.
 
@@ -293,7 +293,7 @@ setup_application_logging(
 3. **Signal Generation**: `strategy.generate_signals(data)`
 4. **Backtest Execution**: `BacktestEngine.execute_strategy_evaluation()`
 5. **Metrics Calculation**: `PerformanceAnalyzer.compute_extended_performance_stats()`
-6. **Charting**: `BacktestChartBuilder.display_charts()`
+6. **Charting**: `ChartBuilder.display_charts()`
 7. **Persistence**: `StrategyArchiver.persist_strategy_results()` (if profitable)
 
 ### Strategy Comparison
@@ -432,7 +432,7 @@ Add new metrics to `PerformanceAnalyzer` for specialized analysis requirements.
 
 ### Enhanced Visualizations
 
-Extend `BacktestChartBuilder` with additional chart types and indicators.
+Extend `ChartBuilder` with additional chart types and indicators.
 
 ### Alternative UI Interfaces
 

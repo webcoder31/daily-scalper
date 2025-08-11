@@ -24,7 +24,7 @@ def test_imports():
         from backtesting.backtest_engine import BacktestEngine
         from backtesting.performance_analyzer import PerformanceAnalyzer
         from market_data.market_data_provider import MarketDataProvider
-        from charting.chart_builder import ChartBuilder
+        from charting.chart_builder import BacktestChartBuilder
         from persistence.strategy_archiver import StrategyArchiver
         print("✅ All modules imported successfully")
         return True

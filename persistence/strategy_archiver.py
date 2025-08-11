@@ -452,23 +452,23 @@ class StrategyArchiver:
         """
         try:
             # Import here to avoid circular imports
-            from charting.backtest_chart_builder import BacktestChartBuilder
+            from charting.chart_builder import ChartBuilder
             
             # Save main chart
             main_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['main_chart']}"
-            main_chart = BacktestChartBuilder.create_backtest_charts(results)
+            main_chart = ChartBuilder.create_backtest_charts(results)
             main_chart.write_html(str(main_chart_path))
             logger.debug(f"Main chart saved: {main_chart_path}")
             
             # Save metrics chart
             metrics_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['metrics_chart']}"
-            metrics_chart = BacktestChartBuilder.create_performance_metrics_chart(results)
+            metrics_chart = ChartBuilder.create_performance_metrics_chart(results)
             metrics_chart.write_html(str(metrics_chart_path))
             logger.debug(f"Metrics chart saved: {metrics_chart_path}")
             
             # Save drawdown chart
             drawdown_chart_path = self.charts_dir / f"{save_id}{self.FILE_EXTENSIONS['drawdown_chart']}"
-            drawdown_chart = BacktestChartBuilder.create_drawdown_chart(results)
+            drawdown_chart = ChartBuilder.create_drawdown_chart(results)
             drawdown_chart.write_html(str(drawdown_chart_path))
             logger.debug(f"Drawdown chart saved: {drawdown_chart_path}")
             
