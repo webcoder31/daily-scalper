@@ -447,7 +447,7 @@ from dataclasses import dataclass
 class Theme:
     # Core colors - primary application colors
     primary: str = "bold bright_cyan"
-    secondary: str = "white"
+    secondary: str = "bright_yellow"
     accent: str = "bold bright_blue"
     
     # Status colors - for success, error, warning, and info messages

@@ -86,7 +86,7 @@ def ui_interactive_menu(
     title: Optional[str] = None,
     title_style: str = THEME.title,
     width: int = 100,
-    option_style: str = THEME.primary,
+    option_style: str = THEME.secondary,
     desc_style: str = THEME.secondary,
     selected_style: str = THEME.selected,
     border_style: str = THEME.table_border,

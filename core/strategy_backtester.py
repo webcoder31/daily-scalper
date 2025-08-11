@@ -324,7 +324,7 @@ class StrategyBacktester:
             try:
                 strategy = create_strategy(strategy_name, **strategy_parameters)
                 console.print("✅ Strategy ready\n", style=THEME.success)
-                console.print(f"{strategy.get_explanation()}\n", style=THEME.success)
+                console.print(f"{strategy.get_explanation()}\n", style=THEME.secondary)
             except Exception as e:
                 raise StrategyError(f"Strategy initialization failed: {str(e)}") from e
 
@@ -428,7 +428,7 @@ class StrategyBacktester:
             results_list: List[Dict[str, Any]] = []
 
             # Create progress table for real-time results
-            progress_table = ui_modern_table("Comparison Results")
+            progress_table = ui_modern_table("Comparison Results", show_line=True)
             progress_table.add_column("Test", style=THEME.table_header, width=8)
             progress_table.add_column("Configuration", width=32)
             progress_table.add_column("Return", justify="right", width=12)
@@ -528,7 +528,7 @@ class StrategyBacktester:
         try:
             ranked_strategies = PerformanceAnalyzer.sort_strategies_by_performance(results_list)
 
-            ranking_table = ui_modern_table("Strategy Ranking")
+            ranking_table = ui_modern_table("Strategy Ranking", show_line=True)
             ranking_table.add_column("Rank", style=THEME.table_header, width=5)
             ranking_table.add_column("Configuration", width=25)
             ranking_table.add_column("Return", justify="right", width=15)
