@@ -34,9 +34,9 @@ type annotations, and robust error handling.
 trading-strategy-backtester/
 ├── main.py                               # Entry point
 ├── config.py                             # Global configuration
-├── functional_test.py                    # Functional testing
-├── test_setup.py                         # Setup validation
-├── validation_test.py                    # Comprehensive validation
+├── check_app_setup.py                    # Check application setup
+├── check_app_core.py                     # Check core functionality
+├── check_app_health.py                   # Comprehensive system validation
 ├── backtesting/                          # Backtesting engine and analysis
 │   ├── __init__.py
 │   ├── backtest_engine.py                # Backtesting execution
@@ -383,21 +383,21 @@ from backtesting.backtest_engine import BacktestError
 
 ### Test Files
 
-- **[`test_setup.py`](test_setup.py)**: Environment and dependency validation
-- **[`functional_test.py`](functional_test.py)**: End-to-end functionality testing
-- **[`validation_test.py`](validation_test.py)**: Comprehensive system validation
+- **[`check_app_setup.py`](check_app_setup.py)**: Environment and dependency validation
+- **[`check_app_core.py`](check_app_core.py)**: Check core functionality
+- **[`check_app_health.py`](check_app_health.py)**: Comprehensive system validation
 
 ### Running Tests
 
 ```bash
 # Environment validation
-python test_setup.py
+python check_app_setup.py
 
 # Functional testing
-python functional_test.py
+python check_app_core.py
 
 # Comprehensive validation
-python validation_test.py
+python check_app_health.py
 ```
 
 ---

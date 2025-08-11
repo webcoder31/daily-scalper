@@ -54,7 +54,7 @@ with an interactive menu and clear visualizations. No coding required for basic 
 
 4. **Test the installation**
    ```bash
-   python test_setup.py
+   python check_app_setup.py
    ```
    If all tests pass, you're ready to go!
 
@@ -126,9 +126,9 @@ The application follows a professional modular architecture:
 trading-strategy-backtester/
 ├── main.py                               # Entry point
 ├── config.py                             # Global configuration
-├── functional_test.py                    # Functional testing
-├── test_setup.py                         # Setup validation
-├── validation_test.py                    # Comprehensive validation
+├── check_app_setup.py                    # Check application setup
+├── check_app_core.py                     # Check core functionality
+├── check_app_health.py                   # Comprehensive system validation
 ├── backtesting/                          # Backtesting engine and analysis
 │   ├── __init__.py
 │   ├── backtest_engine.py                # Backtesting execution

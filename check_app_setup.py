@@ -228,7 +228,7 @@ def main():
         print("\n🔧 Recommended actions:")
         print("   1. Install dependencies: pip install -r requirements.txt")
         print("   2. Check file structure")
-        print("   3. Run tests again: python test_setup.py")
+        print("   3. Run tests again: python check_app_setup.py")
     
     print("=" * 60)
     return 0 if passed == total else 1
